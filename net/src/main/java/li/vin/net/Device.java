@@ -14,7 +14,7 @@ import rx.Observable;
  * Created by kyle on 6/21/14.
  */
 public final class Device implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Device>>() {}.getType();
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Device>>() { }.getType();
 
   private final String id;
   private final String chipId;

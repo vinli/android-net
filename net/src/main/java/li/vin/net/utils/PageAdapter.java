@@ -22,7 +22,9 @@ public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter imple
 
   private int mCount = 0;
 
+  // CHECKSTYLE.OFF: VisibilityModifier
   protected final String mTag;
+  // CHECKSTYLE.ON
 
   public PageAdapter() {
     mTag = ((Object) this).getClass().getSimpleName();

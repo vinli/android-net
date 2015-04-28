@@ -14,7 +14,7 @@ import rx.Observable;
  * Created by kyle on 7/10/14.
  */
 public final class Group implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Group>>() {}.getType();
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Group>>() { }.getType();
 
   private final String id, name;
   private final Links links;

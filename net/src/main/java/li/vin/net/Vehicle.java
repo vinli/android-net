@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Created by ottowagner on 6/27/14.
  */
 public final class Vehicle implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Vehicle>>() {}.getType();
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Vehicle>>() { }.getType();
 
   private final String id;
   private final String make;

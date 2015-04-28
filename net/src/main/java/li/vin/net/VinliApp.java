@@ -100,7 +100,7 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
    * It will be gone soon.</Ul>
    */
   public Observable<Device> registerDevice(String deviceID) {
-    return  mDevices.registerDevice(new Device(deviceID,null,null,null));
+    return  mDevices.registerDevice(new Device(deviceID, null, null, null));
   }
 
   @Override public Observable<Device> registerDevice(Device device) {
@@ -143,7 +143,7 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
     return mLinkLoader;
   }
 
-  private static final <T> void registerPageAdapter(GsonBuilder b, Type t, Class<T> cls, LinkLoader loader) {
+  private static <T> void registerPageAdapter(GsonBuilder b, Type t, Class<T> cls, LinkLoader loader) {
     b.registerTypeAdapter(t, PageConverter.create(cls, t, loader));
   }
 

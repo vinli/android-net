@@ -11,7 +11,7 @@ import rx.internal.operators.OnSubscribeFromIterable;
  * Created by kyle on 7/7/14.
  */
 public final class Page<T> {
-  /*package*/ static final <T> Page<T> create(List<T> items, Meta meta, LinkLoader linkLoader, Type type) {
+  /*package*/ static <T> Page<T> create(List<T> items, Meta meta, LinkLoader linkLoader, Type type) {
     if (items == null) {
       throw new IllegalArgumentException("items == null");
     }
@@ -72,15 +72,19 @@ public final class Page<T> {
   }
 
   /*package*/ static final class Meta {
+    // CHECKSTYLE.OFF: VisibilityModifier
     public final Pagination pagination;
+    // CHECKSTYLE.ON
 
     public Meta(Pagination pagination) {
       this.pagination = pagination;
     }
 
-    /*package*/ static final class Pagination {
+    public static final class Pagination {
       public final int total, limit, offset;
+      // CHECKSTYLE.OFF: VisibilityModifier
       public final Links links;
+      // CHECKSTYLE.ON
 
       public Pagination(int total, int limit, int offset, Links links) {
         this.total = total;
@@ -89,7 +93,7 @@ public final class Page<T> {
         this.links = links;
       }
 
-      /*package*/ static final class Links {
+      public static final class Links {
         public final String first, last, next, prev;
 
         public Links(String first, String last, String next, String prev) {
