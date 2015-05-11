@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +20,7 @@ import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 
-public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
+public final class VinliApp implements Devices, Diagnostics, Vehicles {
 
   public static VinliApp create(String id, String key) {
     return new VinliApp(id, key);
@@ -28,7 +29,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
   private final Vehicles mVehicles;
-  private final Groups mGroups;
   private final LinkLoader mLinkLoader;
 
   private VinliApp(String id, String key) {
@@ -45,7 +45,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
 
     registerPageAdapter(gsonB, Device.PAGE_TYPE, Device.class, mLinkLoader);
     registerPageAdapter(gsonB, Vehicle.PAGE_TYPE, Vehicle.class, mLinkLoader);
-    registerPageAdapter(gsonB, Group.PAGE_TYPE, Group.class, mLinkLoader);
 
     final GsonConverter gson = new GsonConverter(gsonB.create());
     gf.setGson(gson);
@@ -69,7 +68,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
     mDevices = platformAdapter.create(Devices.class);
     mDiagnostics = diagnosticsAdapter.create(Diagnostics.class);
     mVehicles = platformAdapter.create(Vehicles.class);
-    mGroups = platformAdapter.create(Groups.class);
   }
 
   @Override public Observable<Page<Device>> getDevices() {
@@ -122,18 +120,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
 
   @Override public Observable<Vehicle> getLatestDeviceVehicle(String id) {
     return mVehicles.getLatestDeviceVehicle(id);
-  }
-
-  @Override public Observable<Page<Group>> getGroups() {
-    return mGroups.getGroups();
-  }
-
-  @Override public Observable<Page<Group>> getGroups(Integer limit, Integer offset) {
-    return mGroups.getGroups(limit, offset);
-  }
-
-  @Override public Observable<Group> getGroup(String groupId) {
-    return mGroups.getGroup(groupId);
   }
 
   /*package*/ LinkLoader getLinkLoader() {

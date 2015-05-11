@@ -94,10 +94,6 @@ public final class Device implements VinliItem, Parcelable {
     return app.getLinkLoader().loadItem(links.latestVehicle, Vehicle.class);
   }
 
-  public Observable<Page<Group>> loadGroups(VinliApp app) {
-    return app.getLinkLoader().loadPage(links.groups, Group.PAGE_TYPE);
-  }
-
   /*package*/ static final class Links {
     public final String self, groups, vehicles, latestVehicle;
 
