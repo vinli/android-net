@@ -5,9 +5,6 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
-/**
- * Created by ottowagner on 6/27/14.
- */
 public interface Vehicles {
 
   @GET("/vehicles") Observable<Page<Vehicle>> getVehicles();

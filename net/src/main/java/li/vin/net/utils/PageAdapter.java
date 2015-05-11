@@ -14,9 +14,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
-/**
- * Created by kyle on 7/8/14.
- */
 public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter implements Observer<Page<T>> {
   private final List<Page<T>> mPages = new ArrayList<Page<T>>();
 

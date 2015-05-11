@@ -2,9 +2,6 @@ package li.vin.net;
 
 import java.io.Serializable;
 
-/**
- * Created by kyle on 6/22/14.
- */
 public class Dtc implements Serializable {
 
 

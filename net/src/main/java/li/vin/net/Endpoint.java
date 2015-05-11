@@ -1,8 +1,5 @@
 package li.vin.net;
 
-/**
- * Created by kyle on 7/9/14.
- */
 /*package*/ enum Endpoint implements retrofit.Endpoint {
   PLATFORM("platform"),
   EVENTS("events"),

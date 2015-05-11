@@ -10,9 +10,6 @@ import java.util.Arrays;
 
 import rx.Observable;
 
-/**
- * Created by kyle on 7/10/14.
- */
 public final class Group implements VinliItem, Parcelable {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Group>>() { }.getType();
 

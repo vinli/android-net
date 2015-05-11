@@ -7,9 +7,6 @@ import java.util.List;
 import rx.Observable;
 import rx.internal.operators.OnSubscribeFromIterable;
 
-/**
- * Created by kyle on 7/7/14.
- */
 public final class Page<T> {
   /*package*/ static <T> Page<T> create(List<T> items, Meta meta, LinkLoader linkLoader, Type type) {
     if (items == null) {

@@ -5,9 +5,6 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
-/**
- * Created by kyle on 7/10/14.
- */
 /*package*/ interface Groups {
 
   @GET("/groups") Observable<Page<Group>> getGroups();

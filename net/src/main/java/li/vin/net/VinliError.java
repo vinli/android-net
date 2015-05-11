@@ -1,8 +1,5 @@
 package li.vin.net;
 
-/**
- * Created by kyle on 7/9/14.
- */
 public final class VinliError extends RuntimeException {
 
   /*package*/ static VinliError serverError(ServerError err) {

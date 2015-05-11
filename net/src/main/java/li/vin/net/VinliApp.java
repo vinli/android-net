@@ -19,9 +19,6 @@ import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 
-/**
- * Created by kyle on 6/22/14.
- */
 public final class VinliApp implements Devices, Diagnostics, Vehicles, Groups {
 
   public static VinliApp create(String id, String key) {

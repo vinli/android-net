@@ -11,9 +11,6 @@ import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.Subscriber;
 
-/**
- * Created by kyle on 7/9/14.
- */
 /*package*/ class LinkLoader {
   private static final Observable EMPTY_OBSERVABLE = Observable.create(new Observable.OnSubscribe<Object>() {
     @Override public void call(Subscriber<? super Object> subscriber) {

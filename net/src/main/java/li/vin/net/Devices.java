@@ -7,9 +7,6 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
-/**
- * Created by kyle on 6/21/14.
- */
 /*package*/ interface Devices {
 
   @GET("/devices") Observable<Page<Device>> getDevices();
