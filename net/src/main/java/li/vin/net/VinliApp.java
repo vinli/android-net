@@ -1,5 +1,7 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.android.AndroidLog;
 import retrofit.client.Client;
@@ -21,22 +24,17 @@ import retrofit.converter.GsonConverter;
 import rx.Observable;
 
 public final class VinliApp implements Devices, Diagnostics, Vehicles {
-
-  public static VinliApp create(String id, String key) {
-    return new VinliApp(id, key);
-  }
-
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
   private final Vehicles mVehicles;
   private final LinkLoader mLinkLoader;
 
-  private VinliApp(String id, String key) {
+  /*protected*/ VinliApp(@NonNull String accessToken) {
     final GsonBuilder gsonB = new GsonBuilder()
-      .registerTypeAdapter(Device.class, WrappedJsonConverter.create(Device.class))
-      .registerTypeAdapter(Vehicle.class, WrappedJsonConverter.create(Vehicle.class))
-      .registerTypeAdapter(Dtc.class, WrappedJsonConverter.create(Dtc.class))
-      .registerTypeAdapter(Group.class, WrappedJsonConverter.create(Group.class));
+        .registerTypeAdapter(Device.class, WrappedJsonConverter.create(Device.class))
+        .registerTypeAdapter(Vehicle.class, WrappedJsonConverter.create(Vehicle.class))
+        .registerTypeAdapter(Dtc.class, WrappedJsonConverter.create(Dtc.class))
+        .registerTypeAdapter(Group.class, WrappedJsonConverter.create(Group.class));
 
     final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
@@ -49,21 +47,25 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
     final GsonConverter gson = new GsonConverter(gsonB.create());
     gf.setGson(gson);
 
+    final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
+
     final RestAdapter platformAdapter = new RestAdapter.Builder()
-      .setEndpoint(Endpoint.PLATFORM)
-      .setLog(logger)
-      .setLogLevel(RestAdapter.LogLevel.FULL)
-      .setClient(client)
-      .setConverter(gson)
-      .build();
+        .setEndpoint(Endpoint.PLATFORM)
+        .setLog(logger)
+        .setLogLevel(RestAdapter.LogLevel.FULL)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build();
 
     final RestAdapter diagnosticsAdapter = new RestAdapter.Builder()
-      .setEndpoint(Endpoint.DIAGNOSTICS)
-      .setLog(logger)
-      .setLogLevel(RestAdapter.LogLevel.FULL)
-      .setClient(client)
-      .setConverter(gson)
-      .build();
+        .setEndpoint(Endpoint.DIAGNOSTICS)
+        .setLog(logger)
+        .setLogLevel(RestAdapter.LogLevel.FULL)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build();
 
     mDevices = platformAdapter.create(Devices.class);
     mDiagnostics = diagnosticsAdapter.create(Diagnostics.class);
@@ -225,4 +227,16 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
     }
   }
 
+  private static final class OauthInterceptor implements RequestInterceptor {
+    private static final String AUTH = "Authorization";
+    private final String mBearer;
+
+    public OauthInterceptor(String accessToken) {
+      mBearer = "Bearer " + accessToken;
+    }
+
+    @Override public void intercept(RequestFacade request) {
+      request.addHeader(AUTH, mBearer);
+    }
+  }
 }
