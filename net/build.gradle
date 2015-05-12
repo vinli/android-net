@@ -1,4 +1,16 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
 apply plugin: 'com.android.library'
+apply from: rootProject.file('gradle/checkstyle.gradle')
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 22
@@ -33,6 +45,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'io.reactivex:rxandroid:0.24.+'
     compile 'com.android.support:support-annotations:22.1.+'
+    compile 'com.github.frankiesardo:auto-parcel:0.3'
+    apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 }
 
-apply from: rootProject.file('gradle/checkstyle.gradle')

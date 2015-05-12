@@ -52,7 +52,7 @@ public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter imple
   }
 
   @Override public long getItemId(int position) {
-    return getItem(position).getId().hashCode();
+    return getItem(position).id().hashCode();
   }
 
   @Override public void onCompleted() {

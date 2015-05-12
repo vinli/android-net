@@ -88,7 +88,10 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
   }
 
   public Observable<Device> registerDevice(String chipId, String caseId) {
-    return mDevices.registerDevice(new Device(null, chipId, caseId, null));
+    return mDevices.registerDevice(Device.builder()
+        .caseId(caseId)
+        .chipId(chipId)
+        .build());
   }
 
   /** <p><b>Parameters:</b></p>  <Ul>deviceId - Api device id for Vinli devices.</Ul>
@@ -97,7 +100,7 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
    * It will be gone soon.</Ul>
    */
   public Observable<Device> registerDevice(String deviceID) {
-    return  mDevices.registerDevice(new Device(deviceID, null, null, null));
+    return  mDevices.registerDevice(Device.builder().id(deviceID).build());
   }
 
   @Override public Observable<Device> registerDevice(Device device) {
