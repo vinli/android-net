@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 
 public class SignInActivity extends Activity {
+  private static final String TAG = SignInActivity.class.getSimpleName();
+
   private static final String CLIENT_ID = "li.vin.net.SignInActivity#CLIENT_ID";
   private static final String REDIRECT_URI = "li.vin.net.SignInActivity#REDIRECT_URI";
 
@@ -54,22 +57,37 @@ public class SignInActivity extends Activity {
 
     wv.setWebViewClient(new WebViewClient() {
       @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        Log.d(TAG, "shouldOverrideUrlLoading: " + url);
+
         if (url.startsWith(redirectUri)) {
           final Uri uri = Uri.parse(url);
+          final String[] fragmentPieces = uri.getFragment().split("&");
 
-          final String error = uri.getQueryParameter("error");
+          String error = null;
+          String accessToken = null;
+          for (String piece : fragmentPieces) {
+            if (piece.startsWith("access_token=")) {
+              accessToken = piece.substring("access_token=".length());
+              break;
+            } else if (piece.startsWith("error=")) {
+              error = piece.substring("error=".length());
+              break;
+            }
+          }
+
           if (error == null) {
-            final String accessToken = uri.getQueryParameter("access_token");
             if (accessToken == null) {
               final Intent errorIntent = new Intent(ACTION_ERROR);
               errorIntent.putExtra(Vinli.SIGN_IN_ERROR, "missing access_token");
               startActivity(errorIntent);
             } else {
+              Log.d(TAG, "oauth accessToken: " + accessToken);
               final Intent approvedIntent = new Intent(ACTION_APPROVED);
               approvedIntent.putExtra(Vinli.ACCESS_TOKEN, accessToken);
               startActivity(approvedIntent);
             }
           } else {
+            Log.d(TAG, "oauth error: " + error);
             final Intent errorIntent = new Intent(ACTION_ERROR);
             errorIntent.putExtra(Vinli.SIGN_IN_ERROR, error);
             startActivity(errorIntent);
@@ -82,10 +100,14 @@ public class SignInActivity extends Activity {
       }
     });
 
-    wv.loadUrl(OAUTH_ENPOINT.buildUpon()
+    final String url = OAUTH_ENPOINT.buildUpon()
         .appendQueryParameter("client_id", clientId)
         .appendQueryParameter("redirect_uri", redirectUri)
-        .toString());
+        .toString();
+
+    Log.d("SignInActivity", "loading url: " + url);
+
+    wv.loadUrl(url);
   }
 
 }
