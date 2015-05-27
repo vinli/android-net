@@ -17,24 +17,27 @@ public abstract class Device implements VinliItem, Parcelable {
     return new AutoParcel_Device.Builder();
   }
 
-  public abstract String chipId();
-  public abstract String caseId();
+  /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
 
   /*package*/ Device() { }
 
-  public Observable<Page<Vehicle>> loadVehicles(VinliApp app) {
-    return app.getLinkLoader().loadPage(links().vehicles(), Vehicle.PAGE_TYPE);
+  public Observable<Page<Vehicle>> vehicles() {
+    return app().getLinkLoader().loadPage(links().vehicles(), Vehicle.PAGE_TYPE);
   }
 
-  public Observable<Vehicle> loadLatestVehicle(VinliApp app) {
-    return app.getLinkLoader().loadItem(links().latestVehicle(), Vehicle.class);
+  public Observable<Vehicle> latestVehicle() {
+    return app().getLinkLoader().loadItem(links().latestVehicle(), Vehicle.class);
+  }
+
+  public Observable<Page<Rule>> rules() {
+    return app().getLinkLoader().loadPage(links().rules(), Rule.PAGE_TYPE);
   }
 
   @AutoParcel
   /*package*/ static abstract class Links {
     public abstract String self();
-    public abstract String groups();
+    public abstract String rules();
     public abstract String vehicles();
     public abstract String latestVehicle();
 
@@ -43,19 +46,20 @@ public abstract class Device implements VinliItem, Parcelable {
     @AutoParcel.Builder
     interface Builder {
       Builder self(String s);
-      Builder groups(String s);
+      Builder rules(String s);
       Builder vehicles(String s);
       Builder latestVehicle(String s);
+
       Links build();
     }
   }
 
   @AutoParcel.Builder
   /*package*/ interface Builder {
+    Builder app(VinliApp app);
     Builder id(String s);
-    Builder chipId(String s);
-    Builder caseId(String s);
     Builder links(Links l);
+
     Device build();
   }
 }

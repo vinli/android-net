@@ -10,7 +10,6 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,10 +22,9 @@ import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 
-public final class VinliApp implements Devices, Diagnostics, Vehicles {
+public final class VinliApp implements Devices, Diagnostics {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
-  private final Vehicles mVehicles;
   private final LinkLoader mLinkLoader;
 
   /*protected*/ VinliApp(@NonNull String accessToken) {
@@ -34,18 +32,18 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
         .registerTypeAdapter(Device.class, WrappedJsonConverter.create(Device.class))
         .registerTypeAdapter(Vehicle.class, WrappedJsonConverter.create(Vehicle.class))
         .registerTypeAdapter(Dtc.class, WrappedJsonConverter.create(Dtc.class))
-        .registerTypeAdapter(Group.class, WrappedJsonConverter.create(Group.class));
+        .registerTypeAdapter(Rule.class, WrappedJsonConverter.create(Rule.class));
 
     final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
-    final LinkLoader.GsonFactory gf = new LinkLoader.GsonFactory();
-    mLinkLoader = new LinkLoader(gf, client);
+    mLinkLoader = new LinkLoader(client, accessToken);
 
     registerPageAdapter(gsonB, Device.PAGE_TYPE, Device.class, mLinkLoader);
     registerPageAdapter(gsonB, Vehicle.PAGE_TYPE, Vehicle.class, mLinkLoader);
+    registerPageAdapter(gsonB, Rule.PAGE_TYPE, Rule.class, mLinkLoader);
 
     final GsonConverter gson = new GsonConverter(gsonB.create());
-    gf.setGson(gson);
+    mLinkLoader.setGson(gson);
 
     final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
 
@@ -69,7 +67,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
 
     mDevices = platformAdapter.create(Devices.class);
     mDiagnostics = diagnosticsAdapter.create(Diagnostics.class);
-    mVehicles = platformAdapter.create(Vehicles.class);
   }
 
   @Override public Observable<Page<Device>> getDevices() {
@@ -109,22 +106,6 @@ public final class VinliApp implements Devices, Diagnostics, Vehicles {
 
   @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
     return mDiagnostics.diagnoseDtcCode(dtcCode);
-  }
-
-  @Override public Observable<Page<Vehicle>> getVehicles() {
-    return mVehicles.getVehicles();
-  }
-
-  @Override public Observable<Page<Vehicle>> getVehicles(Integer limit, Integer offset) {
-    return mVehicles.getVehicles(limit, offset);
-  }
-
-  @Override public Observable<Vehicle> getVehicle(String id) {
-    return mVehicles.getVehicle(id);
-  }
-
-  @Override public Observable<Vehicle> getLatestDeviceVehicle(String id) {
-    return mVehicles.getLatestDeviceVehicle(id);
   }
 
   /*package*/ LinkLoader getLinkLoader() {

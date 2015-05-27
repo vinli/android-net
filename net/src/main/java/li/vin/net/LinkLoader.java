@@ -2,8 +2,11 @@ package li.vin.net;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 
 import retrofit.client.Client;
+import retrofit.client.Header;
 import retrofit.client.Request;
 import retrofit.client.Response;
 import retrofit.converter.ConversionException;
@@ -22,12 +25,17 @@ import rx.Subscriber;
 
   private static final String GET = "GET";
 
-  private final GsonFactory mGson;
+  private GsonConverter mGson;
   private final Client mClient;
+  private final List<Header> mHeaders;
 
-  public LinkLoader(GsonFactory gson, Client client) {
-    mGson = gson;
+  public LinkLoader(Client client, String accessToken) {
     mClient = client;
+    mHeaders = Collections.singletonList(new Header("Authorization", "Bearer " + accessToken));
+  }
+
+  public void setGson(GsonConverter gson) {
+    mGson = gson;
   }
 
   @SuppressWarnings("unchecked")
@@ -49,11 +57,15 @@ import rx.Subscriber;
   }
 
   private Observable load(String link, final Type type) {
-    final String fullUrl = Endpoint.PLATFORM.getUrlWithoutVersion() + link;
+    if (mGson == null) {
+      throw new AssertionError("mGson not set");
+    }
+
+    final String fullUrl = link;
 
     return Observable.create(new Observable.OnSubscribe<Object>() {
       @Override public void call(Subscriber<? super Object> subscriber) {
-        final Request request = new Request(GET, fullUrl, null, null);
+        final Request request = new Request(GET, fullUrl, mHeaders, null);
         try {
           final Response resp = mClient.execute(request);
           if (subscriber.isUnsubscribed()) {
@@ -62,33 +74,19 @@ import rx.Subscriber;
 
           final int statusCode = resp.getStatus();
           if (statusCode >= 200 && statusCode < 300) { // 2XX == successful request
-            final Object parsedResponse = mGson.getGson().fromBody(resp.getBody(), type);
+            final Object parsedResponse = mGson.fromBody(resp.getBody(), type);
             subscriber.onNext(parsedResponse);
             subscriber.onCompleted();
           } else {
             final VinliError.ServerError err =
-               (VinliError.ServerError) mGson.getGson().fromBody(resp.getBody(), VinliError.ServerError.class);
+               (VinliError.ServerError) mGson.fromBody(resp.getBody(), VinliError.ServerError.class);
             subscriber.onError(VinliError.serverError(err));
           }
-        } catch (IOException e) {
-          subscriber.onError(e);
-        } catch (ConversionException e) {
+        } catch (IOException | ConversionException e) {
           subscriber.onError(e);
         }
       }
     });
-  }
-
-  public static final class GsonFactory {
-    private GsonConverter mGson;
-
-    public void setGson(GsonConverter gson) {
-      mGson = gson;
-    }
-
-    public GsonConverter getGson() {
-      return mGson;
-    }
   }
 
 }

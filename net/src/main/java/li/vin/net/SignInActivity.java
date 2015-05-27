@@ -21,7 +21,7 @@ public class SignInActivity extends Activity {
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
 
   private static final Uri OAUTH_ENPOINT =
-      Uri.parse("https://auth-dev.vin.li/oauth/authorization/new?response_type=token");
+      Uri.parse("http://10.0.1.166:3000/oauth/authorization/new?response_type=token");
 
   /*protected*/ static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
       @NonNull String redirectUri) {
