@@ -4,69 +4,54 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
+import auto.parcel.AutoParcel;
 import rx.Observable;
 import rx.internal.operators.OnSubscribeFromIterable;
 
-public final class Page<T> {
-  /*package*/ static <T> Page<T> create(List<T> items, Meta meta, LinkLoader linkLoader, Type type) {
-    if (items == null) {
-      throw new IllegalArgumentException("items == null");
-    }
-    if (meta == null) {
-      throw new IllegalArgumentException("meta == null");
-    }
-    if (linkLoader == null) {
-      throw new IllegalArgumentException("nextLoader == null");
-    }
-    if (type == null) {
-      throw new IllegalArgumentException("type == null");
-    }
-    return new Page<T>(items, meta, linkLoader, type);
+@AutoParcel
+public abstract class Page<T extends VinliItem> {
+  /*package*/ static final <T extends VinliItem> Builder<T> builder() {
+    return new AutoParcel_Page.Builder<>();
   }
 
-  private final List<T> mItems;
-  private final Meta mMeta;
-  private final LinkLoader mLinkLoader;
-  private final Type mType;
-
-  private Page(List<T> items, Meta meta, LinkLoader linkLoader, Type type) {
-    mItems = Collections.unmodifiableList(items);
-    mMeta = meta;
-    mLinkLoader = linkLoader;
-    mType = type;
-  }
+  /*package*/ abstract List<T> items();
+  /*package*/ abstract Meta meta();
+  /*package*/ abstract LinkLoader linkLoader();
+  /*package*/ abstract Type type();
 
   public int size() {
-    return mItems.size();
+    return items().size();
   }
 
   public List<T> getItems() {
-    return mItems;
+    return Collections.unmodifiableList(items());
   }
 
   public Observable<T> observeItems() {
-    return Observable.create(new OnSubscribeFromIterable<T>(mItems));
+    return Observable.create(new OnSubscribeFromIterable<>(items()));
   }
 
   public boolean hasNextPage() {
-    return mMeta.pagination.links.next != null;
+    return meta().pagination.links.next != null;
   }
 
   public Observable<Page<T>> loadPrevPage() {
-    return mLinkLoader.loadPage(mMeta.pagination.links.prev, mType);
+    return linkLoader().loadPage(meta().pagination.links.prev, type());
   }
 
   public Observable<Page<T>> loadNextPage() {
-    return mLinkLoader.loadPage(mMeta.pagination.links.next, mType);
+    return linkLoader().loadPage(meta().pagination.links.next, type());
   }
 
   public Observable<Page<T>> loadFirstPage() {
-    return mLinkLoader.loadPage(mMeta.pagination.links.first, mType);
+    return linkLoader().loadPage(meta().pagination.links.first, type());
   }
 
   public Observable<Page<T>> loadLastPage() {
-    return mLinkLoader.loadPage(mMeta.pagination.links.last, mType);
+    return linkLoader().loadPage(meta().pagination.links.last, type());
   }
+
+  /*package*/ Page() { }
 
   /*package*/ static final class Meta {
     // CHECKSTYLE.OFF: VisibilityModifier
@@ -101,5 +86,15 @@ public final class Page<T> {
         }
       }
     }
+  }
+
+  @AutoParcel.Builder
+  /*package*/ interface Builder<T extends VinliItem> {
+    Builder<T> items(List<T> l);
+    Builder<T> meta(Meta m);
+    Builder<T> linkLoader(LinkLoader ll);
+    Builder<T> type(Type t);
+
+    Page<T> build();
   }
 }

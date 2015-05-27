@@ -1,6 +1,8 @@
 package li.vin.net;
 
-public interface VinliItem {
+import android.os.Parcelable;
+
+public interface VinliItem extends Parcelable {
 
   String id();
 

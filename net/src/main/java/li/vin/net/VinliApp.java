@@ -2,17 +2,7 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -25,48 +15,56 @@ import rx.Observable;
 public final class VinliApp implements Devices, Diagnostics {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
+  private final Rules mRules;
+
   private final LinkLoader mLinkLoader;
 
   /*protected*/ VinliApp(@NonNull String accessToken) {
-    final GsonBuilder gsonB = new GsonBuilder()
-        .registerTypeAdapter(Device.class, WrappedJsonConverter.create(Device.class))
-        .registerTypeAdapter(Vehicle.class, WrappedJsonConverter.create(Vehicle.class))
-        .registerTypeAdapter(Dtc.class, WrappedJsonConverter.create(Dtc.class))
-        .registerTypeAdapter(Rule.class, WrappedJsonConverter.create(Rule.class));
+    final GsonBuilder gsonB = new GsonBuilder();
 
     final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
     mLinkLoader = new LinkLoader(client, accessToken);
 
-    registerPageAdapter(gsonB, Device.PAGE_TYPE, Device.class, mLinkLoader);
-    registerPageAdapter(gsonB, Vehicle.PAGE_TYPE, Vehicle.class, mLinkLoader);
-    registerPageAdapter(gsonB, Rule.PAGE_TYPE, Rule.class, mLinkLoader);
+    Device.registerGson(gsonB, this, mLinkLoader);
 
     final GsonConverter gson = new GsonConverter(gsonB.create());
     mLinkLoader.setGson(gson);
+
+    final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 
     final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
 
     final RestAdapter platformAdapter = new RestAdapter.Builder()
         .setEndpoint(Endpoint.PLATFORM)
         .setLog(logger)
-        .setLogLevel(RestAdapter.LogLevel.FULL)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
-        .build();
-
-    final RestAdapter diagnosticsAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.DIAGNOSTICS)
-        .setLog(logger)
-        .setLogLevel(RestAdapter.LogLevel.FULL)
+        .setLogLevel(logLevel)
         .setClient(client)
         .setConverter(gson)
         .setRequestInterceptor(oauthInterceptor)
         .build();
 
     mDevices = platformAdapter.create(Devices.class);
-    mDiagnostics = diagnosticsAdapter.create(Diagnostics.class);
+
+    mDiagnostics = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.DIAGNOSTICS)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Diagnostics.class);
+
+    mRules = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.RULES)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Rules.class);
   }
 
   @Override public Observable<Page<Device>> getDevices() {
@@ -82,13 +80,6 @@ public final class VinliApp implements Devices, Diagnostics {
 
   @Override public Observable<Device> getDevice(String deviceId) {
     return mDevices.getDevice(deviceId);
-  }
-
-  public Observable<Device> registerDevice(String chipId, String caseId) {
-    return mDevices.registerDevice(Device.builder()
-        .caseId(caseId)
-        .chipId(chipId)
-        .build());
   }
 
   /** <p><b>Parameters:</b></p>  <Ul>deviceId - Api device id for Vinli devices.</Ul>
@@ -108,107 +99,12 @@ public final class VinliApp implements Devices, Diagnostics {
     return mDiagnostics.diagnoseDtcCode(dtcCode);
   }
 
+  /*package*/ Rules rules() {
+    return mRules;
+  }
+
   /*package*/ LinkLoader getLinkLoader() {
     return mLinkLoader;
-  }
-
-  private static <T> void registerPageAdapter(GsonBuilder b, Type t, Class<T> cls, LinkLoader loader) {
-    b.registerTypeAdapter(t, PageConverter.create(cls, t, loader));
-  }
-
-  public static final class WrappedJsonConverter<T> extends TypeAdapter<T> {
-
-    public static <T> WrappedJsonConverter<T> create(Class<T> cls) {
-      return new WrappedJsonConverter<T>(cls, cls.getSimpleName().toLowerCase(Locale.US));
-    }
-
-    private final String mName;
-    private final Class<T> mCls;
-    private final Gson mGson = new Gson();
-
-    private WrappedJsonConverter(Class<T> cls, String name) {
-      mCls = cls;
-      mName = name;
-    }
-
-    @Override public void write(JsonWriter out, T value) throws IOException {
-      out.beginObject();
-        out.name(mName);
-        mGson.toJson(value, mCls, out);
-      out.endObject();
-    }
-
-    @Override public T read(JsonReader in) throws IOException {
-      in.beginObject();
-
-        final String name = in.nextName();
-        if (!mName.equals(name)) {
-          throw new IOException(name + " does not match expected name " + mName);
-        }
-        final T item = mGson.fromJson(in, mCls);
-
-      in.endObject();
-
-      return item;
-    }
-
-  }
-
-  private static final class PageConverter<T> extends TypeAdapter<Page<T>> {
-    private static final String META = "meta";
-
-    public static <T> PageConverter<T> create(Class<T> cls, Type pageType, LinkLoader loader) {
-      return new PageConverter<T>(cls, pageType, cls.getSimpleName().toLowerCase(Locale.US) + 's', loader);
-    }
-
-    private final String mName;
-    private final Class<T> mCls;
-    private final Type mPageType;
-    private final LinkLoader mLoader;
-    private final Gson mGson = new Gson();
-
-    private PageConverter(Class<T> cls, Type pageType, String name, LinkLoader loader) {
-      mCls = cls;
-      mPageType = pageType;
-      mName = name;
-      mLoader = loader;
-    }
-
-    @Override public void write(JsonWriter out, Page<T> value) throws IOException {
-      throw new UnsupportedOperationException("writing a page is not supported");
-    }
-
-    @Override public Page<T> read(JsonReader in) throws IOException {
-      List<T> items = null;
-      Page.Meta meta = null;
-
-      in.beginObject();
-      while (in.hasNext()) {
-        final String name = in.nextName();
-        if (META.equals(name)) {
-          meta = mGson.fromJson(in, Page.Meta.class);
-        } else if (mName.equals(name)) {
-          items = new ArrayList<T>();
-          in.beginArray();
-          while (in.hasNext()) {
-            items.add(mGson.<T>fromJson(in, mCls));
-          }
-          in.endArray();
-        } else {
-          throw new IOException("unrecognized key '" + name + "' while parsing " + mName);
-        }
-      }
-      in.endObject();
-
-      if (items == null) {
-        throw new IOException("no items found while parsing " + mName);
-      }
-      if (meta == null) {
-        throw new IOException("no meta found while parsing " + mName);
-      }
-
-      return Page.create(items, meta, mLoader, mPageType);
-    }
   }
 
   private static final class OauthInterceptor implements RequestInterceptor {

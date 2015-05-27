@@ -1,19 +1,29 @@
 package li.vin.net;
 
+import com.squareup.okhttp.HttpUrl;
+
 /*package*/ enum Endpoint implements retrofit.Endpoint {
-  PLATFORM("platform"),
-  EVENTS("events"),
   DIAGNOSTICS("diag"),
+  EVENTS("events"),
+  PLATFORM("platform"),
+  RULES("rules"),
   TELEMETRY("telemetry");
 
-  private static final String PROTOCOL = "https://";
-  private static final String DOMAIN_END = ".vin.li";
-  private static final String API_V1 = "/api/v1";
+  private static final String DOMAIN = "-dev.vin.li";
 
-  private final String mDomain;
+  private final HttpUrl mBaseUrl;
+  private final HttpUrl mUrl;
 
-  private Endpoint(String domain) {
-    mDomain = domain;
+  private Endpoint(String subDomain) {
+    mBaseUrl = new HttpUrl.Builder()
+        .scheme("https")
+        .host(subDomain + DOMAIN)
+        .build();
+
+    mUrl = mBaseUrl.newBuilder()
+        .addPathSegment("api")
+        .addPathSegment("v1")
+        .build();
   }
 
   @Override public String getName() {
@@ -21,53 +31,11 @@ package li.vin.net;
   }
 
   @Override public String getUrl() {
-    return innerGetUrl().append(API_V1).toString();
+    return mUrl.toString();
   }
 
   public String getUrlWithoutVersion() {
-    return innerGetUrl().toString();
-  }
-
-  private StringBuilder innerGetUrl() {
-    final StringBuilder sb = new StringBuilder().append(PROTOCOL).append(mDomain);
-
-    final String env = getEnv();
-    if (env != null) {
-      sb.append('-').append(env);
-    }
-
-    return sb.append(DOMAIN_END);
-  }
-
-  private static final Object ENVIRONMENT_LOCK = new Object();
-  private static Environment sEnvironment = Environment.TEST;
-
-  public static void setEnvironment(Environment env) {
-    synchronized (ENVIRONMENT_LOCK) {
-      sEnvironment = env;
-    }
-  }
-
-  private static String getEnv() {
-    synchronized (ENVIRONMENT_LOCK) {
-      return sEnvironment.getUrl();
-    }
-  }
-
-  private static enum Environment {
-    PRODUCTION(null),
-    STAGING("staging"),
-    TEST("test");
-
-    private final String mUrl;
-
-    private Environment(String url) {
-      mUrl = url;
-    }
-
-    public String getUrl() {
-      return mUrl;
-    }
+    return mBaseUrl.toString();
   }
 
 }

@@ -10,7 +10,7 @@ import auto.parcel.AutoParcel;
 
 @AutoParcel
 public abstract class Vehicle implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Vehicle>>() { }.getType();
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<AutoParcel_Vehicle>>() { }.getType();
 
   /*package*/ static final Builder builder() {
     return new AutoParcel_Vehicle.Builder();

@@ -15,14 +15,6 @@ import rx.Observable;
 import rx.Subscriber;
 
 /*package*/ class LinkLoader {
-  private static final Observable EMPTY_OBSERVABLE = Observable.create(new Observable.OnSubscribe<Object>() {
-    @Override public void call(Subscriber<? super Object> subscriber) {
-      if (!subscriber.isUnsubscribed()) {
-        subscriber.onCompleted();
-      }
-    }
-  });
-
   private static final String GET = "GET";
 
   private GsonConverter mGson;
@@ -39,18 +31,18 @@ import rx.Subscriber;
   }
 
   @SuppressWarnings("unchecked")
-  public <T> Observable<T> loadItem(String link, Class<T> cls) {
+  public <T extends VinliItem> Observable<T> loadItem(String link, Class<T> cls) {
     if (link == null) {
-      return EMPTY_OBSERVABLE;
+      return Observable.empty();
     }
 
     return load(link, cls);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> Observable<Page<T>> loadPage(String link, Type type) {
+  public <T extends VinliItem> Observable<Page<T>> loadPage(String link, Type type) {
     if (link == null) {
-      return EMPTY_OBSERVABLE;
+      return Observable.empty();
     }
 
     return load(link, type);

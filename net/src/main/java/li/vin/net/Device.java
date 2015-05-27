@@ -1,17 +1,28 @@
 package li.vin.net;
 
-import android.os.Parcelable;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
 import rx.Observable;
 
 @AutoParcel
-public abstract class Device implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Device>>() { }.getType();
+public abstract class Device implements VinliItem {
+  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app, LinkLoader ll) {
+    final DeviceAdapter adapter = DeviceAdapter.create(app);
+
+    gb.registerTypeAdapter(Device.class, WrappedJsonAdapter.create(Device.class, adapter));
+
+    final Type type = new TypeToken<Page<Device>>() { }.getType();
+    gb.registerTypeAdapter(type, PageAdapter.create(Device.class, adapter, type, ll));
+  }
 
   /*package*/ static final Builder builder() {
     return new AutoParcel_Device.Builder();
@@ -31,7 +42,7 @@ public abstract class Device implements VinliItem, Parcelable {
   }
 
   public Observable<Page<Rule>> rules() {
-    return app().getLinkLoader().loadPage(links().rules(), Rule.PAGE_TYPE);
+    return app().rules().forDevice(this.id(), null, null);
   }
 
   @AutoParcel
@@ -61,5 +72,45 @@ public abstract class Device implements VinliItem, Parcelable {
     Builder links(Links l);
 
     Device build();
+  }
+
+  private static final class DeviceAdapter extends TypeAdapter<Device> {
+
+    public static final DeviceAdapter create(VinliApp app) {
+      return new DeviceAdapter(app, new Gson().getAdapter(Device.Links.class));
+    }
+
+    private final VinliApp mApp;
+    private final TypeAdapter<Device.Links> mLinksAdapter;
+
+    private DeviceAdapter(VinliApp app, TypeAdapter<Device.Links> linksAdapter) {
+      mApp = app;
+      mLinksAdapter = linksAdapter;
+    }
+
+    @Override public void write(JsonWriter out, Device value) throws IOException {
+      out.beginObject();
+        out.name("id").value(value.id());
+      out.endObject();
+    }
+
+    @Override public Device read(JsonReader in) throws IOException {
+      final Device.Builder b = Device.builder();
+      b.app(mApp);
+
+      in.beginObject();
+        while (in.hasNext()) {
+          final String name = in.nextName();
+
+          switch (name) {
+            case "id": b.id(in.nextString()); break;
+            case "links": b.links(mLinksAdapter.read(in)); break;
+            default: throw new IOException("unknown device key " + name);
+          }
+        }
+      in.endObject();
+
+      return b.build();
+    }
   }
 }
