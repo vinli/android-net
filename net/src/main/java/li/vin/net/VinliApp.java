@@ -28,6 +28,7 @@ public final class VinliApp implements Devices, Diagnostics {
 
     Device.registerGson(gsonB, this);
     Rule.registerGson(gsonB, this);
+    Event.registerGson(gsonB, this);
 
     mGson = gsonB.create();
 

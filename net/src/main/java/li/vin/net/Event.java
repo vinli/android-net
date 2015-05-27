@@ -2,6 +2,7 @@ package li.vin.net;
 
 import android.os.Parcelable;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -16,13 +17,20 @@ import auto.parcel.AutoParcel;
 public abstract class Event implements VinliItem, Parcelable {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Event>>() { }.getType();
 
+  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
+    final EventAdapter adapter = EventAdapter.create(app);
+
+    gb.registerTypeAdapter(Event.class, WrappedJsonAdapter.create(Event.class, adapter));
+
+    gb.registerTypeAdapter(PAGE_TYPE, PageAdapter.create(adapter, PAGE_TYPE, app, Event.class));
+  }
+
   /*package*/ static final Builder builder() {
     return new AutoParcel_Event.Builder();
   }
 
   public abstract String eventType();
   public abstract String timestamp();
-
 
   /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
@@ -78,8 +86,8 @@ public abstract class Event implements VinliItem, Parcelable {
     }
 
     @Override public Event read(JsonReader in) throws IOException {
-      final Event.Builder b = Event.builder();
-      b.app(mApp);
+      final Event.Builder b = Event.builder()
+          .app(mApp);
 
       in.beginObject();
       while (in.hasNext()) {
@@ -87,6 +95,8 @@ public abstract class Event implements VinliItem, Parcelable {
 
         switch (name) {
           case "id": b.id(in.nextString()); break;
+          case "eventType": b.eventType(in.nextString()); break;
+          case "timestamp": b.timestamp(in.nextString()); break;
           case "links": b.links(mApp.gson().<Event.Links>fromJson(in, Event.Links.class)); break;
           default: throw new IOException("unknown event key " + name);
         }
