@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -31,6 +32,7 @@ public abstract class Event implements VinliItem, Parcelable {
 
   public abstract String eventType();
   public abstract String timestamp();
+  @Nullable public abstract ObjectRef object();
 
   /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
@@ -60,6 +62,7 @@ public abstract class Event implements VinliItem, Parcelable {
     Builder id(String s);
     Builder eventType(String s);
     Builder timestamp(String s);
+    Builder object(ObjectRef o);
 
     Builder app(VinliApp app);
     Builder links(Links l);
@@ -97,6 +100,7 @@ public abstract class Event implements VinliItem, Parcelable {
           case "id": b.id(in.nextString()); break;
           case "eventType": b.eventType(in.nextString()); break;
           case "timestamp": b.timestamp(in.nextString()); break;
+          case "object": b.object(mApp.gson().<ObjectRef>fromJson(in, ObjectRef.class)); break;
           case "links": b.links(mApp.gson().<Event.Links>fromJson(in, Event.Links.class)); break;
           default: throw new IOException("unknown event key " + name);
         }

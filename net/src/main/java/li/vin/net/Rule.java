@@ -20,13 +20,14 @@ import rx.Observable;
 
 @AutoParcel
 public abstract class Rule implements VinliItem {
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Rule>>() { }.getType();
+
   /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
     final RuleAdapter adapter = RuleAdapter.create(app);
 
     gb.registerTypeAdapter(Rule.class, WrappedJsonAdapter.create(Rule.class, adapter));
 
-    final Type type = new TypeToken<Page<Rule>>() { }.getType();
-    gb.registerTypeAdapter(type, PageAdapter.create(adapter, type, app, Rule.class));
+    gb.registerTypeAdapter(PAGE_TYPE, PageAdapter.create(adapter, PAGE_TYPE, app, Rule.class));
   }
 
   /*package*/ static final Builder builder() {
@@ -49,6 +50,10 @@ public abstract class Rule implements VinliItem {
 
   public Observable<Page<Event>> events() {
     return app().getLinkLoader().loadPage(links().events(), Event.PAGE_TYPE);
+  }
+
+  public Observable<Page<Subscription>> subscriptions() {
+    return app().getLinkLoader().loadPage(links().subscriptions(), Subscription.PAGE_TYPE);
   }
 
   @AutoParcel

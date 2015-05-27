@@ -66,8 +66,9 @@ public abstract class Device implements VinliItem {
 
   @AutoParcel.Builder
   /*package*/ interface Builder {
-    Builder app(VinliApp app);
     Builder id(String s);
+
+    Builder app(VinliApp app);
     Builder links(Links l);
 
     Device build();
