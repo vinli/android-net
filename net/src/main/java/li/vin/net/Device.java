@@ -1,6 +1,5 @@
 package li.vin.net;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
@@ -15,13 +14,13 @@ import rx.Observable;
 
 @AutoParcel
 public abstract class Device implements VinliItem {
-  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app, LinkLoader ll) {
+  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
     final DeviceAdapter adapter = DeviceAdapter.create(app);
 
     gb.registerTypeAdapter(Device.class, WrappedJsonAdapter.create(Device.class, adapter));
 
     final Type type = new TypeToken<Page<Device>>() { }.getType();
-    gb.registerTypeAdapter(type, PageAdapter.create(Device.class, adapter, type, ll));
+    gb.registerTypeAdapter(type, PageAdapter.create(adapter, type, app, Device.class));
   }
 
   /*package*/ static final Builder builder() {
@@ -77,15 +76,13 @@ public abstract class Device implements VinliItem {
   private static final class DeviceAdapter extends TypeAdapter<Device> {
 
     public static final DeviceAdapter create(VinliApp app) {
-      return new DeviceAdapter(app, new Gson().getAdapter(Device.Links.class));
+      return new DeviceAdapter(app);
     }
 
     private final VinliApp mApp;
-    private final TypeAdapter<Device.Links> mLinksAdapter;
 
-    private DeviceAdapter(VinliApp app, TypeAdapter<Device.Links> linksAdapter) {
+    private DeviceAdapter(VinliApp app) {
       mApp = app;
-      mLinksAdapter = linksAdapter;
     }
 
     @Override public void write(JsonWriter out, Device value) throws IOException {
@@ -104,7 +101,7 @@ public abstract class Device implements VinliItem {
 
           switch (name) {
             case "id": b.id(in.nextString()); break;
-            case "links": b.links(mLinksAdapter.read(in)); break;
+            case "links": b.links(mApp.gson().<Device.Links>fromJson(in, Device.Links.class)); break;
             default: throw new IOException("unknown device key " + name);
           }
         }

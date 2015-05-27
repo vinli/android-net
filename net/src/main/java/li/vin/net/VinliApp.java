@@ -2,6 +2,7 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import retrofit.RequestInterceptor;
@@ -16,7 +17,7 @@ public final class VinliApp implements Devices, Diagnostics {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
   private final Rules mRules;
-
+  private final Gson mGson;
   private final LinkLoader mLinkLoader;
 
   /*protected*/ VinliApp(@NonNull String accessToken) {
@@ -24,12 +25,15 @@ public final class VinliApp implements Devices, Diagnostics {
 
     final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
-    mLinkLoader = new LinkLoader(client, accessToken);
 
-    Device.registerGson(gsonB, this, mLinkLoader);
+    Device.registerGson(gsonB, this);
+    Rule.registerGson(gsonB, this);
 
-    final GsonConverter gson = new GsonConverter(gsonB.create());
-    mLinkLoader.setGson(gson);
+    mGson = gsonB.create();
+
+    final GsonConverter gson = new GsonConverter(mGson);
+
+    mLinkLoader = new LinkLoader(client, accessToken, gson);
 
     final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
 
@@ -105,6 +109,10 @@ public final class VinliApp implements Devices, Diagnostics {
 
   /*package*/ LinkLoader getLinkLoader() {
     return mLinkLoader;
+  }
+
+  /*package*/ Gson gson() {
+    return mGson;
   }
 
   private static final class OauthInterceptor implements RequestInterceptor {

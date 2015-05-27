@@ -2,8 +2,12 @@ package li.vin.net;
 
 import android.os.Parcelable;
 
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
@@ -12,7 +16,12 @@ import auto.parcel.AutoParcel;
 public abstract class Event implements VinliItem, Parcelable {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Event>>() { }.getType();
 
+  /*package*/ static final Builder builder() {
+    return new AutoParcel_Event.Builder();
+  }
+
   public abstract String eventType();
+  public abstract String timestamp();
 
 
   /*package*/ abstract VinliApp app();
@@ -36,5 +45,56 @@ public abstract class Event implements VinliItem, Parcelable {
 
       Links build();
     }
+  }
+
+  @AutoParcel.Builder
+  /*package*/ interface Builder {
+    Builder id(String s);
+    Builder eventType(String s);
+    Builder timestamp(String s);
+
+    Builder app(VinliApp app);
+    Builder links(Links l);
+
+    Event build();
+  }
+
+  private static final class EventAdapter extends TypeAdapter<Event> {
+
+    public static final EventAdapter create(VinliApp app) {
+      return new EventAdapter(app);
+    }
+
+    private final VinliApp mApp;
+
+    private EventAdapter(VinliApp app) {
+      mApp = app;
+    }
+
+    @Override public void write(JsonWriter out, Event value) throws IOException {
+      out.beginObject();
+        out.name("id").value(value.id());
+      out.endObject();
+    }
+
+    @Override public Event read(JsonReader in) throws IOException {
+      final Event.Builder b = Event.builder();
+      b.app(mApp);
+
+      in.beginObject();
+      while (in.hasNext()) {
+        final String name = in.nextName();
+
+        switch (name) {
+          case "id": b.id(in.nextString()); break;
+          case "links": b.links(mApp.gson().<Event.Links>fromJson(in, Event.Links.class)); break;
+          default: throw new IOException("unknown event key " + name);
+        }
+      }
+      in.endObject();
+
+      return b.build();
+    }
+
   }
 }

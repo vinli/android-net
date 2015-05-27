@@ -17,16 +17,13 @@ import rx.Subscriber;
 /*package*/ class LinkLoader {
   private static final String GET = "GET";
 
-  private GsonConverter mGson;
+  private final GsonConverter mGson;
   private final Client mClient;
   private final List<Header> mHeaders;
 
-  public LinkLoader(Client client, String accessToken) {
+  public LinkLoader(Client client, String accessToken, GsonConverter gson) {
     mClient = client;
     mHeaders = Collections.singletonList(new Header("Authorization", "Bearer " + accessToken));
-  }
-
-  public void setGson(GsonConverter gson) {
     mGson = gson;
   }
 

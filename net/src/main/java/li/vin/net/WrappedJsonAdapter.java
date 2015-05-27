@@ -1,6 +1,5 @@
 package li.vin.net;
 
-import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -8,14 +7,10 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Locale;
 
-/*package*/ class WrappedJsonAdapter<T> extends TypeAdapter<T> {
+/*package*/ class WrappedJsonAdapter<T extends VinliItem> extends TypeAdapter<T> {
 
-  public static <T> WrappedJsonAdapter<T> create(Class<T> cls) {
-    return create(cls, new Gson().getAdapter(cls));
-  }
-
-  public static <T> WrappedJsonAdapter<T> create(Class<T> cls, TypeAdapter<T> adapter) {
-    return new WrappedJsonAdapter<T>(adapter, cls.getSimpleName().toLowerCase(Locale.US));
+  public static <T extends VinliItem> WrappedJsonAdapter<T> create(Class<T> cls, TypeAdapter<T> adapter) {
+    return new WrappedJsonAdapter<>(adapter, cls.getSimpleName().toLowerCase(Locale.US));
   }
 
   private final String mName;
