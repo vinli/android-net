@@ -3,12 +3,13 @@ package li.vin.net;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.squareup.okhttp.HttpUrl;
 
 
 public class SignInActivity extends Activity {
@@ -20,8 +21,14 @@ public class SignInActivity extends Activity {
   private static final String ACTION_ERROR = "li.vin.net.signIn.ERROR";
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
 
-  private static final Uri OAUTH_ENPOINT =
-      Uri.parse("http://10.0.1.166:3000/oauth/authorization/new?response_type=token");
+  private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder()
+      .scheme("https")
+      .host("my-dev.vin.li")
+      .addPathSegment("oauth")
+      .addPathSegment("authorization")
+      .addPathSegment("new")
+      .addQueryParameter("response_type", "token")
+      .build();
 
   /*protected*/ static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
       @NonNull String redirectUri) {
@@ -60,8 +67,8 @@ public class SignInActivity extends Activity {
         Log.d(TAG, "shouldOverrideUrlLoading: " + url);
 
         if (url.startsWith(redirectUri)) {
-          final Uri uri = Uri.parse(url);
-          final String[] fragmentPieces = uri.getFragment().split("&");
+          final HttpUrl uri = HttpUrl.parse(url);
+          final String[] fragmentPieces = uri.fragment().split("&");
 
           String error = null;
           String accessToken = null;
@@ -100,9 +107,9 @@ public class SignInActivity extends Activity {
       }
     });
 
-    final String url = OAUTH_ENPOINT.buildUpon()
-        .appendQueryParameter("client_id", clientId)
-        .appendQueryParameter("redirect_uri", redirectUri)
+    final String url = OAUTH_ENPOINT.newBuilder()
+        .addQueryParameter("client_id", clientId)
+        .addQueryParameter("redirect_uri", redirectUri)
         .toString();
 
     Log.d("SignInActivity", "loading url: " + url);
