@@ -31,7 +31,6 @@ public abstract class Event implements VinliItem {
   public abstract Meta meta();
   @Nullable public abstract ObjectRef object();
 
-  /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
 
   @AutoParcel
@@ -61,7 +60,6 @@ public abstract class Event implements VinliItem {
     Builder meta(Meta m);
     Builder object(ObjectRef o);
 
-    Builder app(VinliApp app);
     Builder links(Links l);
 
     Event build();
