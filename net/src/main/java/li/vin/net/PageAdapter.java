@@ -24,19 +24,28 @@ public class PageAdapter<T extends VinliItem> extends TypeAdapter<Page<T>> {
       Type pageType,
       VinliApp app,
       String name) {
-    return new PageAdapter<>(itemAdapter, pageType, app, name);
+    return new PageAdapter<>(itemAdapter, pageType, app, null, name);
+  }
+
+  public static <T extends VinliItem> PageAdapter<T> create(
+      Class<T> cls,
+      Type pageType,
+      VinliApp app) {
+    return new PageAdapter<>(null, pageType, app, cls, cls.getSimpleName().toLowerCase(Locale.US) + 's');
   }
 
   private final String mName;
   private final Type mPageType;
   private final VinliApp mApp;
   private final TypeAdapter<T> mItemAdapter;
+  private final Class<T> mClass;
 
-  private PageAdapter(TypeAdapter<T> itemAdapter, Type pageType, VinliApp app, String name) {
+  private PageAdapter(TypeAdapter<T> itemAdapter, Type pageType, VinliApp app, Class<T> cls, String name) {
     mItemAdapter = itemAdapter;
     mPageType = pageType;
     mApp = app;
     mName = name;
+    mClass = cls;
   }
 
   @Override public void write(JsonWriter out, Page<T> value) throws IOException {
@@ -59,7 +68,11 @@ public class PageAdapter<T extends VinliItem> extends TypeAdapter<Page<T>> {
 
         in.beginArray();
           while (in.hasNext()) {
-            items.add(mItemAdapter.read(in));
+            final T item = mItemAdapter == null ?
+                mApp.gson().<T>fromJson(in, mClass) :
+                mItemAdapter.read(in);
+
+            items.add(item);
           }
         in.endArray();
 
