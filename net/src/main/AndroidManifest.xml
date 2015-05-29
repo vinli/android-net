@@ -8,7 +8,8 @@
     <activity
         android:name=".SignInActivity"
         android:label="@string/title_activity_sign_in"
-        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+        android:noHistory="true">
     </activity>
   </application>
 
