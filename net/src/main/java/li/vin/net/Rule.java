@@ -8,6 +8,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
@@ -36,12 +37,12 @@ public abstract class Rule implements VinliItem {
 
   public abstract String name();
   public abstract boolean evaluated();
-  public abstract boolean covered();
-  public abstract String createdAt();
-  public abstract String deviceId();
+  @Nullable public abstract Boolean covered();
+  @Nullable public abstract String createdAt();
+  @Nullable public abstract String deviceId();
   @Nullable public abstract PolygonBoundary polygonBoundary();
   @Nullable public abstract RadiusBoundary radiusBoundary();
-  public abstract List<ParametricBoundary> parametricBoundaries();
+  @Nullable public abstract List<ParametricBoundary> parametricBoundaries();
 
   /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
@@ -70,12 +71,12 @@ public abstract class Rule implements VinliItem {
     Builder id(String s);
     Builder name(String s);
     Builder evaluated(boolean b);
-    Builder covered(boolean b);
-    Builder createdAt(String s);
-    Builder deviceId(String s);
-    Builder polygonBoundary(PolygonBoundary pb);
-    Builder radiusBoundary(RadiusBoundary rb);
-    Builder parametricBoundaries(List<ParametricBoundary> l);
+    Builder covered(@Nullable Boolean b);
+    Builder createdAt(@Nullable String s);
+    Builder deviceId(@Nullable String s);
+    Builder polygonBoundary(@Nullable PolygonBoundary pb);
+    Builder radiusBoundary(@Nullable RadiusBoundary rb);
+    Builder parametricBoundaries(@Nullable List<ParametricBoundary> l);
 
     Builder app(VinliApp app);
     Builder links(Links l);
@@ -218,8 +219,22 @@ public abstract class Rule implements VinliItem {
           case "id": b.id(in.nextString()); break;
           case "name": b.name(in.nextString()); break;
           case "evaluated": b.evaluated(in.nextBoolean()); break;
-          case "covered": b.covered(in.nextBoolean()); break;
-          case "createdAt": b.createdAt(in.nextString()); break;
+          case "covered":
+            if (in.peek() == JsonToken.NULL) {
+              in.nextNull();
+            } else {
+              b.covered(in.nextBoolean());
+            }
+
+            break;
+          case "createdAt":
+            if (in.peek() == JsonToken.NULL) {
+              in.nextNull();
+            } else {
+              b.createdAt(in.nextString());
+            }
+
+            break;
           case "deviceId": b.createdAt(in.nextString()); break;
           case "boundaries":
             final List<ParametricBoundary> parametricBoundaries = new ArrayList<>();
