@@ -1,7 +1,9 @@
 package li.vin.net;
 
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
@@ -23,12 +25,18 @@ import rx.Observable;
 public abstract class Rule implements VinliItem {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Rule>>() { }.getType();
 
-  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
-    final RuleAdapter adapter = RuleAdapter.create(app);
+  /*package*/ static final void registerGson(GsonBuilder gb) {
+    final RuleAdapter adapter = new RuleAdapter();
 
-    gb.registerTypeAdapter(Rule.class, WrappedJsonAdapter.create(Rule.class, adapter));
+    gb.registerTypeAdapter(Rule.class, adapter);
+    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Rule.class));
 
-    gb.registerTypeAdapter(PAGE_TYPE, PageAdapter.create(adapter, PAGE_TYPE, app, Rule.class));
+    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Rule_Links.class));
+    gb.registerTypeAdapter(ParametricBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
+    gb.registerTypeAdapter(RadiusBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
+    gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
+    gb.registerTypeAdapter(Coordinate.class, AutoParcelAdapter.create(AutoParcel_Rule_Coordinate.class));
+    gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
   }
 
   /*package*/ static final Builder builder() {
@@ -44,21 +52,20 @@ public abstract class Rule implements VinliItem {
   @Nullable public abstract RadiusBoundary radiusBoundary();
   @Nullable public abstract List<ParametricBoundary> parametricBoundaries();
 
-  /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
 
   /*package*/ Rule() { }
 
-  public Observable<Page<Event>> events() {
-    return app().getLinkLoader().loadPage(links().events(), Event.PAGE_TYPE);
+  public Observable<TimeSeries<Event>> events() {
+    return Vinli.curApp().linkLoader().loadTimeSeries(links().events(), Event.TIME_SERIES_TYPE);
   }
 
   public Observable<Page<Subscription>> subscriptions() {
-    return app().getLinkLoader().loadPage(links().subscriptions(), Subscription.PAGE_TYPE);
+    return Vinli.curApp().linkLoader().loadPage(links().subscriptions(), Subscription.PAGE_TYPE);
   }
 
   @AutoParcel
-  /*package*/ static abstract class Links {
+  /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
     public abstract String events();
     public abstract String subscriptions();
@@ -77,8 +84,6 @@ public abstract class Rule implements VinliItem {
     Builder polygonBoundary(@Nullable PolygonBoundary pb);
     Builder radiusBoundary(@Nullable RadiusBoundary rb);
     Builder parametricBoundaries(@Nullable List<ParametricBoundary> l);
-
-    Builder app(VinliApp app);
     Builder links(Links l);
 
     Rule build();
@@ -131,7 +136,7 @@ public abstract class Rule implements VinliItem {
   }
 
   @AutoParcel
-  public static abstract class Coordinate {
+  public static abstract class Coordinate implements Parcelable {
     /*package*/ static final Builder builder() {
       return new AutoParcel_Rule_Coordinate.Builder();
     }
@@ -170,18 +175,13 @@ public abstract class Rule implements VinliItem {
   }
 
   private static final class RuleAdapter extends TypeAdapter<Rule> {
-
-    public static final RuleAdapter create(VinliApp app) {
-      return new RuleAdapter(app);
-    }
-
-    private final VinliApp mApp;
-
-    private RuleAdapter(VinliApp app) {
-      mApp = app;
-    }
+    private Gson gson;
 
     @Override public void write(JsonWriter out, Rule value) throws IOException {
+      if (gson == null) {
+        gson = Vinli.curApp().gson();
+      }
+
       out.beginObject();
         out.name("id").value(value.id());
         out.name("name").value(value.name());
@@ -192,24 +192,27 @@ public abstract class Rule implements VinliItem {
         out.name("boundaries").beginArray();
           final PolygonBoundary polyBoundary = value.polygonBoundary();
           if (polyBoundary != null) {
-            mApp.gson().toJson(polyBoundary, PolygonBoundary.class, out);
+            gson.toJson(polyBoundary, PolygonBoundary.class, out);
           }
 
           final RadiusBoundary radiusBoundary = value.radiusBoundary();
           if (radiusBoundary != null) {
-            mApp.gson().toJson(radiusBoundary, RadiusBoundary.class, out);
+            gson.toJson(radiusBoundary, RadiusBoundary.class, out);
           }
 
           for (final ParametricBoundary pb : value.parametricBoundaries()) {
-            mApp.gson().toJson(pb, ParametricBoundary.class, out);
+            gson.toJson(pb, ParametricBoundary.class, out);
           }
         out.endArray();
       out.endObject();
     }
 
     @Override public Rule read(JsonReader in) throws IOException {
-      final Rule.Builder b = Rule.builder()
-          .app(mApp);
+      if (gson == null) {
+        gson = Vinli.curApp().gson();
+      }
+
+      final Rule.Builder b = Rule.builder();
 
       in.beginObject();
       while (in.hasNext()) {
@@ -247,13 +250,13 @@ public abstract class Rule implements VinliItem {
 
               switch (type) {
                 case "parametric":
-                  parametricBoundaries.add(mApp.gson().fromJson(boundary, ParametricBoundary.class));
+                  parametricBoundaries.add(gson.fromJson(boundary, ParametricBoundary.class));
                   break;
                 case "polygon":
-                  b.polygonBoundary(mApp.gson().fromJson(boundary, PolygonBoundary.class));
+                  b.polygonBoundary(gson.fromJson(boundary, PolygonBoundary.class));
                   break;
                 case "radius":
-                  b.radiusBoundary(mApp.gson().fromJson(boundary, RadiusBoundary.class));
+                  b.radiusBoundary(gson.fromJson(boundary, RadiusBoundary.class));
                   break;
                 default:
                   throw new IOException("unknown boundary type " + type);
@@ -264,7 +267,7 @@ public abstract class Rule implements VinliItem {
 
             b.parametricBoundaries(parametricBoundaries);
             break;
-          case "links": b.links(mApp.gson().<Rule.Links>fromJson(in, AutoParcel_Rule_Links.class)); break;
+          case "links": b.links(gson.<Rule.Links>fromJson(in, Links.class)); break;
           default: throw new IOException("unknown rule key " + name);
         }
       }

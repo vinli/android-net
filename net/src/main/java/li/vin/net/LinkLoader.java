@@ -28,16 +28,25 @@ import rx.Subscriber;
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends VinliItem> Observable<T> loadItem(String link, Class<T> cls) {
+  public <T extends VinliItem> Observable<Wrapped<T>> loadItem(String link, Type type) {
     if (link == null) {
       return Observable.empty();
     }
 
-    return load(link, cls);
+    return load(link, type);
   }
 
   @SuppressWarnings("unchecked")
   public <T extends VinliItem> Observable<Page<T>> loadPage(String link, Type type) {
+    if (link == null) {
+      return Observable.empty();
+    }
+
+    return load(link, type);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends VinliItem> Observable<TimeSeries<T>> loadTimeSeries(String link, Type type) {
     if (link == null) {
       return Observable.empty();
     }

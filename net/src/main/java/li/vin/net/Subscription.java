@@ -3,12 +3,8 @@ package li.vin.net;
 import android.support.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
@@ -17,12 +13,10 @@ import auto.parcel.AutoParcel;
 public abstract class Subscription implements VinliItem {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Subscription>>() { }.getType();
 
-  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
-    final SubscriptionAdapter adapter = SubscriptionAdapter.create(app);
-
-    gb.registerTypeAdapter(Subscription.class, WrappedJsonAdapter.create(Subscription.class, adapter));
-
-    gb.registerTypeAdapter(PAGE_TYPE, PageAdapter.create(adapter, PAGE_TYPE, app, Subscription.class));
+  /*package*/ static final void registerGson(GsonBuilder gb) {
+    gb.registerTypeAdapter(Subscription.class, AutoParcelAdapter.create(AutoParcel_Subscription.class));
+    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Subscription_Links.class));
+    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Subscription.class));
   }
 
   /*package*/ static final Builder builder() {
@@ -73,49 +67,5 @@ public abstract class Subscription implements VinliItem {
     Builder links(Links l);
 
     Subscription build();
-  }
-
-  private static final class SubscriptionAdapter extends TypeAdapter<Subscription> {
-
-    public static final SubscriptionAdapter create(VinliApp app) {
-      return new SubscriptionAdapter(app);
-    }
-
-    private final VinliApp mApp;
-
-    private SubscriptionAdapter(VinliApp app) {
-      mApp = app;
-    }
-
-    @Override public void write(JsonWriter out, Subscription value) throws IOException {
-      out.beginObject();
-      out.name("id").value(value.id());
-      out.endObject();
-    }
-
-    @Override public Subscription read(JsonReader in) throws IOException {
-      final Subscription.Builder b = Subscription.builder();
-      b.app(mApp);
-
-      in.beginObject();
-      while (in.hasNext()) {
-        final String name = in.nextName();
-
-        switch (name) {
-          case "id": b.id(in.nextString()); break;
-          case "deviceId": b.deviceId(in.nextString()); break;
-          case "url": b.url(in.nextString()); break;
-          case "object": b.object(mApp.gson().<ObjectRef>fromJson(in, ObjectRef.class)); break;
-          case "appData": b.url(in.nextString()); break;
-          case "createdAt": b.url(in.nextString()); break;
-          case "updatedAt": b.url(in.nextString()); break;
-          case "links": b.links(mApp.gson().<Subscription.Links>fromJson(in, Subscription.Links.class)); break;
-          default: throw new IOException("unknown subscription key " + name);
-        }
-      }
-      in.endObject();
-
-      return b.build();
-    }
   }
 }

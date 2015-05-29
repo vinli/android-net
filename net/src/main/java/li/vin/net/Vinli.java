@@ -66,5 +66,12 @@ public final class Vinli {
     return sApp;
   }
 
+  /*package*/ static final VinliApp curApp() {
+    if (sApp == null) {
+      throw new IllegalStateException("no current app exists");
+    }
+    return sApp;
+  }
+
   private Vinli() { }
 }

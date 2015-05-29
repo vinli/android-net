@@ -13,10 +13,12 @@ import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 
-public final class VinliApp implements Devices, Diagnostics {
+public final class VinliApp implements Diagnostics {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
   private final Rules mRules;
+  private final Events mEvents;
+
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
 
@@ -26,11 +28,14 @@ public final class VinliApp implements Devices, Diagnostics {
     final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
 
-    Device.registerGson(gsonB, this);
-    Rule.registerGson(gsonB, this);
-    Event.registerGson(gsonB, this);
-    Subscription.registerGson(gsonB, this);
-    Vehicle.registerGson(gsonB, this);
+    Device.registerGson(gsonB);
+    Rule.registerGson(gsonB);
+    Event.registerGson(gsonB);
+    Subscription.registerGson(gsonB);
+    Vehicle.registerGson(gsonB);
+    Message.registerGson(gsonB);
+    Page.registerGson(gsonB);
+    TimeSeries.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -72,34 +77,31 @@ public final class VinliApp implements Devices, Diagnostics {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Rules.class);
+
+    mEvents = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.EVENTS)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Events.class);
   }
 
-  @Override public Observable<Page<Device>> devices() {
-    return mDevices.devices();
+  public Observable<Page<Device>> devices() {
+    return mDevices.devices(null, null);
   }
 
   /**
    * Pass null for default
    */
-  @Override public Observable<Page<Device>> devices(Integer limit, Integer offset) {
+  public Observable<Page<Device>> devices(Integer limit, Integer offset) {
     return mDevices.devices(limit, offset);
   }
 
-  @Override public Observable<Device> device(String deviceId) {
-    return mDevices.device(deviceId);
-  }
-
-  /** <p><b>Parameters:</b></p>  <Ul>deviceId - Api device id for Vinli devices.</Ul>
-   * <p><b>Returns:</b></p> <Ul>Device observable stream</Ul>
-   * <p><b>Notice:</b></p> <Ul>This function was orignally intended for debugging purposes.
-   * It will be gone soon.</Ul>
-   */
-  public Observable<Device> registerDevice(String deviceID) {
-    return  mDevices.registerDevice(Device.builder().id(deviceID).build());
-  }
-
-  @Override public Observable<Device> registerDevice(Device device) {
-    return mDevices.registerDevice(device);
+  public Observable<Device> device(String deviceId) {
+    return mDevices.device(deviceId).map(Wrapped.<Device>pluckItem());
   }
 
   @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
@@ -110,7 +112,11 @@ public final class VinliApp implements Devices, Diagnostics {
     return mRules;
   }
 
-  /*package*/ LinkLoader getLinkLoader() {
+  /*package*/ Events events() {
+    return mEvents;
+  }
+
+  /*package*/ LinkLoader linkLoader() {
     return mLinkLoader;
   }
 

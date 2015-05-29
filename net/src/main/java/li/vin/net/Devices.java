@@ -9,13 +9,11 @@ import rx.Observable;
 
 /*package*/ interface Devices {
 
-  @GET("/devices") Observable<Page<Device>> devices();
-
   @GET("/devices")
   Observable<Page<Device>> devices(@Query("limit") Integer limit, @Query("offset") Integer offset);
 
-  @GET("/devices/{id}") Observable<Device> device(@Path("id") String deviceId);
+  @GET("/devices/{id}") Observable<Wrapped<Device>> device(@Path("id") String deviceId);
 
-  @POST("/devices") Observable<Device> registerDevice(@Body Device device);
+  @POST("/devices") Observable<Wrapped<Device>> registerDevice(@Body Wrapped<Device> device);
 
 }

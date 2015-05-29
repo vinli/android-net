@@ -4,26 +4,21 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
 
 @AutoParcel
-public abstract class Event implements VinliItem, Parcelable {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Event>>() { }.getType();
+public abstract class Event implements VinliItem {
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Event>>() { }.getType();
 
-  /*package*/ static final void registerGson(GsonBuilder gb, VinliApp app) {
-    final EventAdapter adapter = EventAdapter.create(app);
-
-    gb.registerTypeAdapter(Event.class, WrappedJsonAdapter.create(Event.class, adapter));
-
-    gb.registerTypeAdapter(PAGE_TYPE, PageAdapter.create(adapter, PAGE_TYPE, app, Event.class));
+  /*package*/ static final void registerGson(GsonBuilder gb) {
+    gb.registerTypeAdapter(Event.class, AutoParcelAdapter.create(AutoParcel_Event.class));
+    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Event_Links.class));
+    gb.registerTypeAdapter(Meta.class, AutoParcelAdapter.create(AutoParcel_Event_Meta.class));
+    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Event.class));
   }
 
   /*package*/ static final Builder builder() {
@@ -32,13 +27,15 @@ public abstract class Event implements VinliItem, Parcelable {
 
   public abstract String eventType();
   public abstract String timestamp();
+  public abstract String deviceId();
+  public abstract Meta meta();
   @Nullable public abstract ObjectRef object();
 
   /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
 
   @AutoParcel
-  /*package*/ static abstract class Links {
+  /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
     public abstract String rules();
     public abstract String vehicles();
@@ -47,58 +44,26 @@ public abstract class Event implements VinliItem, Parcelable {
     /*package*/ Links() { }
   }
 
+  @AutoParcel
+  public static abstract class Meta implements Parcelable {
+    public abstract String direction();
+    public abstract boolean firstEval();
+    public abstract Rule rule();
+    public abstract Message message();
+  }
+
   @AutoParcel.Builder
   /*package*/ interface Builder {
     Builder id(String s);
     Builder eventType(String s);
     Builder timestamp(String s);
+    Builder deviceId(String s);
+    Builder meta(Meta m);
     Builder object(ObjectRef o);
 
     Builder app(VinliApp app);
     Builder links(Links l);
 
     Event build();
-  }
-
-  private static final class EventAdapter extends TypeAdapter<Event> {
-
-    public static final EventAdapter create(VinliApp app) {
-      return new EventAdapter(app);
-    }
-
-    private final VinliApp mApp;
-
-    private EventAdapter(VinliApp app) {
-      mApp = app;
-    }
-
-    @Override public void write(JsonWriter out, Event value) throws IOException {
-      out.beginObject();
-        out.name("id").value(value.id());
-      out.endObject();
-    }
-
-    @Override public Event read(JsonReader in) throws IOException {
-      final Event.Builder b = Event.builder()
-          .app(mApp);
-
-      in.beginObject();
-      while (in.hasNext()) {
-        final String name = in.nextName();
-
-        switch (name) {
-          case "id": b.id(in.nextString()); break;
-          case "eventType": b.eventType(in.nextString()); break;
-          case "timestamp": b.timestamp(in.nextString()); break;
-          case "object": b.object(mApp.gson().<ObjectRef>fromJson(in, ObjectRef.class)); break;
-          case "links": b.links(mApp.gson().<Event.Links>fromJson(in, AutoParcel_Event_Links.class)); break;
-          default: throw new IOException("unknown event key " + name);
-        }
-      }
-      in.endObject();
-
-      return b.build();
-    }
-
   }
 }

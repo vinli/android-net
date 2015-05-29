@@ -19,55 +19,22 @@ import java.util.Locale;
 
 import auto.parcel.AutoParcel;
 import rx.Observable;
-import rx.functions.Func1;
 import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
-public abstract class Page<T extends VinliItem> implements Parcelable {
-  public static final Func1 EXTRACT_ITEMS = new Func1<Page<?>, Observable<?>>() {
-    @Override public Observable<?> call(Page<?> tPage) {
-      return tPage.observeItems();
-    }
-  };
-
-  @SuppressWarnings("unchecked")
-  public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> extractItems() {
-    return EXTRACT_ITEMS;
-  }
-
-  public static final Func1 ALL_ITEMS = new Func1<Page<? extends VinliItem>, Observable<? extends VinliItem>>() {
-    @Override
-    @SuppressWarnings("unchecked")
-    public Observable<? extends VinliItem> call(Page<? extends VinliItem> tPage) {
-      if (tPage.hasNextPage()) {
-        return tPage.observeItems().concatWith(tPage.loadNextPage().flatMap(ALL_ITEMS));
-      }
-
-      return tPage.observeItems();
-    }
-  };
-
-  @SuppressWarnings("unchecked")
-  public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> allItems() {
-    return ALL_ITEMS;
-  }
-
+public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(
         Meta.class,
-        AutoParcelAdapter.create(AutoParcel_Page_Meta.class));
+        AutoParcelAdapter.create(AutoParcel_TimeSeries_Meta.class));
 
     gb.registerTypeAdapter(
         Meta.Pagination.class,
-        AutoParcelAdapter.create(AutoParcel_Page_Meta_Pagination.class));
+        AutoParcelAdapter.create(AutoParcel_TimeSeries_Meta_Pagination.class));
 
     gb.registerTypeAdapter(
         Meta.Pagination.Links.class,
-        AutoParcelAdapter.create(AutoParcel_Page_Meta_Pagination_Links.class));
-  }
-
-  /*package*/ static final <T extends VinliItem> Builder<T> builder() {
-    return new AutoParcel_Page.Builder<>();
+        AutoParcelAdapter.create(AutoParcel_TimeSeries_Meta_Pagination_Links.class));
   }
 
   /*package*/ abstract List<T> items();
@@ -80,7 +47,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
   public int total() {
     Log.d("Page", "pagination: " + meta().pagination());
-    return meta().pagination().total();
+    return size() + meta().pagination().remaining();
   }
 
   public List<T> getItems() {
@@ -93,46 +60,10 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
   public boolean hasNextPage() {
     final Meta.Pagination.Links links = meta().pagination().links();
-    return links != null && links.next() != null;
+    return links != null && links.prior() != null;
   }
 
-  public Observable<Page<T>> loadPrevPage() {
-    final Meta.Pagination.Links links = meta().pagination().links();
-    if (links == null) {
-      return Observable.empty();
-    }
-
-    return Vinli.curApp().linkLoader().loadPage(links.prev(), type());
-  }
-
-  public Observable<Page<T>> loadNextPage() {
-    final Meta.Pagination.Links links = meta().pagination().links();
-    if (links == null) {
-      return Observable.empty();
-    }
-
-    return Vinli.curApp().linkLoader().loadPage(links.next(), type());
-  }
-
-  public Observable<Page<T>> loadFirstPage() {
-    final Meta.Pagination.Links links = meta().pagination().links();
-    if (links == null) {
-      return Observable.empty();
-    }
-
-    return Vinli.curApp().linkLoader().loadPage(links.first(), type());
-  }
-
-  public Observable<Page<T>> loadLastPage() {
-    final Meta.Pagination.Links links = meta().pagination().links();
-    if (links == null) {
-      return Observable.empty();
-    }
-
-    return Vinli.curApp().linkLoader().loadPage(links.last(), type());
-  }
-
-  /*package*/ Page() { }
+  /*package*/ TimeSeries() { }
 
   @AutoParcel
   /*package*/ static abstract class Meta implements Parcelable {
@@ -140,17 +71,14 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
     @AutoParcel
     public static abstract class Pagination implements Parcelable {
-      public abstract int total();
+      public abstract int remaining();
       public abstract int limit();
-      public abstract int offset();
+      public abstract String until();
       @Nullable public abstract Links links();
 
       @AutoParcel
       public static abstract class Links implements Parcelable {
-        public abstract String first();
-        public abstract String last();
-        public abstract String next();
-        public abstract String prev();
+        public abstract String prior();
       }
     }
   }
@@ -161,10 +89,10 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
     Builder<T> meta(Meta m);
     Builder<T> type(Type t);
 
-    Page<T> build();
+    TimeSeries<T> build();
   }
 
-  /*package*/ static final class Adapter<T extends VinliItem> extends TypeAdapter<Page<T>> {
+  /*package*/ static final class Adapter<T extends VinliItem> extends TypeAdapter<TimeSeries<T>> {
     public static final <T extends VinliItem> Adapter<T> create(Type pageType, Class<T> itemCls) {
       return create(pageType, itemCls, itemCls.getSimpleName().toLowerCase(Locale.US) + 's');
     }
@@ -185,16 +113,16 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       this.collectionName = collectionName;
     }
 
-    @Override public void write(JsonWriter out, Page<T> value) throws IOException {
-      throw new UnsupportedOperationException("writing a page is not supported");
+    @Override public void write(JsonWriter out, TimeSeries<T> value) throws IOException {
+      throw new UnsupportedOperationException("writing a time series is not supported");
     }
 
-    @Override public Page<T> read(JsonReader in) throws IOException {
+    @Override public TimeSeries<T> read(JsonReader in) throws IOException {
       if (gson == null) {
         gson = Vinli.curApp().gson();
       }
 
-      final Page.Builder<T> b = new AutoParcel_Page.Builder<T>()
+      final TimeSeries.Builder<T> b = new AutoParcel_TimeSeries.Builder<T>()
           .type(pageType);
 
       in.beginObject();
@@ -202,7 +130,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
         final String name = in.nextName();
 
         if ("meta".equals(name)) {
-          b.meta(gson.<Page.Meta>fromJson(in, Page.Meta.class));
+          b.meta(gson.<TimeSeries.Meta>fromJson(in, TimeSeries.Meta.class));
         } else if (collectionName.equals(name)) {
           final List<T> items = new ArrayList<>();
 
