@@ -11,4 +11,6 @@ public abstract class Message implements VinliItem {
   }
 
   public abstract String timestamp();
+
+  /*package*/ Message() { }
 }
