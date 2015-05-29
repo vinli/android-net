@@ -6,10 +6,39 @@ import java.util.List;
 
 import auto.parcel.AutoParcel;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
 public abstract class Page<T extends VinliItem> {
+  public static final Func1 EXTRACT_ITEMS = new Func1<Page<?>, Observable<?>>() {
+    @Override public Observable<?> call(Page<?> tPage) {
+      return tPage.observeItems();
+    }
+  };
+
+  @SuppressWarnings("unchecked")
+  public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> extractItems() {
+    return EXTRACT_ITEMS;
+  }
+
+  public static final Func1 ALL_ITEMS = new Func1<Page<? extends VinliItem>, Observable<? extends VinliItem>>() {
+    @Override
+    @SuppressWarnings("unchecked")
+    public Observable<? extends VinliItem> call(Page<? extends VinliItem> tPage) {
+      if (tPage.hasNextPage()) {
+        return tPage.observeItems().concatWith(tPage.loadNextPage().flatMap(ALL_ITEMS));
+      }
+
+      return tPage.observeItems();
+    }
+  };
+
+  @SuppressWarnings("unchecked")
+  public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> allItems() {
+    return ALL_ITEMS;
+  }
+
   /*package*/ static final <T extends VinliItem> Builder<T> builder() {
     return new AutoParcel_Page.Builder<>();
   }
@@ -32,7 +61,10 @@ public abstract class Page<T extends VinliItem> {
   }
 
   public boolean hasNextPage() {
-    return meta().pagination.links.next != null;
+    final Meta meta = meta();
+    return meta.pagination != null &&
+        meta.pagination.links != null &&
+        meta.pagination.links.next != null;
   }
 
   public Observable<Page<T>> loadPrevPage() {
