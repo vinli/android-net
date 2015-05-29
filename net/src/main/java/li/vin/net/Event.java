@@ -45,16 +45,6 @@ public abstract class Event implements VinliItem, Parcelable {
     public abstract String latestVehicle();
 
     /*package*/ Links() { }
-
-    @AutoParcel.Builder
-    interface Builder {
-      Builder self(String s);
-      Builder rules(String s);
-      Builder vehicles(String s);
-      Builder latestVehicle(String s);
-
-      Links build();
-    }
   }
 
   @AutoParcel.Builder
@@ -101,7 +91,7 @@ public abstract class Event implements VinliItem, Parcelable {
           case "eventType": b.eventType(in.nextString()); break;
           case "timestamp": b.timestamp(in.nextString()); break;
           case "object": b.object(mApp.gson().<ObjectRef>fromJson(in, ObjectRef.class)); break;
-          case "links": b.links(mApp.gson().<Event.Links>fromJson(in, Event.Links.class)); break;
+          case "links": b.links(mApp.gson().<Event.Links>fromJson(in, AutoParcel_Event_Links.class)); break;
           default: throw new IOException("unknown event key " + name);
         }
       }

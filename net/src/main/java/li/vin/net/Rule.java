@@ -58,24 +58,11 @@ public abstract class Rule implements VinliItem {
 
   @AutoParcel
   /*package*/ static abstract class Links {
-    /*package*/ static final Builder builder() {
-      return new AutoParcel_Rule_Links.Builder();
-    }
-
     public abstract String self();
     public abstract String events();
     public abstract String subscriptions();
 
     /*package*/ Links() { }
-
-    @AutoParcel.Builder
-    interface Builder {
-      Builder self(String s);
-      Builder events(String s);
-      Builder subscriptions(String s);
-
-      Links build();
-    }
   }
 
   @AutoParcel.Builder
@@ -262,7 +249,7 @@ public abstract class Rule implements VinliItem {
 
             b.parametricBoundaries(parametricBoundaries);
             break;
-          case "links": b.links(mApp.gson().<Rule.Links>fromJson(in, Rule.Links.class)); break;
+          case "links": b.links(mApp.gson().<Rule.Links>fromJson(in, AutoParcel_Rule_Links.class)); break;
           default: throw new IOException("unknown rule key " + name);
         }
       }

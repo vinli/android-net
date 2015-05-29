@@ -52,16 +52,6 @@ public abstract class Device implements VinliItem {
     public abstract String latestVehicle();
 
     /*package*/ Links() { }
-
-    @AutoParcel.Builder
-    interface Builder {
-      Builder self(String s);
-      Builder rules(String s);
-      Builder vehicles(String s);
-      Builder latestVehicle(String s);
-
-      Links build();
-    }
   }
 
   @AutoParcel.Builder
@@ -102,7 +92,7 @@ public abstract class Device implements VinliItem {
 
           switch (name) {
             case "id": b.id(in.nextString()); break;
-            case "links": b.links(mApp.gson().<Device.Links>fromJson(in, Device.Links.class)); break;
+            case "links": b.links(mApp.gson().<Device.Links>fromJson(in, AutoParcel_Device_Links.class)); break;
             default: throw new IOException("unknown device key " + name);
           }
         }
