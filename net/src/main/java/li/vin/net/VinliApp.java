@@ -73,19 +73,19 @@ public final class VinliApp implements Devices, Diagnostics {
         .create(Rules.class);
   }
 
-  @Override public Observable<Page<Device>> getDevices() {
-    return mDevices.getDevices();
+  @Override public Observable<Page<Device>> devices() {
+    return mDevices.devices();
   }
 
   /**
    * Pass null for default
    */
-  @Override public Observable<Page<Device>> getDevices(Integer limit, Integer offset) {
-    return mDevices.getDevices(limit, offset);
+  @Override public Observable<Page<Device>> devices(Integer limit, Integer offset) {
+    return mDevices.devices(limit, offset);
   }
 
-  @Override public Observable<Device> getDevice(String deviceId) {
-    return mDevices.getDevice(deviceId);
+  @Override public Observable<Device> device(String deviceId) {
+    return mDevices.device(deviceId);
   }
 
   /** <p><b>Parameters:</b></p>  <Ul>deviceId - Api device id for Vinli devices.</Ul>
