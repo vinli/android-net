@@ -36,6 +36,7 @@ public final class VinliApp implements Diagnostics {
     Message.registerGson(gsonB);
     Page.registerGson(gsonB);
     TimeSeries.registerGson(gsonB);
+    ObjectRef.registerGson(gsonB);
 
     mGson = gsonB.create();
 
