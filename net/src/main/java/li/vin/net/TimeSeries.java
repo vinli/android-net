@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,10 +18,39 @@ import java.util.Locale;
 
 import auto.parcel.AutoParcel;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
 public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
+  public static final Func1 EXTRACT_ITEMS = new Func1<TimeSeries<?>, Observable<?>>() {
+    @Override public Observable<?> call(TimeSeries<?> tTimeSeries) {
+      return tTimeSeries.observeItems();
+    }
+  };
+
+  @SuppressWarnings("unchecked")
+  public static final <T extends VinliItem> Func1<TimeSeries<T>, Observable<T>> extractItems() {
+    return (Func1<TimeSeries<T>, Observable<T>>) EXTRACT_ITEMS;
+  }
+
+  public static final Func1 ALL_ITEMS = new Func1<TimeSeries<? extends VinliItem>, Observable<? extends VinliItem>>() {
+    @Override
+    @SuppressWarnings("unchecked")
+    public Observable<? extends VinliItem> call(TimeSeries<? extends VinliItem> tTimeSeries) {
+      if (tTimeSeries.hasPrior()) {
+        return tTimeSeries.observeItems().concatWith(tTimeSeries.loadPrior().flatMap(ALL_ITEMS));
+      }
+
+      return tTimeSeries.observeItems();
+    }
+  };
+
+  @SuppressWarnings("unchecked")
+  public static final <T extends VinliItem> Func1<TimeSeries<T>, Observable<T>> allItems() {
+    return (Func1<TimeSeries<T>, Observable<T>>) ALL_ITEMS;
+  }
+
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(
         Meta.class,
@@ -46,7 +74,6 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
   }
 
   public int total() {
-    Log.d("Page", "pagination: " + meta().pagination());
     return size() + meta().pagination().remaining();
   }
 
@@ -58,7 +85,16 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
     return Observable.create(new OnSubscribeFromIterable<>(items()));
   }
 
-  public boolean hasNextPage() {
+  public Observable<TimeSeries<T>> loadPrior() {
+    final Meta.Pagination.Links links = meta().pagination().links();
+    if (links == null) {
+      return Observable.empty();
+    }
+
+    return Vinli.curApp().linkLoader().loadTimeSeries(links.prior(), type());
+  }
+
+  public boolean hasPrior() {
     final Meta.Pagination.Links links = meta().pagination().links();
     return links != null && links.prior() != null;
   }

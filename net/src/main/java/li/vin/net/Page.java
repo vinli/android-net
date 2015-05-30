@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,7 +31,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
   @SuppressWarnings("unchecked")
   public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> extractItems() {
-    return EXTRACT_ITEMS;
+    return (Func1<Page<T>, Observable<T>>) EXTRACT_ITEMS;
   }
 
   public static final Func1 ALL_ITEMS = new Func1<Page<? extends VinliItem>, Observable<? extends VinliItem>>() {
@@ -49,7 +48,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
   @SuppressWarnings("unchecked")
   public static final <T extends VinliItem> Func1<Page<T>, Observable<T>> allItems() {
-    return ALL_ITEMS;
+    return (Func1<Page<T>, Observable<T>>) ALL_ITEMS;
   }
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
@@ -79,7 +78,6 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
   }
 
   public int total() {
-    Log.d("Page", "pagination: " + meta().pagination());
     return meta().pagination().total();
   }
 

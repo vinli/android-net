@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
@@ -35,7 +36,6 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(ParametricBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
     gb.registerTypeAdapter(RadiusBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
-    gb.registerTypeAdapter(Coordinate.class, AutoParcelAdapter.create(AutoParcel_Rule_Coordinate.class));
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
   }
 
@@ -133,26 +133,6 @@ public abstract class Rule implements VinliItem {
     }
 
     /*package*/ RadiusBoundary() { }
-  }
-
-  @AutoParcel
-  public static abstract class Coordinate implements Parcelable {
-    /*package*/ static final Builder builder() {
-      return new AutoParcel_Rule_Coordinate.Builder();
-    }
-
-    public abstract float lon();
-    public abstract float lat();
-
-    @AutoParcel.Builder
-    /*package*/ interface Builder {
-      Builder lon(float f);
-      Builder lat(float f);
-
-      Coordinate build();
-    }
-
-    /*package*/ Coordinate() { }
   }
 
   @AutoParcel
@@ -259,7 +239,7 @@ public abstract class Rule implements VinliItem {
                   b.radiusBoundary(gson.fromJson(boundary, RadiusBoundary.class));
                   break;
                 default:
-                  throw new IOException("unknown boundary type " + type);
+                  throw new JsonParseException("unknown boundary type " + type);
               }
             }
 
@@ -268,7 +248,7 @@ public abstract class Rule implements VinliItem {
             b.parametricBoundaries(parametricBoundaries);
             break;
           case "links": b.links(gson.<Rule.Links>fromJson(in, Links.class)); break;
-          default: throw new IOException("unknown rule key " + name);
+          default: throw new JsonParseException("unknown rule key " + name);
         }
       }
       in.endObject();

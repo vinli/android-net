@@ -47,7 +47,7 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Event>> events() {
-    return Vinli.curApp().events().events(id(), null, null, null, null, null);
+    return events(null, null, null, null, null);
   }
 
   public Observable<TimeSeries<Event>> events(
@@ -57,6 +57,25 @@ public abstract class Device implements VinliItem {
       @Nullable Date until,
       @Nullable Integer limit) {
     return Vinli.curApp().events().events(id(), type, objectId, since, until, limit);
+  }
+
+  public Observable<TimeSeries<Location>> locations() {
+    return locations(null, null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Location>> locations(
+      @Nullable String fields,
+      @Nullable Date until,
+      @Nullable Date since,
+      @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().locations().locations(id(), fields, until, since, limit, sortDir);
+  }
+
+  public Observable<Location> latestlocation() {
+    return locations(null, null, null, 1, null)
+        .flatMap(TimeSeries.<Location>extractItems())
+        .firstOrDefault(null);
   }
 
   @AutoParcel

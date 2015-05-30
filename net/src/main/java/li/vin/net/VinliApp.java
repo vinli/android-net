@@ -18,6 +18,7 @@ public final class VinliApp implements Diagnostics {
   private final Diagnostics mDiagnostics;
   private final Rules mRules;
   private final Events mEvents;
+  private final Locations mLocations;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -37,6 +38,8 @@ public final class VinliApp implements Diagnostics {
     Page.registerGson(gsonB);
     TimeSeries.registerGson(gsonB);
     ObjectRef.registerGson(gsonB);
+    Location.registerGson(gsonB);
+    Coordinate.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -88,6 +91,16 @@ public final class VinliApp implements Diagnostics {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Events.class);
+
+    mLocations = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.TELEMETRY)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Locations.class);
   }
 
   public Observable<Page<Device>> devices() {
@@ -115,6 +128,10 @@ public final class VinliApp implements Diagnostics {
 
   /*package*/ Events events() {
     return mEvents;
+  }
+
+  /*package*/ Locations locations() {
+    return mLocations;
   }
 
   /*package*/ LinkLoader linkLoader() {
