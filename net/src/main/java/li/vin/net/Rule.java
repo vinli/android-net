@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -17,6 +18,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import auto.parcel.AutoParcel;
@@ -25,11 +27,13 @@ import rx.Observable;
 @AutoParcel
 public abstract class Rule implements VinliItem {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Rule>>() { }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Rule>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     final RuleAdapter adapter = new RuleAdapter();
 
     gb.registerTypeAdapter(Rule.class, adapter);
+    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Rule.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Rule.class));
 
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Rule_Links.class));
@@ -40,7 +44,8 @@ public abstract class Rule implements VinliItem {
   }
 
   /*package*/ static final Builder builder() {
-    return new AutoParcel_Rule.Builder();
+    return new AutoParcel_Rule.Builder()
+        .parametricBoundaries(Collections.<ParametricBoundary>emptyList());
   }
 
   public abstract String name();
@@ -50,7 +55,7 @@ public abstract class Rule implements VinliItem {
   @Nullable public abstract String deviceId();
   @Nullable public abstract PolygonBoundary polygonBoundary();
   @Nullable public abstract RadiusBoundary radiusBoundary();
-  @Nullable public abstract List<ParametricBoundary> parametricBoundaries();
+  @NonNull public abstract List<ParametricBoundary> parametricBoundaries();
 
   /*package*/ abstract Links links();
 
@@ -62,6 +67,12 @@ public abstract class Rule implements VinliItem {
 
   public Observable<Page<Subscription>> subscriptions() {
     return Vinli.curApp().linkLoader().loadPage(links().subscriptions(), Subscription.PAGE_TYPE);
+  }
+
+  public Observable<Rule> fill() {
+    return Vinli.curApp().linkLoader()
+        .<Rule>loadItem(links().self(), Rule.WRAPPED_TYPE)
+        .map(Wrapped.<Rule>pluckItem());
   }
 
   @AutoParcel
@@ -83,7 +94,7 @@ public abstract class Rule implements VinliItem {
     Builder deviceId(@Nullable String s);
     Builder polygonBoundary(@Nullable PolygonBoundary pb);
     Builder radiusBoundary(@Nullable RadiusBoundary rb);
-    Builder parametricBoundaries(@Nullable List<ParametricBoundary> l);
+    Builder parametricBoundaries(List<ParametricBoundary> l);
     Builder links(Links l);
 
     Rule build();
