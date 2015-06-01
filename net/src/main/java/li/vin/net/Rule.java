@@ -43,7 +43,7 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
   }
 
-  /*package*/ static final Builder builder() {
+  public static final Builder builder() {
     return new AutoParcel_Rule.Builder()
         .parametricBoundaries(Collections.<ParametricBoundary>emptyList());
   }
@@ -85,7 +85,7 @@ public abstract class Rule implements VinliItem {
   }
 
   @AutoParcel.Builder
-  /*package*/ interface Builder {
+  public interface Builder {
     Builder id(String s);
     Builder name(String s);
     Builder evaluated(boolean b);
@@ -102,7 +102,7 @@ public abstract class Rule implements VinliItem {
 
   @AutoParcel
   public static abstract class ParametricBoundary implements VinliItem {
-    /*package*/ static final Builder builder() {
+    public static final Builder builder() {
       return new AutoParcel_Rule_ParametricBoundary.Builder();
     }
 
@@ -111,7 +111,7 @@ public abstract class Rule implements VinliItem {
     @Nullable public abstract Float max();
 
     @AutoParcel.Builder
-    /*package*/ interface Builder {
+    public interface Builder {
       Builder id(String s);
       Builder parameter(String s);
       Builder min(Float f);
@@ -125,7 +125,7 @@ public abstract class Rule implements VinliItem {
 
   @AutoParcel
   public static abstract class RadiusBoundary implements VinliItem {
-    /*package*/ static final Builder builder() {
+    public static final Builder builder() {
       return new AutoParcel_Rule_RadiusBoundary.Builder();
     }
 
@@ -134,7 +134,7 @@ public abstract class Rule implements VinliItem {
     public abstract float lat();
 
     @AutoParcel.Builder
-    /*package*/ interface Builder {
+    public interface Builder {
       Builder id(String s);
       Builder radius(float f);
       Builder lon(float f);
@@ -148,14 +148,14 @@ public abstract class Rule implements VinliItem {
 
   @AutoParcel
   public static abstract class PolygonBoundary implements VinliItem {
-    /*package*/ static final Builder builder() {
+    public static final Builder builder() {
       return new AutoParcel_Rule_PolygonBoundary.Builder();
     }
 
     public abstract List<Coordinate> coordinates();
 
     @AutoParcel.Builder
-    /*package*/ interface Builder {
+    public interface Builder {
       Builder id(String s);
       Builder coordinates(List<Coordinate> l);
 
