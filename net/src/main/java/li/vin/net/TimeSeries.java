@@ -114,7 +114,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
 
       @AutoParcel
       public static abstract class Links implements Parcelable {
-        public abstract String prior();
+        @Nullable public abstract String prior();
       }
     }
   }

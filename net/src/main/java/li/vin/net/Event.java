@@ -36,9 +36,10 @@ public abstract class Event implements VinliItem {
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
-    public abstract String rules();
-    public abstract String vehicles();
-    public abstract String latestVehicle();
+//    public abstract String rules();
+//    public abstract String vehicles();
+//    public abstract String latestVehicle();
+    public abstract String notifications();
 
     /*package*/ Links() { }
   }

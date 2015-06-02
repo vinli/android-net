@@ -78,8 +78,8 @@ public abstract class Rule implements VinliItem {
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
-    public abstract String events();
-    public abstract String subscriptions();
+    @Nullable public abstract String events();
+    @Nullable public abstract String subscriptions();
 
     /*package*/ Links() { }
   }
@@ -152,12 +152,12 @@ public abstract class Rule implements VinliItem {
       return new AutoParcel_Rule_PolygonBoundary.Builder();
     }
 
-    public abstract List<Coordinate> coordinates();
+    public abstract List<List<Coordinate>> coordinates();
 
     @AutoParcel.Builder
     public interface Builder {
       Builder id(String s);
-      Builder coordinates(List<Coordinate> l);
+      Builder coordinates(List<List<Coordinate>> l);
 
       PolygonBoundary build();
     }

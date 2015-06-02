@@ -147,8 +147,8 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       public static abstract class Links implements Parcelable {
         public abstract String first();
         public abstract String last();
-        public abstract String next();
-        public abstract String prev();
+        @Nullable public abstract String next();
+        @Nullable public abstract String prev();
       }
     }
   }
