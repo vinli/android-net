@@ -39,11 +39,17 @@ public abstract class Location implements VinliItem {
   }
 
   private static final class LocationAdapter extends TypeAdapter<Location> {
+    private Gson gson;
+
     @Override public void write(JsonWriter out, Location value) throws IOException {
       throw new UnsupportedOperationException("writing a location is not supported");
     }
 
     @Override public Location read(JsonReader in) throws IOException {
+      if (gson == null) {
+        gson = Vinli.curApp().gson();
+      }
+
       final Location.Builder b = new AutoParcel_Location.Builder();
 
       in.beginObject();
@@ -59,14 +65,7 @@ public abstract class Location implements VinliItem {
 
               switch (geoName) {
                 case "type": in.skipValue(); break;
-                case "coordinates":
-                  in.beginArray();
-                    b.coordinate(Coordinate.builder()
-                        .lon((float) in.nextDouble())
-                        .lat((float) in.nextDouble())
-                        .build());
-                  in.endArray();
-                  break;
+                case "coordinates": b.coordinate(gson.<Coordinate>fromJson(in, Coordinate.class)); break;
                 default: throw new JsonParseException("unknown location geometry key " + geoName);
               }
             }
