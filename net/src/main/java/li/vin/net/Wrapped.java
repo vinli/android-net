@@ -1,6 +1,6 @@
 package li.vin.net;
 
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -15,7 +15,7 @@ import auto.parcel.AutoParcel;
 import rx.functions.Func1;
 
 @AutoParcel
-/*package*/ abstract class Wrapped<T extends VinliItem> implements Parcelable {
+/*package*/ abstract class Wrapped<T> {
   public static final Func1 PLUCK_ITEM = new Func1<Wrapped<?>, Object>() {
     @Override public Object call(Wrapped<?> tWrapped) {
       return tWrapped.item();
@@ -23,18 +23,22 @@ import rx.functions.Func1;
   };
 
   @SuppressWarnings("unchecked")
-  public static final <T extends VinliItem> Func1<Wrapped<T>, T> pluckItem() {
+  public static final <T> Func1<Wrapped<T>, T> pluckItem() {
     return PLUCK_ITEM;
+  }
+
+  public static final <T> Wrapped<T> create(@NonNull T item) {
+    return new AutoParcel_Wrapped<>(item);
   }
 
   @Nullable public abstract T item();
 
-  /*package*/ static final class Adapter<T extends VinliItem> extends TypeAdapter<Wrapped<T>> {
-    public static final <T extends VinliItem> Adapter<T> create(Class<T> itemCls) {
+  /*package*/ static final class Adapter<T> extends TypeAdapter<Wrapped<T>> {
+    public static final <T> Adapter<T> create(Class<T> itemCls) {
       return create(itemCls, itemCls.getSimpleName().toLowerCase(Locale.US));
     }
 
-    public static final <T extends VinliItem> Adapter<T> create(Class<T> itemCls, String itemName) {
+    public static final <T> Adapter<T> create(Class<T> itemCls, String itemName) {
       return new Adapter<>(itemCls, itemName);
     }
 

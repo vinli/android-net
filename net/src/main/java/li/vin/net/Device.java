@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
@@ -33,17 +34,21 @@ public abstract class Device implements VinliItem {
   /*package*/ Device() { }
 
   public Observable<Page<Vehicle>> vehicles() {
-    return Vinli.curApp().linkLoader().loadPage(links().vehicles(), Vehicle.PAGE_TYPE);
+    return Vinli.curApp().linkLoader().read(links().vehicles(), Vehicle.PAGE_TYPE);
   }
 
   public Observable<Vehicle> latestVehicle() {
     return Vinli.curApp().linkLoader()
-        .<Vehicle>loadItem(links().latestVehicle(), Vehicle.WRAPPED_TYPE)
+        .<Wrapped<Vehicle>>read(links().latestVehicle(), Vehicle.WRAPPED_TYPE)
         .map(Wrapped.<Vehicle>pluckItem());
   }
 
   public Observable<Page<Rule>> rules() {
-    return Vinli.curApp().rules().forDevice(this.id(), null, null);
+    return Vinli.curApp().rules().rules(id(), null, null);
+  }
+
+  public Observable<Rule> rule(@NonNull String ruleId) {
+    return Vinli.curApp().rules().rule(id(), ruleId).map(Wrapped.<Rule>pluckItem());
   }
 
   public Observable<TimeSeries<Event>> events() {

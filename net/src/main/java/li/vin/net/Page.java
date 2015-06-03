@@ -97,37 +97,47 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
   public Observable<Page<T>> loadPrevPage() {
     final Meta.Pagination.Links links = meta().pagination().links();
     if (links == null) {
-      return Observable.empty();
+      return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().loadPage(links.prev(), type());
+    final String link = links.prev();
+    if (link == null) {
+      return Observable.error(new IOException("no prev link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(link, type());
   }
 
   public Observable<Page<T>> loadNextPage() {
     final Meta.Pagination.Links links = meta().pagination().links();
     if (links == null) {
-      return Observable.empty();
+      return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().loadPage(links.next(), type());
+    final String link = links.next();
+    if (link == null) {
+      return Observable.error(new IOException("no next link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(link, type());
   }
 
   public Observable<Page<T>> loadFirstPage() {
     final Meta.Pagination.Links links = meta().pagination().links();
     if (links == null) {
-      return Observable.empty();
+      return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().loadPage(links.first(), type());
+    return Vinli.curApp().linkLoader().read(links.first(), type());
   }
 
   public Observable<Page<T>> loadLastPage() {
     final Meta.Pagination.Links links = meta().pagination().links();
     if (links == null) {
-      return Observable.empty();
+      return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().loadPage(links.last(), type());
+    return Vinli.curApp().linkLoader().read(links.last(), type());
   }
 
   /*package*/ Page() { }

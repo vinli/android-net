@@ -88,10 +88,15 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
   public Observable<TimeSeries<T>> loadPrior() {
     final Meta.Pagination.Links links = meta().pagination().links();
     if (links == null) {
-      return Observable.empty();
+      return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().loadTimeSeries(links.prior(), type());
+    final String link = links.prior();
+    if (link == null) {
+      return Observable.error(new IOException("no prior link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(link, type());
   }
 
   public boolean hasPrior() {
