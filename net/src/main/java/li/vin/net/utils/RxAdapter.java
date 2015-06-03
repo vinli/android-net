@@ -71,8 +71,8 @@ public abstract class RxAdapter<T> extends BaseAdapter {
   }
 
   private static final <T> Observable<T> bind(@NonNull Object context, @NonNull Observable<T> observable) {
-    return context instanceof Activity ?
-        AppObservable.bindActivity((Activity) context, observable) :
-        AppObservable.bindFragment(context, observable);
+    return context instanceof Activity
+        ? AppObservable.bindActivity((Activity) context, observable)
+        : AppObservable.bindFragment(context, observable);
   }
 }

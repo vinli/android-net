@@ -47,9 +47,9 @@ import java.util.Locale;
       throw new IOException(name + " does not match expected name " + mName);
     }
 
-    final T item = mAdapter == null ?
-        mApp.gson().<T>fromJson(in, mClass) :
-        mAdapter.read(in);
+    final T item = mAdapter == null
+        ? mApp.gson().<T>fromJson(in, mClass)
+        : mAdapter.read(in);
 
     in.endObject();
 

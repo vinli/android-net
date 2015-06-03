@@ -53,7 +53,7 @@ public abstract class Location implements VinliItem {
       final Location.Builder b = new AutoParcel_Location.Builder();
 
       in.beginObject();
-      while(in.hasNext()) {
+      while (in.hasNext()) {
         final String locationName = in.nextName();
 
         switch (locationName) {
@@ -73,7 +73,7 @@ public abstract class Location implements VinliItem {
             break;
           case "properties":
             in.beginObject();
-            while(in.hasNext()) {
+            while (in.hasNext()) {
               final String propName = in.nextName();
 
               switch (propName) {

@@ -91,8 +91,8 @@ public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter {
   }
 
   private static final <T extends VinliItem> Observable<Page<T>> bind(Object context, Observable<Page<T>> observable) {
-    return context instanceof Activity ?
-        AppObservable.bindActivity((Activity) context, observable) :
-        AppObservable.bindFragment(context, observable);
+    return context instanceof Activity
+        ? AppObservable.bindActivity((Activity) context, observable)
+        : AppObservable.bindFragment(context, observable);
   }
 }
