@@ -66,11 +66,21 @@ public abstract class Rule implements VinliItem {
   /*package*/ Rule() { }
 
   public Observable<TimeSeries<Event>> events() {
-    return Vinli.curApp().linkLoader().read(links().events(), Event.TIME_SERIES_TYPE);
+    final String events = links().events();
+    if (events == null) {
+      return Observable.error(new IOException("no events link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(events, Event.TIME_SERIES_TYPE);
   }
 
   public Observable<Page<Subscription>> subscriptions() {
-    return Vinli.curApp().linkLoader().read(links().subscriptions(), Subscription.PAGE_TYPE);
+    final String subscriptions = links().subscriptions();
+    if (subscriptions == null) {
+      return Observable.error(new IOException("no subscriptions link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(subscriptions, Subscription.PAGE_TYPE);
   }
 
   public Observable<Rule> fill() {
