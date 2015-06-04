@@ -41,6 +41,10 @@ public abstract class Subscription implements VinliItem {
     return Vinli.curApp().linkLoader().read(links().notifications(), Notification.PAGE_TYPE);
   }
 
+  public Observable<Void> delete() {
+    return Vinli.curApp().linkLoader().delete(links().self());
+  }
+
   @AutoParcel
   /*package*/ static abstract class Links {
     public abstract String self();
