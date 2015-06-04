@@ -1,5 +1,8 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -7,11 +10,15 @@ import rx.Observable;
 
 public interface Vehicles {
 
-  @GET("/vehicles") Observable<Page<Vehicle>> getVehicles();
+  @GET("/devices/{deviceId}/vehicles")
+  Observable<Page<Vehicle>> vehicles(
+      @NonNull @Path("deviceId") String deviceId,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("offset") Integer offset);
 
-  @GET("/vehicles")
-  Observable<Page<Vehicle>> getVehicles(@Query("limit") Integer limit, @Query("offset") Integer offset);
-  @GET("/devices/{id}/vehicles/_latest") Observable<Vehicle> getLatestDeviceVehicle(@Path("id") String deviceId);
-  @GET("/vehicles/{id}") Observable<Vehicle> getVehicle(@Path("id") String id);
+  @GET("/devices/{deviceId}/vehicles/{vehicleId}")
+  Observable<Wrapped<Vehicle>> vehicle(
+      @NonNull @Path("deviceId") String deviceId,
+      @NonNull @Path("vehicleId") String vehicleId);
 
 }

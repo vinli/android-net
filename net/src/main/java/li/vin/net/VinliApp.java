@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,6 +20,8 @@ public final class VinliApp implements Diagnostics {
   private final Rules mRules;
   private final Events mEvents;
   private final Locations mLocations;
+  private final Snapshots mSnapshots;
+  private final Vehicles mVehicles;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -63,6 +66,7 @@ public final class VinliApp implements Diagnostics {
         .build();
 
     mDevices = platformAdapter.create(Devices.class);
+    mVehicles = platformAdapter.create(Vehicles.class);
 
     mDiagnostics = new RestAdapter.Builder()
         .setEndpoint(Endpoint.DIAGNOSTICS)
@@ -94,15 +98,17 @@ public final class VinliApp implements Diagnostics {
         .build()
         .create(Events.class);
 
-    mLocations = new RestAdapter.Builder()
+    final RestAdapter telemAdapter = new RestAdapter.Builder()
         .setEndpoint(Endpoint.TELEMETRY)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
         .setConverter(gson)
         .setRequestInterceptor(oauthInterceptor)
-        .build()
-        .create(Locations.class);
+        .build();
+
+    mLocations = telemAdapter.create(Locations.class);
+    mSnapshots = telemAdapter.create(Snapshots.class);
   }
 
   public Observable<Page<Device>> devices() {
@@ -112,16 +118,22 @@ public final class VinliApp implements Diagnostics {
   /**
    * Pass null for default
    */
-  public Observable<Page<Device>> devices(Integer limit, Integer offset) {
+  public Observable<Page<Device>> devices(
+      @Nullable Integer limit,
+      @Nullable Integer offset) {
     return mDevices.devices(limit, offset);
   }
 
-  public Observable<Device> device(String deviceId) {
+  public Observable<Device> device(@NonNull String deviceId) {
     return mDevices.device(deviceId).map(Wrapped.<Device>pluckItem());
   }
 
   @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
     return mDiagnostics.diagnoseDtcCode(dtcCode);
+  }
+
+  /*package*/ Vehicles vehicles() {
+    return mVehicles;
   }
 
   /*package*/ Rules rules() {
@@ -134,6 +146,10 @@ public final class VinliApp implements Diagnostics {
 
   /*package*/ Locations locations() {
     return mLocations;
+  }
+
+  /*package*/ Snapshots snapshots() {
+    return mSnapshots;
   }
 
   /*package*/ LinkLoader linkLoader() {

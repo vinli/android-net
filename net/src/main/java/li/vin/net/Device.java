@@ -30,17 +30,32 @@ public abstract class Device implements VinliItem {
   /*package*/ Device() { }
 
   public Observable<Page<Vehicle>> vehicles() {
-    return Vinli.curApp().linkLoader().read(links().vehicles(), Vehicle.PAGE_TYPE);
+    return vehicles(null, null);
   }
 
-  public Observable<Vehicle> latestVehicle() {
-    return Vinli.curApp().linkLoader()
-        .<Wrapped<Vehicle>>read(links().latestVehicle(), Vehicle.WRAPPED_TYPE)
+  public Observable<Page<Vehicle>> vehicles(
+      @Nullable Integer limit,
+      @Nullable Integer offset) {
+    return Vinli.curApp().vehicles().vehicles(id(), limit, offset);
+  }
+
+  public Observable<Vehicle> vehicle(@NonNull String vehicleId) {
+    return Vinli.curApp().vehicles().vehicle(id(), vehicleId)
         .map(Wrapped.<Vehicle>pluckItem());
   }
 
+  public Observable<Vehicle> latestVehicle() {
+    return vehicle("_latest");
+  }
+
   public Observable<Page<Rule>> rules() {
-    return Vinli.curApp().rules().rules(id(), null, null);
+    return rules(null, null);
+  }
+
+  public Observable<Page<Rule>> rules(
+      @Nullable Integer limit,
+      @Nullable Integer offset) {
+    return Vinli.curApp().rules().rules(id(), limit, offset);
   }
 
   public Observable<Rule> rule(@NonNull String ruleId) {
@@ -77,6 +92,19 @@ public abstract class Device implements VinliItem {
     return locations(null, null, null, 1, null)
         .flatMap(TimeSeries.<Location>extractItems())
         .firstOrDefault(null);
+  }
+
+  public Observable<TimeSeries<Snapshot>> snapshots() {
+    return snapshots(null, null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Snapshot>> snapshots(
+      @Nullable String fields,
+      @Nullable Date until,
+      @Nullable Date since,
+      @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().snapshots().snapshots(id(), fields, until, since, limit, sortDir);
   }
 
   @AutoParcel

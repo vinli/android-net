@@ -1,8 +1,9 @@
 package li.vin.net;
 
-import retrofit.http.Body;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import retrofit.http.GET;
-import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
@@ -10,10 +11,12 @@ import rx.Observable;
 /*package*/ interface Devices {
 
   @GET("/devices")
-  Observable<Page<Device>> devices(@Query("limit") Integer limit, @Query("offset") Integer offset);
+  Observable<Page<Device>> devices(
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("offset") Integer offset);
 
-  @GET("/devices/{id}") Observable<Wrapped<Device>> device(@Path("id") String deviceId);
-
-  @POST("/devices") Observable<Wrapped<Device>> registerDevice(@Body Wrapped<Device> device);
+  @GET("/devices/{deviceId}")
+  Observable<Wrapped<Device>> device(
+      @NonNull @Path("deviceId") String deviceId);
 
 }
