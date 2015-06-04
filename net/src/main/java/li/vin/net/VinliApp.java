@@ -40,6 +40,7 @@ public final class VinliApp implements Diagnostics {
     ObjectRef.registerGson(gsonB);
     Location.registerGson(gsonB);
     Coordinate.registerGson(gsonB);
+    Snapshot.registerGson(gsonB);
 
     mGson = gsonB.create();
 
