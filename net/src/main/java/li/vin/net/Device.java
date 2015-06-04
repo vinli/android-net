@@ -59,7 +59,8 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<Rule> rule(@NonNull String ruleId) {
-    return Vinli.curApp().rules().rule(id(), ruleId).map(Wrapped.<Rule>pluckItem());
+    return Vinli.curApp().rules().rule(id(), ruleId)
+        .map(Wrapped.<Rule>pluckItem());
   }
 
   public Observable<TimeSeries<Event>> events() {
@@ -105,6 +106,23 @@ public abstract class Device implements VinliItem {
       @Nullable Integer limit,
       @Nullable String sortDir) {
     return Vinli.curApp().snapshots().snapshots(id(), fields, until, since, limit, sortDir);
+  }
+
+  public Observable<Page<Subscription>> subscriptions() {
+    return subscriptions(null, null, null, null);
+  }
+
+  public Observable<Page<Subscription>> subscriptions(
+      @Nullable Integer limit,
+      @Nullable Integer offset,
+      @Nullable String objectId,
+      @Nullable String objectType) {
+    return Vinli.curApp().subscriptions().subscriptions(id(), limit, offset, objectId, objectType);
+  }
+
+  public Observable<Subscription> subscription(@NonNull String subscriptionId) {
+    return Vinli.curApp().subscriptions().subscription(id(), subscriptionId)
+        .map(Wrapped.<Subscription>pluckItem());
   }
 
   @AutoParcel

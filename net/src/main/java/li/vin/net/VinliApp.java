@@ -22,6 +22,7 @@ public final class VinliApp implements Diagnostics {
   private final Locations mLocations;
   private final Snapshots mSnapshots;
   private final Vehicles mVehicles;
+  private final Subscriptions mSubscriptions;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -88,15 +89,17 @@ public final class VinliApp implements Diagnostics {
         .build()
         .create(Rules.class);
 
-    mEvents = new RestAdapter.Builder()
+    final RestAdapter eventsAdapter = new RestAdapter.Builder()
         .setEndpoint(Endpoint.EVENTS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
         .setConverter(gson)
         .setRequestInterceptor(oauthInterceptor)
-        .build()
-        .create(Events.class);
+        .build();
+
+    mEvents = eventsAdapter.create(Events.class);
+    mSubscriptions = eventsAdapter.create(Subscriptions.class);
 
     final RestAdapter telemAdapter = new RestAdapter.Builder()
         .setEndpoint(Endpoint.TELEMETRY)
@@ -150,6 +153,10 @@ public final class VinliApp implements Diagnostics {
 
   /*package*/ Snapshots snapshots() {
     return mSnapshots;
+  }
+
+  /*package*/ Subscriptions subscriptions() {
+    return mSubscriptions;
   }
 
   /*package*/ LinkLoader linkLoader() {
