@@ -46,7 +46,6 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
 
     gb.registerTypeAdapter(RuleSeed.class, new RuleSeed.Adapter());
-
   }
 
   public static final Rule.RuleCreator create() {

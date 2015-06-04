@@ -25,10 +25,6 @@ public abstract class Device implements VinliItem {
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Device.class));
   }
 
-  /*package*/ static final Builder builder() {
-    return new AutoParcel_Device.Builder();
-  }
-
   /*package*/ abstract Links links();
 
   /*package*/ Device() { }
@@ -91,13 +87,5 @@ public abstract class Device implements VinliItem {
     public abstract String latestVehicle();
 
     /*package*/ Links() { }
-  }
-
-  @AutoParcel.Builder
-  /*package*/ interface Builder {
-    Builder id(String s);
-    Builder links(Links l);
-
-    Device build();
   }
 }

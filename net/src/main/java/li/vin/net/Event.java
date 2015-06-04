@@ -21,10 +21,6 @@ public abstract class Event implements VinliItem {
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Event.class));
   }
 
-  /*package*/ static final Builder builder() {
-    return new AutoParcel_Event.Builder();
-  }
-
   public abstract String eventType();
   public abstract String timestamp();
   public abstract String deviceId();
@@ -50,19 +46,5 @@ public abstract class Event implements VinliItem {
     public abstract boolean firstEval();
     public abstract Rule rule();
     public abstract Message message();
-  }
-
-  @AutoParcel.Builder
-  /*package*/ interface Builder {
-    Builder id(String s);
-    Builder eventType(String s);
-    Builder timestamp(String s);
-    Builder deviceId(String s);
-    Builder meta(Meta m);
-    Builder object(ObjectRef o);
-
-    Builder links(Links l);
-
-    Event build();
   }
 }

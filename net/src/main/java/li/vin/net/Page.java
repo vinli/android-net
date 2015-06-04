@@ -65,10 +65,6 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
         AutoParcelAdapter.create(AutoParcel_Page_Meta_Pagination_Links.class));
   }
 
-  /*package*/ static final <T extends VinliItem> Builder<T> builder() {
-    return new AutoParcel_Page.Builder<>();
-  }
-
   /*package*/ abstract List<T> items();
   /*package*/ abstract Meta meta();
   /*package*/ abstract Type type();

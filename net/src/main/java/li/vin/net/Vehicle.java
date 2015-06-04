@@ -18,10 +18,6 @@ public abstract class Vehicle implements VinliItem {
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Vehicle.class));
   }
 
-  /*package*/ static final Builder builder() {
-    return new AutoParcel_Vehicle.Builder();
-  }
-
   public abstract String make();
   public abstract String model();
   public abstract String year();
@@ -29,15 +25,4 @@ public abstract class Vehicle implements VinliItem {
   public abstract String vin();
 
   /*package*/ Vehicle() { }
-
-  @AutoParcel.Builder
-  interface Builder {
-    Builder id(String s);
-    Builder make(String s);
-    Builder model(String s);
-    Builder year(String s);
-    Builder trim(String s);
-    Builder vin(String s);
-    Vehicle build();
-  }
 }
