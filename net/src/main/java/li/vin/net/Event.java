@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
+import rx.Observable;
 
 @AutoParcel
 public abstract class Event implements VinliItem {
@@ -26,6 +27,10 @@ public abstract class Event implements VinliItem {
   public abstract String deviceId();
   public abstract Meta meta();
   @Nullable public abstract ObjectRef object();
+
+  public Observable<Page<Notification>> notifications() {
+    return Vinli.curApp().linkLoader().read(links().notifications(), Notification.PAGE_TYPE);
+  }
 
   /*package*/ abstract Links links();
 
