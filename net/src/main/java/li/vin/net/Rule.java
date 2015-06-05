@@ -45,7 +45,7 @@ public abstract class Rule implements VinliItem {
 
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
 
-    gb.registerTypeAdapter(RuleSeed.class, new RuleSeed.Adapter());
+    gb.registerTypeAdapter(Seed.class, new Seed.Adapter());
   }
 
   public static final Rule.RuleCreator create() {
@@ -310,8 +310,8 @@ public abstract class Rule implements VinliItem {
         throw new IllegalStateException("Missing required properties:" + missing);
       }
 
-      final Rule.RuleSeed ruleSeed =
-          new Rule.RuleSeed(name, polygonBoundary, radiusBoundary, parametricBoundaries);
+      final Seed ruleSeed =
+          new Seed(name, polygonBoundary, radiusBoundary, parametricBoundaries);
 
       return Vinli.curApp().rules()
           .create(deviceId, ruleSeed)
@@ -319,13 +319,13 @@ public abstract class Rule implements VinliItem {
     }
   }
 
-  /*package*/ static final class RuleSeed {
+  /*package*/ static final class Seed {
     @NonNull public final String name;
     @Nullable public final PolygonBoundary.Seed polygonBoundary;
     @Nullable public final RadiusBoundary.Seed radiusBoundary;
     @Nullable public final List<ParametricBoundary.Seed> parametricBoundaries;
 
-    public RuleSeed(
+    public Seed(
         String name,
         PolygonBoundary.Seed polygonBoundary,
         RadiusBoundary.Seed radiusBoundary,
@@ -336,10 +336,10 @@ public abstract class Rule implements VinliItem {
       this.parametricBoundaries = parametricBoundaries;
     }
 
-    public static final class Adapter extends TypeAdapter<RuleSeed> {
+    public static final class Adapter extends TypeAdapter<Seed> {
       private Gson gson;
 
-      @Override public void write(JsonWriter out, RuleSeed value) throws IOException {
+      @Override public void write(JsonWriter out, Seed value) throws IOException {
         if (gson == null) {
           gson = Vinli.curApp().gson();
         }
@@ -368,7 +368,7 @@ public abstract class Rule implements VinliItem {
         out.endObject();
       }
 
-      @Override public RuleSeed read(JsonReader in) throws IOException {
+      @Override public Seed read(JsonReader in) throws IOException {
         throw new UnsupportedOperationException("reading a RuleSeed is not supported");
       }
     }

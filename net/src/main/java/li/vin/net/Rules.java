@@ -27,5 +27,5 @@ import rx.Observable;
   @POST("/devices/{deviceId}/rules")
   Observable<Wrapped<Rule>> create(
       @NonNull @Path("deviceId") String deviceId,
-      @NonNull @Body Rule.RuleSeed ruleSeed);
+      @NonNull @Body Rule.Seed ruleSeed);
 }
