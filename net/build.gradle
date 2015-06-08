@@ -9,7 +9,8 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
-apply from: rootProject.file('gradle/checkstyle.gradle')
+apply from: file('../gradle/checkstyle.gradle')
+apply from: file('../gradle/javadoc.gradle')
 apply plugin: 'android-apt'
 
 android {
