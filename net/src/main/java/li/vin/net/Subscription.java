@@ -28,7 +28,7 @@ public abstract class Subscription implements VinliItem {
     gb.registerTypeAdapter(SeedEdit.class, new SeedEdit.Adapter());
   }
 
-  public static final SeedCreate.Builder create() {
+  public static final SeedCreate.Saver create() {
     return new AutoParcel_Subscription_SeedCreate.Builder();
   }
 
@@ -49,7 +49,7 @@ public abstract class Subscription implements VinliItem {
     return Vinli.curApp().linkLoader().read(links().notifications(), Notification.PAGE_TYPE);
   }
 
-  public SeedEdit.Builder edit() {
+  public SeedEdit.Saver edit() {
     return new AutoParcel_Subscription_SeedEdit.Builder()
         .appData(appData())
         .url(url())
@@ -105,14 +105,14 @@ public abstract class Subscription implements VinliItem {
     /*package*/ SeedCreate() { }
 
     @AutoParcel.Builder
-    public static abstract class Builder {
-      public abstract Builder eventType(String s);
-      public abstract Builder object(@Nullable ObjectRef o);
-      public abstract Builder url(String s);
-      public abstract Builder appData(@Nullable String s);
-      public abstract Builder deviceId(String deviceId);
+    public static abstract class Saver {
+      public abstract Saver eventType(String s);
+      public abstract Saver object(@Nullable ObjectRef o);
+      public abstract Saver url(String s);
+      public abstract Saver appData(@Nullable String s);
+      public abstract Saver deviceId(String deviceId);
 
-      /*package*/ Builder() { }
+      /*package*/ Saver() { }
 
       /*package*/ abstract SeedCreate autoBuild();
 
@@ -158,13 +158,13 @@ public abstract class Subscription implements VinliItem {
     /*package*/ SeedEdit() { }
 
     @AutoParcel.Builder
-    public static abstract class Builder {
-      public abstract Builder url(String s);
-      public abstract Builder appData(@Nullable String s);
-      /*package*/ abstract Builder deviceId(String deviceId);
-      /*package*/ abstract Builder subscriptionId(String deviceId);
+    public static abstract class Saver {
+      public abstract Saver url(String s);
+      public abstract Saver appData(@Nullable String s);
+      /*package*/ abstract Saver deviceId(String deviceId);
+      /*package*/ abstract Saver subscriptionId(String deviceId);
 
-      /*package*/ Builder() { }
+      /*package*/ Saver() { }
 
       /*package*/ abstract SeedEdit autoBuild();
 
