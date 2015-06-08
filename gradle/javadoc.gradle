@@ -1,0 +1,17 @@
+def variants = android.hasProperty('applicationVariants') \
+    ? android.applicationVariants \
+    : android.libraryVariants
+
+variants.all { variant ->
+    def name = variant.buildType.name
+
+    task("generate${name.capitalize()}JavaDoc", type: Javadoc) {
+        description "Generates Javadoc for $name."
+        source = variant.javaCompile.source
+        classpath = files(variant.javaCompile.classpath.files, android.bootClasspath)
+        options.links("https://docs.oracle.com/javase/7/docs/api/");
+        options.linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference");
+        exclude '**/BuildConfig.java'
+        exclude '**/R.java'
+    }
+}
