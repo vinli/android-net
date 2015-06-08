@@ -23,7 +23,7 @@ import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
 public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
-  public static final Func1 EXTRACT_ITEMS = new Func1<TimeSeries<?>, Observable<?>>() {
+  /*package*/ static final Func1 EXTRACT_ITEMS = new Func1<TimeSeries<?>, Observable<?>>() {
     @Override public Observable<?> call(TimeSeries<?> tTimeSeries) {
       return tTimeSeries.observeItems();
     }
@@ -34,7 +34,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
     return (Func1<TimeSeries<T>, Observable<T>>) EXTRACT_ITEMS;
   }
 
-  public static final Func1 ALL_ITEMS = new Func1<TimeSeries<? extends VinliItem>, Observable<? extends VinliItem>>() {
+  /*package*/ static final Func1 ALL_ITEMS = new Func1<TimeSeries<? extends VinliItem>, Observable<? extends VinliItem>>() {
     @Override
     @SuppressWarnings("unchecked")
     public Observable<? extends VinliItem> call(TimeSeries<? extends VinliItem> tTimeSeries) {

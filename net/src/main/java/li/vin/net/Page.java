@@ -23,7 +23,7 @@ import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
 public abstract class Page<T extends VinliItem> implements Parcelable {
-  public static final Func1 EXTRACT_ITEMS = new Func1<Page<?>, Observable<?>>() {
+  /*package*/ static final Func1 EXTRACT_ITEMS = new Func1<Page<?>, Observable<?>>() {
     @Override public Observable<?> call(Page<?> tPage) {
       return tPage.observeItems();
     }
@@ -34,7 +34,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
     return (Func1<Page<T>, Observable<T>>) EXTRACT_ITEMS;
   }
 
-  public static final Func1 ALL_ITEMS = new Func1<Page<? extends VinliItem>, Observable<? extends VinliItem>>() {
+  /*package*/ static final Func1 ALL_ITEMS = new Func1<Page<? extends VinliItem>, Observable<? extends VinliItem>>() {
     @Override
     @SuppressWarnings("unchecked")
     public Observable<? extends VinliItem> call(Page<? extends VinliItem> tPage) {
