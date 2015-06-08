@@ -48,8 +48,8 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(Seed.class, new Seed.Adapter());
   }
 
-  public static final Rule.RuleCreator create() {
-    return new Rule.RuleCreator();
+  public static final Seed.Saver create() {
+    return new AutoParcel_Rule_Seed.Builder();
   }
 
   public abstract String name();
@@ -251,92 +251,37 @@ public abstract class Rule implements VinliItem {
     /*package*/ PolygonBoundary() { }
   }
 
-  public static final class RuleCreator {
-    private String name;
-    private Device device;
-    private String deviceId;
-    private Rule.PolygonBoundary.Seed polygonBoundary;
-    private Rule.RadiusBoundary.Seed radiusBoundary;
-    private List<Rule.ParametricBoundary.Seed> parametricBoundaries;
+  @AutoParcel
+  public static abstract class Seed {
+    @NonNull public abstract String name();
+    @Nullable public abstract PolygonBoundary.Seed polygonBoundary();
+    @Nullable public abstract RadiusBoundary.Seed radiusBoundary();
+    @Nullable public abstract List<ParametricBoundary.Seed> parametricBoundaries();
+    @NonNull public abstract String deviceId();
 
-    /*package*/ RuleCreator() { }
+    /*package*/ Seed() { }
 
-    public RuleCreator name(String name) {
-      this.name = name;
-      return this;
-    }
+    @AutoParcel.Builder
+    public static abstract class Saver {
+      public abstract Saver name(@NonNull String s);
+      public abstract Saver polygonBoundary(@Nullable PolygonBoundary.Seed s);
+      public abstract Saver radiusBoundary(@Nullable RadiusBoundary.Seed s);
+      public abstract Saver parametricBoundaries(@Nullable List<ParametricBoundary.Seed> l);
+      public abstract Saver deviceId(@NonNull String s);
 
-    public RuleCreator device(Device device) {
-      this.device = device;
-      return this;
-    }
+      /*package*/ Saver() { }
 
-    public RuleCreator deviceId(String deviceId) {
-      this.deviceId = deviceId;
-      return this;
-    }
+      /*package*/ abstract Seed autoBuild();
 
-    public RuleCreator polygonBoundary(Rule.PolygonBoundary.Seed polygonBoundary) {
-      this.polygonBoundary = polygonBoundary;
-      return this;
-    }
+      public Observable<Rule> save() {
+        final Seed s = autoBuild();
 
-    public RuleCreator radiusBoundary(Rule.RadiusBoundary.Seed radiusBoundary) {
-      this.radiusBoundary = radiusBoundary;
-      return this;
-    }
-
-    public RuleCreator parametricBoundaries(List<Rule.ParametricBoundary.Seed> parametricBoundaries) {
-      this.parametricBoundaries = parametricBoundaries;
-      return this;
-    }
-
-    public Observable<Rule> create() {
-      final StringBuilder missing = new StringBuilder();
-      if (name == null) {
-        missing.append(" name");
+        return Vinli.curApp().rules().create(s.deviceId(), s)
+            .map(Wrapped.<Rule>pluckItem());
       }
-
-      if (deviceId == null) {
-        if (device == null) {
-          missing.append(" device||deviceId");
-        } else {
-          deviceId = device.id();
-        }
-      }
-
-      if (missing.length() > 0) {
-        // TODO: should this be Observable.error() instead?
-        throw new IllegalStateException("Missing required properties:" + missing);
-      }
-
-      final Seed ruleSeed =
-          new Seed(name, polygonBoundary, radiusBoundary, parametricBoundaries);
-
-      return Vinli.curApp().rules()
-          .create(deviceId, ruleSeed)
-          .map(Wrapped.<Rule>pluckItem());
-    }
-  }
-
-  /*package*/ static final class Seed {
-    @NonNull public final String name;
-    @Nullable public final PolygonBoundary.Seed polygonBoundary;
-    @Nullable public final RadiusBoundary.Seed radiusBoundary;
-    @Nullable public final List<ParametricBoundary.Seed> parametricBoundaries;
-
-    public Seed(
-        String name,
-        PolygonBoundary.Seed polygonBoundary,
-        RadiusBoundary.Seed radiusBoundary,
-        List<ParametricBoundary.Seed> parametricBoundaries) {
-      this.name = name;
-      this.polygonBoundary = polygonBoundary;
-      this.radiusBoundary = radiusBoundary;
-      this.parametricBoundaries = parametricBoundaries;
     }
 
-    public static final class Adapter extends TypeAdapter<Seed> {
+    /*package*/ static final class Adapter extends TypeAdapter<Seed> {
       private Gson gson;
 
       @Override public void write(JsonWriter out, Seed value) throws IOException {
@@ -346,20 +291,21 @@ public abstract class Rule implements VinliItem {
 
         out.beginObject();
           out.name("rule").beginObject();
-            out.name("name").value(value.name);
+            out.name("name").value(value.name());
             out.name("boundaries").beginArray();
-              final PolygonBoundary.Seed polyBoundary = value.polygonBoundary;
+              final PolygonBoundary.Seed polyBoundary = value.polygonBoundary();
               if (polyBoundary != null) {
                 gson.toJson(polyBoundary, PolygonBoundary.Seed.class, out);
               }
 
-              final RadiusBoundary.Seed radiusBoundary = value.radiusBoundary;
+              final RadiusBoundary.Seed radiusBoundary = value.radiusBoundary();
               if (radiusBoundary != null) {
                 gson.toJson(radiusBoundary, RadiusBoundary.Seed.class, out);
               }
 
-              if (value.parametricBoundaries != null) {
-                for (final ParametricBoundary.Seed pb : value.parametricBoundaries) {
+              final List<ParametricBoundary.Seed> parametricBoundaries = value.parametricBoundaries();
+              if (parametricBoundaries != null) {
+                for (final ParametricBoundary.Seed pb : parametricBoundaries) {
                   gson.toJson(pb, ParametricBoundary.Seed.class, out);
                 }
               }
