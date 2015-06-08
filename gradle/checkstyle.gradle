@@ -4,6 +4,7 @@ checkstyle {
     configFile rootProject.file('checkstyle.xml')
     showViolations true
     toolVersion = '6.6'
+    ignoreFailures = true
 }
 
 def variants = android.hasProperty('applicationVariants') \
