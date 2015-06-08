@@ -8,7 +8,7 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
-public interface Vehicles {
+/*package*/ interface Vehicles {
 
   @GET("/devices/{deviceId}/vehicles")
   Observable<Page<Vehicle>> vehicles(
