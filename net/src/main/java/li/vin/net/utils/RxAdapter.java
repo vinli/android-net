@@ -56,9 +56,9 @@ public abstract class RxAdapter<T> extends BaseAdapter {
       curSubscription.unsubscribe();
     }
 
-    this.observable = context instanceof Activity ?
-        AppObservable.bindActivity((Activity) context, observable) :
-        AppObservable.bindFragment(context, observable);
+    this.observable = context instanceof Activity
+        ? AppObservable.bindActivity((Activity) context, observable)
+        : AppObservable.bindFragment(context, observable);
 
     curSubscription = bind(context, observable).subscribe(subscriber);
 
