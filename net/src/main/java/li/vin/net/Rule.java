@@ -152,13 +152,17 @@ public abstract class Rule implements VinliItem {
       @Nullable public abstract Float min();
       @Nullable public abstract Float max();
 
-      @AutoParcel.Builder
-      public interface Builder {
-        Builder parameter(@NonNull String s);
-        Builder min(@Nullable Float f);
-        Builder max(@Nullable Float f);
+      /*package*/ Seed() { }
 
-        Seed build();
+      @AutoParcel.Builder
+      public static abstract class Builder {
+        public abstract Builder parameter(@NonNull String s);
+        public abstract Builder min(@Nullable Float f);
+        public abstract Builder max(@Nullable Float f);
+
+        public abstract Seed build();
+
+        /*package*/ Builder() { }
       }
     }
 
@@ -200,12 +204,14 @@ public abstract class Rule implements VinliItem {
       public abstract float lat();
 
       @AutoParcel.Builder
-      public interface Builder {
-        Builder radius(float f);
-        Builder lon(float f);
-        Builder lat(float f);
+      public static abstract class Builder {
+        public abstract Builder radius(float f);
+        public abstract Builder lon(float f);
+        public abstract Builder lat(float f);
 
-        Seed build();
+        public abstract Seed build();
+
+        /*package*/ Builder() { }
       }
     }
 
@@ -241,10 +247,12 @@ public abstract class Rule implements VinliItem {
       public abstract List<List<Coordinate>> coordinates();
 
       @AutoParcel.Builder
-      public interface Builder {
-        Builder coordinates(List<List<Coordinate>> l);
+      public static abstract class Builder {
+        public abstract Builder coordinates(List<List<Coordinate>> l);
 
-        Seed build();
+        public abstract Seed build();
+
+        /*package*/ Builder() { }
       }
     }
 
