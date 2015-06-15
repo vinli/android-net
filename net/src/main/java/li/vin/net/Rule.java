@@ -3,7 +3,7 @@ package li.vin.net;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -14,14 +14,11 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import auto.parcel.AutoParcel;
 import rx.Observable;
 
 @AutoParcel
@@ -37,15 +34,18 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Rule_Links.class));
 
     gb.registerTypeAdapter(ParametricBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
-    gb.registerTypeAdapter(ParametricBoundary.Seed.class,
+    gb.registerTypeAdapter(AutoParcel_Rule_ParametricBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary_Seed.class));
 
     gb.registerTypeAdapter(RadiusBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
-
+    gb.registerTypeAdapter(AutoParcel_Rule_RadiusBoundary.Seed.class,
+        AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary_Seed.class));
 
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
+    gb.registerTypeAdapter(AutoParcel_Rule_PolygonBoundary.Seed.class,
+        AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary_Seed.class));
 
-    gb.registerTypeAdapter(Seed.class, new Seed.Adapter());
+    gb.registerTypeAdapter(AutoParcel_Rule_Seed.class, new Seed.Adapter());
   }
 
   public static final Seed.Saver create() {
