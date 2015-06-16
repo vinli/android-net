@@ -28,7 +28,11 @@ public final class Vinli {
 
   private static VinliApp sApp = null;
 
-  public static void clearApp() {
+  public static void clearApp(@NonNull Context context) {
+    context.getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
+        .edit()
+        .putString(ACCESS_TOKEN, null)
+        .apply();
     sApp = null;
   }
 
