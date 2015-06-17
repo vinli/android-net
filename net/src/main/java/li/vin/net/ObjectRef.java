@@ -10,7 +10,19 @@ public abstract class ObjectRef implements VinliItem {
     gb.registerTypeAdapter(ObjectRef.class, AutoParcelAdapter.create(AutoParcel_ObjectRef.class));
   }
 
+  public static final Builder builder() {
+    return new AutoParcel_ObjectRef.Builder();
+  }
+
   public abstract String type();
 
   /*package*/ ObjectRef() { }
+
+  @AutoParcel.Builder
+  /*package*/ interface Builder {
+    Builder id(String s);
+    Builder type(String s);
+
+    ObjectRef build();
+  }
 }
