@@ -19,10 +19,11 @@ public abstract class ObjectRef implements VinliItem {
   /*package*/ ObjectRef() { }
 
   @AutoParcel.Builder
-  /*package*/ interface Builder {
-    Builder id(String s);
-    Builder type(String s);
+  /*package*/ public static abstract class Builder{
+    public abstract Builder id(String s);
+    public abstract Builder type(String s);
 
-    ObjectRef build();
+    public abstract ObjectRef build();
+  /*package*/ Builder(){  }
   }
 }
