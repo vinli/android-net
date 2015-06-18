@@ -18,11 +18,14 @@ import rx.Observable;
 @AutoParcel
 public abstract class Subscription implements VinliItem {
   /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Subscription>>() { }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Subscription>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Subscription.class, AutoParcelAdapter.create(AutoParcel_Subscription.class));
-    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Subscription_Links.class));
+    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Subscription.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Subscription.class));
+
+    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Subscription_Links.class));
 
     gb.registerTypeAdapter(AutoParcel_Subscription_SeedCreate.class, new SeedCreate.Adapter());
     gb.registerTypeAdapter(AutoParcel_Subscription_SeedEdit.class, new SeedEdit.Adapter());
@@ -40,7 +43,6 @@ public abstract class Subscription implements VinliItem {
   public abstract String createdAt();
   public abstract String updatedAt();
 
-  /*package*/ abstract VinliApp app();
   /*package*/ abstract Links links();
 
   /*package*/ Subscription() { }
@@ -88,7 +90,6 @@ public abstract class Subscription implements VinliItem {
     Builder createdAt(String s);
     Builder updatedAt(String s);
 
-    Builder app(VinliApp app);
     Builder links(Links l);
 
     Subscription build();
