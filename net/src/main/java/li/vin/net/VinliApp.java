@@ -23,6 +23,7 @@ public final class VinliApp implements Diagnostics {
   private final Snapshots mSnapshots;
   private final Vehicles mVehicles;
   private final Subscriptions mSubscriptions;
+  private final Users mUsers;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -46,6 +47,7 @@ public final class VinliApp implements Diagnostics {
     Coordinate.registerGson(gsonB);
     Snapshot.registerGson(gsonB);
     Notification.registerGson(gsonB);
+    User.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -112,6 +114,16 @@ public final class VinliApp implements Diagnostics {
 
     mLocations = telemAdapter.create(Locations.class);
     mSnapshots = telemAdapter.create(Snapshots.class);
+
+    mUsers = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.AUTH)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Users.class);
   }
 
   public Observable<Page<Device>> devices() {
@@ -133,6 +145,10 @@ public final class VinliApp implements Diagnostics {
 
   @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
     return mDiagnostics.diagnoseDtcCode(dtcCode);
+  }
+
+  public Observable<User> currentUser() {
+    return mUsers.currentUser().map(Wrapped.<User>pluckItem());
   }
 
   /*package*/ Vehicles vehicles() {
