@@ -1,0 +1,47 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId 'li.vin'
+            artifactId 'android-net'
+            version '1.0.0-beta.1'
+
+            name 'Android Net SDK'
+            description 'Vinli Android Network SDK'
+            url 'https://github.com/vinli/android-net'
+
+            scm {
+                url 'https://github.com/vinli/android-net'
+                connection 'scm:git:git://github.com/vinli/android-net.git'
+                developerConnection 'scm:git:ssh://git@github.com/vinli/android-net.git'
+                tag '1.0.0-beta.1'
+            }
+
+            issueManagement {
+                system 'GitHub Issues'
+                url 'https://github.com/vinli/android-net/issues'
+            }
+
+            licenses {
+                license {
+                    name 'MIT'
+                    url 'http://opensource.org/licenses/MIT'
+                }
+            }
+
+            organization {
+                name 'Vinli, Inc.'
+                url 'https://vin.li'
+            }
+
+            developers {
+                developer {
+                    id 'kturney'
+                    name 'Kyle Turney'
+                }
+            }
+        }
+    }
+}

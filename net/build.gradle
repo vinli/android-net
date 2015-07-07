@@ -42,11 +42,13 @@ android {
 }
 
 dependencies {
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.+'
+    compile 'com.squareup.retrofit:retrofit:1.9.+'
     compile 'io.reactivex:rxandroid:0.24.+'
     compile 'com.android.support:support-annotations:22.1.+'
     compile 'com.github.frankiesardo:auto-parcel:0.3'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 }
 
+apply from: file('../gradle/mavenize.gradle')
+apply from: file('../gradle/bintray-upload.gradle')
