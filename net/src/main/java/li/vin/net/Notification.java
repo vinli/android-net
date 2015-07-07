@@ -9,11 +9,13 @@ import auto.parcel.AutoParcel;
 
 @AutoParcel
 public abstract class Notification implements VinliItem {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Snapshot>>() { }.getType();
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Notification>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
-    gb.registerTypeAdapter(Notification.class, AutoParcelAdapter.create(Notification.class));
+    gb.registerTypeAdapter(Notification.class, AutoParcelAdapter.create(AutoParcel_Notification.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Notification.class));
+
+    gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Notification_Links.class));
   }
 
   public abstract String createdAt();

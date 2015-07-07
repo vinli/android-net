@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -32,6 +33,7 @@ import java.io.IOException;
       gson = Vinli.curApp().gson();
     }
 
+    Log.d("AutoParcelAdapter", "parsing " + autoParcelClass.getSimpleName());
     return gson.fromJson(in, autoParcelClass);
   }
 }
