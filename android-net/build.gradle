@@ -8,6 +8,9 @@ buildscript {
     }
 }
 
+group = project.property('vinli.groupId')
+version = project.property('vinli.version')
+
 apply plugin: 'com.android.library'
 apply from: file('../gradle/checkstyle.gradle')
 apply from: file('../gradle/javadoc.gradle')

@@ -3,25 +3,27 @@ apply plugin: 'com.github.dcendents.android-maven'
 install {
     repositories.mavenInstaller {
         pom.project {
-            packaging 'aar'
-            groupId 'li.vin'
-            artifactId 'android-net'
-            version '1.0.0-beta.1'
+            packaging project.hasProperty('vinli.packaging') \
+                ? project.property('vinli.packaging') \
+                : 'aar'
+            groupId project.property('vinli.groupId')
+            artifactId project.property('vinli.artifactId')
+            version project.property('vinli.version')
 
-            name 'Android Net SDK'
-            description 'Vinli Android Network SDK'
-            url 'https://github.com/vinli/android-net'
+            name project.property('vinli.name')
+            description project.property('vinli.desc')
+            url "https://github.com/vinli/${project.property('vinli.githubRepo')}"
 
             scm {
-                url 'https://github.com/vinli/android-net'
-                connection 'scm:git:git://github.com/vinli/android-net.git'
-                developerConnection 'scm:git:ssh://git@github.com/vinli/android-net.git'
-                tag '1.0.0-beta.1'
+                url "https://github.com/vinli/${project.property('vinli.githubRepo')}"
+                connection "scm:git:git://github.com/vinli/${project.property('vinli.githubRepo')}.git"
+                developerConnection "scm:git:ssh://git@github.com/vinli/${project.property('vinli.githubRepo')}.git"
+                tag project.property('vinli.version')
             }
 
             issueManagement {
                 system 'GitHub Issues'
-                url 'https://github.com/vinli/android-net/issues'
+                url "https://github.com/vinli/${project.property('vinli.githubRepo')}/issues"
             }
 
             licenses {
@@ -43,5 +45,11 @@ install {
                 }
             }
         }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.artifactId = project.property('vinli.artifactId')
     }
 }

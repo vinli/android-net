@@ -38,19 +38,31 @@ bintray {
     key = properties.getProperty('bintray.apikey')
 
     configurations = ['archives']
+
+    dryRun = project.hasProperty('vinli.dryRun') \
+            ? project.property('vinli.dryRun') \
+            : false
+    publish = project.hasProperty('vinli.publish') \
+            ? project.property('vinli.publish') \
+            : false
+
     pkg {
-        repo = 'li.vin'
-        name = 'android-net'
+        repo = project.property('vinli.groupId')
+        name = project.property('vinli.artifactId')
         userOrg = 'vinli'
-        websiteUrl = 'https://github.com/vinli/android-net'
-        vcsUrl = 'git://github.com/vinli/android-net.git'
+        desc = project.property('vinli.desc')
+        websiteUrl = "https://github.com/vinli/${project.property('vinli.githubRepo')}"
+        vcsUrl = "git://github.com/vinli/${project.property('vinli.githubRepo')}.git"
+        issueTrackerUrl = "https://github.com/vinli/${project.property('vinli.githubRepo')}/issues"
         licenses = ['MIT']
         labels = ['android', 'vinli']
-        publish = true
-        publicDownloadNumbers = false
+        publicDownloadNumbers = project.hasProperty('vinli.publicDownloadNumbers') \
+            ? project.property('vinli.publicDownloadNumbers') \
+            : false
         version {
-            name = '1.0.0-beta.1'
-            vcsTag = '1.0.0-beta.1'
+            name = project.property('vinli.version')
+            vcsTag = project.property('vinli.version')
+            released = new Date()
         }
     }
 }
