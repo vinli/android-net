@@ -8,6 +8,12 @@ Vinli Android Net SDK
 
 An Android client for interacting with the Vinli backend from within your application.
 
+Build
+
+-----------
+
+[![Build Status](https://travis-ci.org/vinli/android-net.svg?branch=master)](https://travis-ci.org/vinli/android-net)
+
 Conventions
 -----------
 ### [RxJava](https://github.com/ReactiveX/RxJava/wiki)
