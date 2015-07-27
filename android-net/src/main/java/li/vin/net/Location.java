@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -7,13 +8,13 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
-import auto.parcel.AutoParcel;
+import java.util.Map;
 
 @AutoParcel
 public abstract class Location implements VinliItem {
@@ -26,6 +27,7 @@ public abstract class Location implements VinliItem {
 
   public abstract Coordinate coordinate();
   public abstract String timestamp();
+  public abstract Map<String, String> data();
 
   /*package*/ Location() { }
 
@@ -34,6 +36,7 @@ public abstract class Location implements VinliItem {
     Builder id(String s);
     Builder coordinate(Coordinate c);
     Builder timestamp(String s);
+    Builder data(Map<String, String> m);
 
     Location build();
   }
@@ -80,6 +83,17 @@ public abstract class Location implements VinliItem {
                 case "id": b.id(in.nextString()); break;
                 case "timestamp": b.timestamp(in.nextString()); break;
                 case "links": in.skipValue(); break;
+                case "data":
+                  final Map<String, String> data = new HashMap<>();
+
+                  in.beginObject();
+                  while (in.hasNext()) {
+                    data.put(in.nextName(), in.nextString());
+                  }
+                  in.endObject();
+
+                  b.data(Collections.unmodifiableMap(data));
+                  break;
                 default: throw new JsonParseException("unknown location geometry key " + propName);
               }
             }
