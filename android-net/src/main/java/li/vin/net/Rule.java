@@ -367,7 +367,7 @@ public abstract class Rule implements VinliItem {
             }
 
             break;
-          case "deviceId": b.createdAt(in.nextString()); break;
+          case "deviceId": b.deviceId(in.nextString()); break;
           case "boundaries":
             final List<ParametricBoundary> parametricBoundaries = new ArrayList<>();
 
