@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +14,8 @@ public final class Vinli {
   /*protected*/ static final String ACCESS_TOKEN = "li.vin.net.Vinli#ACCESS_TOKEN";
 
   public static final void signIn(@NonNull Activity context, @NonNull String clientId,
-      @NonNull String redirectUri) {
-    context.startActivity(SignInActivity.newIntent(context, clientId, redirectUri));
+      @NonNull String redirectUri, @NonNull ComponentName componentName) {
+    context.startActivity(SignInActivity.newIntent(context, clientId, redirectUri, componentName));
   }
 
   public static final @Nullable String getSignInError(@NonNull Intent intent) {
