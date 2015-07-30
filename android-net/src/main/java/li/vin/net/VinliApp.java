@@ -14,7 +14,7 @@ import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import rx.Observable;
 
-public final class VinliApp implements Diagnostics {
+public final class VinliApp {
   private final Devices mDevices;
   private final Diagnostics mDiagnostics;
   private final Rules mRules;
@@ -159,8 +159,8 @@ public final class VinliApp implements Diagnostics {
     return mVehicles.vehicle(vehicleId).map(Wrapped.<Vehicle>pluckItem());
   }
 
-  @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
-    return mDiagnostics.diagnoseDtcCode(dtcCode);
+  public Observable<Dtc.Code> diagnoseDtcCode(String number) {
+    return mDiagnostics.diagnose(number).map(Wrapped.<Dtc.Code>pluckItem());
   }
 
   public Observable<User> currentUser() {

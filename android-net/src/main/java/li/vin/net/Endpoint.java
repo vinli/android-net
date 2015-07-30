@@ -4,7 +4,7 @@ import com.squareup.okhttp.HttpUrl;
 
 /*package*/ enum Endpoint implements retrofit.Endpoint {
   AUTH("auth"),
-  DIAGNOSTICS("diag"),
+  DIAGNOSTICS("diagnostics"),
   EVENTS("events"),
   PLATFORM("platform"),
   RULES("rules"),

@@ -1,12 +1,17 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.Query;
 import rx.Observable;
 
 /*package*/ interface Diagnostics {
-  // TODO: real path
-  @GET("/dtc_codes/{dtcCode}")
-  Observable<Dtc> diagnoseDtcCode(@Path("dtcCode") String dtcCode);
+
+  @GET("/vehicles/{vehicleId}/codes")
+  Observable<Page<Dtc>> codes(@NonNull @Path("vehicleId") String vehicleId);
+
+  @GET("/codes")
+  Observable<Wrapped<Dtc.Code>> diagnose(@NonNull @Query("number") String number);
 
 }
