@@ -1,7 +1,7 @@
 package li.vin.net;
 
 import android.app.Activity;
-import android.content.ComponentName;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import com.squareup.okhttp.HttpUrl;
 
 
@@ -18,7 +17,7 @@ public class SignInActivity extends Activity {
 
   private static final String CLIENT_ID = "li.vin.net.SignInActivity#CLIENT_ID";
   private static final String REDIRECT_URI = "li.vin.net.SignInActivity#REDIRECT_URI";
-  private static final String COMPONENT_NAME = "li.vin.net.SignInActivity#COMPONENT_NAME";
+  private static final String PENDING_INTENT = "li.vin.net.SignInActivity#PENDING_INTENT";
 
   private static final String ACTION_ERROR = "li.vin.net.signIn.ERROR";
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
@@ -33,12 +32,12 @@ public class SignInActivity extends Activity {
       .build();
 
   /*protected*/ static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
-      @NonNull String redirectUri, @NonNull ComponentName componentName) {
+      @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
     final Intent signInIntent = new Intent(context, SignInActivity.class);
 
     signInIntent.putExtra(CLIENT_ID, clientId);
     signInIntent.putExtra(REDIRECT_URI, redirectUri);
-    signInIntent.putExtra(COMPONENT_NAME, componentName);
+    signInIntent.putExtra(PENDING_INTENT, pendingIntent);
 
     return signInIntent;
   }
@@ -61,9 +60,9 @@ public class SignInActivity extends Activity {
       throw new AssertionError("missing redirect URI");
     }
 
-    final ComponentName componentName = extras.getParcelable(COMPONENT_NAME);
-    if (componentName == null) {
-      throw new AssertionError("missing component name");
+    final PendingIntent pendingIntent = extras.getParcelable(PENDING_INTENT);
+    if (pendingIntent == null) {
+      throw new AssertionError("missing pending intent");
     }
 
     setContentView(R.layout.activity_vinli_sign_in);
@@ -90,25 +89,27 @@ public class SignInActivity extends Activity {
             }
           }
 
+          Intent resultIntent;
+
           if (error == null) {
             if (accessToken == null) {
-              final Intent errorIntent = new Intent(ACTION_ERROR);
-              errorIntent.setComponent(componentName);
-              errorIntent.putExtra(Vinli.SIGN_IN_ERROR, "missing access_token");
-              startActivity(errorIntent);
+              resultIntent = new Intent(ACTION_ERROR);
+              resultIntent.putExtra(Vinli.SIGN_IN_ERROR, "missing access_token");
             } else {
               Log.d(TAG, "oauth accessToken: " + accessToken);
-              final Intent approvedIntent = new Intent(ACTION_APPROVED);
-              approvedIntent.setComponent(componentName);
-              approvedIntent.putExtra(Vinli.ACCESS_TOKEN, accessToken);
-              startActivity(approvedIntent);
+              resultIntent = new Intent(ACTION_APPROVED);
+              resultIntent.putExtra(Vinli.ACCESS_TOKEN, accessToken);
             }
           } else {
             Log.d(TAG, "oauth error: " + error);
-            final Intent errorIntent = new Intent(ACTION_ERROR);
-            errorIntent.setComponent(componentName);
-            errorIntent.putExtra(Vinli.SIGN_IN_ERROR, error);
-            startActivity(errorIntent);
+            resultIntent = new Intent(ACTION_ERROR);
+            resultIntent.putExtra(Vinli.SIGN_IN_ERROR, error);
+          }
+
+          try {
+            pendingIntent.send(SignInActivity.this, 0, resultIntent);
+          } catch (PendingIntent.CanceledException e) {
+            Log.d(TAG, "pending intent was canceled by caller.");
           }
 
           return true;
