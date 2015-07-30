@@ -171,6 +171,10 @@ public final class VinliApp implements Diagnostics {
     return mTrips.trip(tripId).map(Wrapped.<Trip>pluckItem());
   }
 
+  public Observable<Rule> rule(@NonNull String ruleId) {
+    return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }

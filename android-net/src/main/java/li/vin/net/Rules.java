@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
@@ -21,6 +20,10 @@ import rx.Observable;
   @GET("/devices/{deviceId}/rules/{ruleId}")
   Observable<Wrapped<Rule>> rule(
       @NonNull @Path("deviceId") String deviceId,
+      @NonNull @Path("ruleId") String ruleId);
+
+  @GET("/rules/{ruleId}")
+  Observable<Wrapped<Rule>> rule(
       @NonNull @Path("ruleId") String ruleId);
 
 
