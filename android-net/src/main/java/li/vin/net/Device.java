@@ -126,6 +126,16 @@ public abstract class Device implements VinliItem {
         .map(Wrapped.<Subscription>pluckItem());
   }
 
+  public Observable<Page<Trip>> trips() {
+    return Vinli.curApp().trips().trips(id(), null, null);
+  }
+
+  public Observable<Page<Trip>> trips(
+      @Nullable Integer limit,
+      @Nullable Integer offset) {
+    return Vinli.curApp().trips().trips(id(), limit, offset);
+  }
+
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();

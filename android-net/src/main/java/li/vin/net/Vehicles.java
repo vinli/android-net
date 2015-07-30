@@ -21,4 +21,8 @@ import rx.Observable;
       @NonNull @Path("deviceId") String deviceId,
       @NonNull @Path("vehicleId") String vehicleId);
 
+  @GET("/vehicles/{vehicleId}")
+  Observable<Wrapped<Vehicle>> vehicle(
+      @NonNull @Path("vehicleId") String vehicleId);
+
 }

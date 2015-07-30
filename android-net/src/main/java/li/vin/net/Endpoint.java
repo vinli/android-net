@@ -8,7 +8,8 @@ import com.squareup.okhttp.HttpUrl;
   EVENTS("events"),
   PLATFORM("platform"),
   RULES("rules"),
-  TELEMETRY("telemetry");
+  TELEMETRY("telemetry"),
+  TRIPS("trips");
 
   private static final String DOMAIN = "-dev.vin.li";
 

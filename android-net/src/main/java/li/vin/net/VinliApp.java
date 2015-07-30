@@ -24,6 +24,7 @@ public final class VinliApp implements Diagnostics {
   private final Vehicles mVehicles;
   private final Subscriptions mSubscriptions;
   private final Users mUsers;
+  private final Trips mTrips;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -48,6 +49,7 @@ public final class VinliApp implements Diagnostics {
     Snapshot.registerGson(gsonB);
     Notification.registerGson(gsonB);
     User.registerGson(gsonB);
+    Trip.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -124,6 +126,16 @@ public final class VinliApp implements Diagnostics {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Users.class);
+
+    mTrips = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.TRIPS)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Trips.class);
   }
 
   public Observable<Page<Device>> devices() {
@@ -143,12 +155,20 @@ public final class VinliApp implements Diagnostics {
     return mDevices.device(deviceId).map(Wrapped.<Device>pluckItem());
   }
 
+  public Observable<Vehicle> vehicle(@NonNull String vehicleId) {
+    return mVehicles.vehicle(vehicleId).map(Wrapped.<Vehicle>pluckItem());
+  }
+
   @Override public Observable<Dtc> diagnoseDtcCode(String dtcCode) {
     return mDiagnostics.diagnoseDtcCode(dtcCode);
   }
 
   public Observable<User> currentUser() {
     return mUsers.currentUser().map(Wrapped.<User>pluckItem());
+  }
+
+  public Observable<Trip> trip(@NonNull String tripId) {
+    return mTrips.trip(tripId).map(Wrapped.<Trip>pluckItem());
   }
 
   /*package*/ Vehicles vehicles() {
@@ -173,6 +193,10 @@ public final class VinliApp implements Diagnostics {
 
   /*package*/ Subscriptions subscriptions() {
     return mSubscriptions;
+  }
+
+  /*package*/ Trips trips() {
+    return mTrips;
   }
 
   /*package*/ LinkLoader linkLoader() {
