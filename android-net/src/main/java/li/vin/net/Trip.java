@@ -15,6 +15,7 @@ public abstract class Trip implements VinliItem {
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Trip.class, AutoParcelAdapter.create(AutoParcel_Trip.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Trip_Links.class));
+    gb.registerTypeAdapter(Stats.class, AutoParcelAdapter.create(AutoParcel_Trip_Stats.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Trip.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Trip.class));
   }
@@ -23,6 +24,7 @@ public abstract class Trip implements VinliItem {
   public abstract String status();
   public abstract String vehicleId();
   public abstract String deviceId();
+  public abstract Stats stats();
 
   public Observable<Device> device() {
     return Vinli.curApp().device(deviceId());
@@ -58,5 +60,25 @@ public abstract class Trip implements VinliItem {
     public abstract String events();
 
     /*package*/ Links() { }
+  }
+
+  @AutoParcel
+  public static abstract class Stats implements Parcelable {
+    public abstract float averageLoad();
+    public abstract float averageMovingSpeed();
+    public abstract float averageSpeed();
+    public abstract float distance();
+    public abstract float distanceByGPS();
+    public abstract float distanceByVSS();
+    public abstract long duration();
+    public abstract float fuelConsumed();
+    public abstract float fuelEconomy();
+    public abstract int hardAccelCount();
+    public abstract int hardBrakeCount();
+    public abstract int locationCount();
+    public abstract float maxSpeed();
+    public abstract int messageCount();
+    public abstract float stdDevMovingSpeed();
+    public abstract int stopCount();
   }
 }
