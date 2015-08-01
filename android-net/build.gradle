@@ -45,6 +45,7 @@ android {
 }
 
 dependencies {
+    provided 'com.google.android:support-v4:r7'
     compile 'com.squareup.okhttp:okhttp:2.4.+'
     compile 'com.squareup.retrofit:retrofit:1.9.+'
     compile 'io.reactivex:rxandroid:0.24.+'

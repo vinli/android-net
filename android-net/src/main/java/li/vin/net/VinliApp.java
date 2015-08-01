@@ -1,11 +1,12 @@
 package li.vin.net;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.PendingIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.android.AndroidLog;
@@ -173,6 +174,27 @@ public final class VinliApp {
 
   public Observable<Rule> rule(@NonNull String ruleId) {
     return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
+  }
+
+  public void letUserChooseDevice(
+      @NonNull Activity activity,
+      @NonNull PendingIntent pendingIntent,
+      @NonNull String deviceChosenExtraKey) {
+    DeviceChooser.letUserChooseDevice(this, activity, pendingIntent, deviceChosenExtraKey);
+  }
+
+  public void letUserChooseDevice(
+      @NonNull Fragment fragment,
+      @NonNull PendingIntent pendingIntent,
+      @NonNull String deviceChosenExtraKey) {
+    DeviceChooser.letUserChooseDevice(this, fragment, pendingIntent, deviceChosenExtraKey);
+  }
+
+  public void letUserChooseDevice(
+      @NonNull android.support.v4.app.Fragment fragment,
+      @NonNull PendingIntent pendingIntent,
+      @NonNull String deviceChosenExtraKey) {
+    DeviceChooser.letUserChooseDevice(this, fragment, pendingIntent, deviceChosenExtraKey);
   }
 
   /*package*/ Vehicles vehicles() {

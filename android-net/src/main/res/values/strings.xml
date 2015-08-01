@@ -1,3 +1,4 @@
 <resources>
     <string name="title_activity_sign_in">Vinli Sign In</string>
+    <string name="title_device_chooser">Choose a Device</string>
 </resources>
