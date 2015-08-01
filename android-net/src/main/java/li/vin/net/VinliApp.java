@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.PendingIntent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.gson.Gson;
@@ -176,25 +175,16 @@ public final class VinliApp {
     return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
   }
 
-  public void letUserChooseDevice(
-      @NonNull Activity activity,
-      @NonNull PendingIntent pendingIntent,
-      @NonNull String deviceChosenExtraKey) {
-    DeviceChooser.letUserChooseDevice(this, activity, pendingIntent, deviceChosenExtraKey);
+  public Observable<Device> letUserChooseDevice(@NonNull Activity activity) {
+    return DeviceChooser.letUserChooseDevice(this, activity);
   }
 
-  public void letUserChooseDevice(
-      @NonNull Fragment fragment,
-      @NonNull PendingIntent pendingIntent,
-      @NonNull String deviceChosenExtraKey) {
-    DeviceChooser.letUserChooseDevice(this, fragment, pendingIntent, deviceChosenExtraKey);
+  public Observable<Device> letUserChooseDevice(@NonNull Fragment fragment) {
+    return DeviceChooser.letUserChooseDevice(this, fragment);
   }
 
-  public void letUserChooseDevice(
-      @NonNull android.support.v4.app.Fragment fragment,
-      @NonNull PendingIntent pendingIntent,
-      @NonNull String deviceChosenExtraKey) {
-    DeviceChooser.letUserChooseDevice(this, fragment, pendingIntent, deviceChosenExtraKey);
+  public Observable<Device> letUserChooseDevice(@NonNull android.support.v4.app.Fragment fragment) {
+    return DeviceChooser.letUserChooseDevice(this, fragment);
   }
 
   /*package*/ Vehicles vehicles() {
