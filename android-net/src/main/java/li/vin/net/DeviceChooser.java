@@ -68,7 +68,6 @@ public final class DeviceChooser {
             devices.addAll(devicePage.getItems());
           }
         })
-        .subscribeOn(AndroidSchedulers.mainThread())
         .flatMap(new DeviceChooserDialogMapFunc(context));
   }
 
@@ -173,7 +172,7 @@ public final class DeviceChooser {
                 context.getResources().getDimensionPixelSize(R.dimen.standard_edge_margin);
 
         }
-      });
+      }).subscribeOn(AndroidSchedulers.mainThread());
     }
   }
 
