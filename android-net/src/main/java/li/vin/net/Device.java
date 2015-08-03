@@ -121,9 +121,10 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().subscriptions().subscriptions(id(), limit, offset, objectId, objectType);
   }
 
+  /** Use {@link VinliApp#subscription(String)} instead. */
+  @Deprecated
   public Observable<Subscription> subscription(@NonNull String subscriptionId) {
-    return Vinli.curApp().subscriptions().subscription(id(), subscriptionId)
-        .map(Wrapped.<Subscription>pluckItem());
+    return Vinli.curApp().subscriptions().subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
   }
 
   public Observable<Page<Trip>> trips() {

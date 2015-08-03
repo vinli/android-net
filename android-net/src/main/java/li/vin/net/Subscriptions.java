@@ -21,9 +21,8 @@ import rx.Observable;
       @Nullable @Query("objectId") String objectId,
       @Nullable @Query("objectType") String objectType);
 
-  @GET("/devices/{deviceId}/subscriptions/{subscriptionId}")
+  @GET("/subscriptions/{subscriptionId}")
   Observable<Wrapped<Subscription>> subscription(
-      @NonNull @Path("deviceId") String deviceId,
       @NonNull @Path("subscriptionId") String subscriptionId);
 
   @POST("/devices/{deviceId}/subscriptions")

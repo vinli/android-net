@@ -175,6 +175,10 @@ public final class VinliApp {
     return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
   }
 
+  public Observable<Subscription> subscription(@NonNull String subscriptionId) {
+    return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
+  }
+
   public Observable<Device> letUserChooseDevice(@NonNull Activity activity) {
     return DeviceChooser.letUserChooseDevice(this, activity);
   }
