@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import rx.Observable;
+import rx.Observer;
 
 public final class Vinli {
   /*protected*/ static final String VINLI_PREFS = "li.vin.net.Vinli";
@@ -76,6 +78,21 @@ public final class Vinli {
       throw new IllegalStateException("no current app exists");
     }
     return sApp;
+  }
+
+  public static <T> void registerObserver(@NonNull Observer<T> observer,
+      @NonNull Observable<T> observable) {
+    ObserverManager.registerObserver(observer, observable, null);
+  }
+
+  public static <T> void registerObserver(@NonNull Observer<T> observer,
+      @NonNull Observable<T> observable,
+      @Nullable Object binding) {
+    ObserverManager.registerObserver(observer, observable, binding);
+  }
+
+  public static void unregisterObserver(@NonNull Observer<?> observer) {
+    ObserverManager.unregisterObserver(observer);
   }
 
   private Vinli() { }
