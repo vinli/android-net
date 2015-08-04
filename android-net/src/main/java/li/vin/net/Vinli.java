@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,15 +44,23 @@ public final class Vinli {
     if (sApp == null) {
       final Bundle extras = intent.getExtras();
       if (extras != null) {
-        final String accessToken = extras.getString(ACCESS_TOKEN);
-        if (accessToken != null) {
-          context
-              .getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
-              .edit()
-              .putString(ACCESS_TOKEN, accessToken)
-              .apply();
-
-          sApp = new VinliApp(accessToken);
+        String accessToken = extras.getString("li.vin.my.access_token");
+        if (accessToken == null) {
+          // fallback for backwards compat
+          accessToken = extras.getString(ACCESS_TOKEN);
+        }
+        String userId = extras.getString("li.vin.my.user_id");
+        if (accessToken != null || userId != null) {
+          SharedPreferences pref = context.getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE);
+          SharedPreferences.Editor edit = pref.edit();
+          if (accessToken != null) {
+            edit.putString(ACCESS_TOKEN, accessToken);
+            sApp = new VinliApp(accessToken);
+          }
+          if (userId != null) {
+            edit.putString("li.vin.my.user_id", userId);
+          }
+          edit.apply();
         }
       }
     }
