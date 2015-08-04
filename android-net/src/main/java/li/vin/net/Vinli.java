@@ -59,6 +59,19 @@ public final class Vinli {
     return loadApp(context);
   }
 
+  public static final @Nullable VinliApp initApp(Context context, @NonNull String accessToken) {
+    if (sApp == null) {
+      context.getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
+          .edit()
+          .putString(ACCESS_TOKEN, accessToken)
+          .apply();
+
+      sApp = new VinliApp(accessToken);
+    }
+
+    return loadApp(context);
+  }
+
   public static final @Nullable VinliApp loadApp(@NonNull Context context) {
     if (sApp == null) {
       final String accessToken = context
