@@ -27,6 +27,7 @@ public abstract class Device implements VinliItem {
 
   /*package*/ abstract Links links();
   public abstract String name();
+  public abstract String chipId();
 
   /*package*/ Device() { }
 
