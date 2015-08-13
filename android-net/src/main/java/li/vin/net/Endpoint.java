@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
 import com.squareup.okhttp.HttpUrl;
 
 /*package*/ enum Endpoint implements retrofit.Endpoint {
@@ -11,14 +12,26 @@ import com.squareup.okhttp.HttpUrl;
   TELEMETRY("telemetry"),
   TRIPS("trips");
 
-  private static final String DOMAIN = "-dev.vin.li";
+  /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";
+  /*package*/ static final String DOMAIN_DEV = "-dev.vin.li";
+  /*package*/ static final String DOMAIN_PROD = ".vin.li";
+
+  private static String domain = DOMAIN_PROD;
+
+  /*package*/ static synchronized String domain() {
+    return domain;
+  }
+
+  /*package*/ static synchronized void setDomain(@NonNull String domain) {
+    Endpoint.domain = domain;
+  }
 
   private final HttpUrl mUrl;
 
   private Endpoint(String subDomain) {
     mUrl = new HttpUrl.Builder()
         .scheme("https")
-        .host(subDomain + DOMAIN)
+        .host(subDomain + domain())
         .addPathSegment("api")
         .addPathSegment("v1")
         .build();

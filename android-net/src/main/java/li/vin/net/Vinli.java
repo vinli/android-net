@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,21 @@ public final class Vinli {
   /*protected*/ static final String VINLI_PREFS = "li.vin.net.Vinli";
   /*protected*/ static final String SIGN_IN_ERROR = "li.vin.net.Vinli#SIGN_IN_ERROR";
   /*protected*/ static final String ACCESS_TOKEN = "li.vin.net.Vinli#ACCESS_TOKEN";
+
+  /** Pass one of these constants to {@link #overrideDefaultEnvironment(Environment)}
+   * to override the default production environment. This must be called before any other Vinli
+   * app functionality is initialized, ideally in {@link Application#onCreate()}. */
+  public enum Environment {
+    PRODUCTION(Endpoint.DOMAIN_PROD),
+    DEV(Endpoint.DOMAIN_DEV),
+    DEMO(Endpoint.DOMAIN_DEMO);
+
+    private final String domainStr;
+
+    private Environment(String domainStr) {
+      this.domainStr = domainStr;
+    }
+  }
 
   public static final void signIn(@NonNull Activity context, @NonNull String clientId,
       @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
@@ -109,6 +125,12 @@ public final class Vinli {
 
   public static void unregisterObserver(@NonNull Observer<?> observer) {
     ObserverManager.unregisterObserver(observer);
+  }
+
+  /** Override the default environment with one of the constants from {@link Environment}.
+   * Be sure to call this before making any other Vinli calls or it may have no effect. */
+  public static void overrideDefaultEnvironment(@NonNull Environment environment) {
+    Endpoint.setDomain(environment.domainStr);
   }
 
   private Vinli() { }
