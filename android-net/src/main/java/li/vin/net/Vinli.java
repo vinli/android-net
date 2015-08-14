@@ -15,12 +15,12 @@ public final class Vinli {
   /*protected*/ static final String SIGN_IN_ERROR = "li.vin.net.Vinli#SIGN_IN_ERROR";
   /*protected*/ static final String ACCESS_TOKEN = "li.vin.net.Vinli#ACCESS_TOKEN";
 
-  public static final void signIn(@NonNull Activity context, @NonNull String clientId,
+  public static void signIn(@NonNull Activity context, @NonNull String clientId,
       @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
     context.startActivity(SignInActivity.newIntent(context, clientId, redirectUri, pendingIntent));
   }
 
-  public static final @Nullable String getSignInError(@NonNull Intent intent) {
+  public static @Nullable String getSignInError(@NonNull Intent intent) {
     final Bundle extras = intent.getExtras();
     if (extras == null) {
       return null;
@@ -39,7 +39,7 @@ public final class Vinli {
     sApp = null;
   }
 
-  public static final @Nullable VinliApp initApp(Context context, @NonNull Intent intent) {
+  public static @Nullable VinliApp initApp(Context context, @NonNull Intent intent) {
     if (sApp == null) {
       final Bundle extras = intent.getExtras();
       if (extras != null) {
@@ -62,7 +62,7 @@ public final class Vinli {
     return loadApp(context);
   }
 
-  public static final @Nullable VinliApp initApp(Context context, @NonNull String accessToken) {
+  public static @Nullable VinliApp initApp(Context context, @NonNull String accessToken) {
     if (sApp == null) {
       context.getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
           .edit()
@@ -75,7 +75,7 @@ public final class Vinli {
     return loadApp(context);
   }
 
-  public static final @Nullable VinliApp loadApp(@NonNull Context context) {
+  public static @Nullable VinliApp loadApp(@NonNull Context context) {
     if (sApp == null) {
       final String accessToken = context
           .getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
@@ -89,7 +89,7 @@ public final class Vinli {
     return sApp;
   }
 
-  /*package*/ static final VinliApp curApp() {
+  /*package*/ static VinliApp curApp() {
     if (sApp == null) {
       throw new IllegalStateException("no current app exists");
     }
@@ -98,13 +98,7 @@ public final class Vinli {
 
   public static <T> void registerObserver(@NonNull Observer<T> observer,
       @NonNull Observable<T> observable) {
-    ObserverManager.registerObserver(observer, observable, null);
-  }
-
-  public static <T> void registerObserver(@NonNull Observer<T> observer,
-      @NonNull Observable<T> observable,
-      @Nullable Object binding) {
-    ObserverManager.registerObserver(observer, observable, binding);
+    ObserverManager.registerObserver(observer, observable);
   }
 
   public static void unregisterObserver(@NonNull Observer<?> observer) {

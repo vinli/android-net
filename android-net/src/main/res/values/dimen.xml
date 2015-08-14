@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <dimen name="standard_edge_margin">16dp</dimen>
-  <dimen name="device_chooser_item_text_size">24sp</dimen>
-</resources>

@@ -1,7 +1,5 @@
 package li.vin.net;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.gson.Gson;
@@ -177,18 +175,6 @@ public final class VinliApp {
 
   public Observable<Subscription> subscription(@NonNull String subscriptionId) {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
-  }
-
-  public Observable<Device> letUserChooseDevice(@NonNull Activity activity) {
-    return DeviceChooser.letUserChooseDevice(this, activity);
-  }
-
-  public Observable<Device> letUserChooseDevice(@NonNull Fragment fragment) {
-    return DeviceChooser.letUserChooseDevice(this, fragment);
-  }
-
-  public Observable<Device> letUserChooseDevice(@NonNull android.support.v4.app.Fragment fragment) {
-    return DeviceChooser.letUserChooseDevice(this, fragment);
   }
 
   /*package*/ Vehicles vehicles() {

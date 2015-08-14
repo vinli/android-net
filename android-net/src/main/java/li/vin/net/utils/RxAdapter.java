@@ -1,16 +1,13 @@
 package li.vin.net.utils;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.BaseAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.app.AppObservable;
+import rx.android.schedulers.AndroidSchedulers;
 
 public abstract class RxAdapter<T> extends BaseAdapter {
   private Observable<T> observable;
@@ -51,16 +48,20 @@ public abstract class RxAdapter<T> extends BaseAdapter {
 
   protected void onNext(T t) { }
 
-  public rx.Subscription subscribe(@NonNull Object context, @NonNull Observable<T> observable) {
+  public rx.Subscription subscribe(@NonNull Observable<T> observable) {
+    return subscribe(null, observable);
+  }
+
+  /** Use {@link #subscribe(Observable)} instead. */
+  @Deprecated
+  public rx.Subscription subscribe(Object context, @NonNull Observable<T> observable) {
     if (curSubscription != null && !curSubscription.isUnsubscribed()) {
       curSubscription.unsubscribe();
     }
 
-    this.observable = context instanceof Activity
-        ? AppObservable.bindActivity((Activity) context, observable)
-        : AppObservable.bindFragment(context, observable);
+    this.observable = bind(observable);
 
-    curSubscription = bind(context, observable).subscribe(subscriber);
+    curSubscription = bind(observable).subscribe(subscriber);
 
     if (!items.isEmpty()) {
       items.clear();
@@ -70,9 +71,7 @@ public abstract class RxAdapter<T> extends BaseAdapter {
     return curSubscription;
   }
 
-  private static final <T> Observable<T> bind(@NonNull Object context, @NonNull Observable<T> observable) {
-    return context instanceof Activity
-        ? AppObservable.bindActivity((Activity) context, observable)
-        : AppObservable.bindFragment(context, observable);
+  private static final <T> Observable<T> bind(@NonNull Observable<T> observable) {
+    return observable.observeOn(AndroidSchedulers.mainThread());
   }
 }

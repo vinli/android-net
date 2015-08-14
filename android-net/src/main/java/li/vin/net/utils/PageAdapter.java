@@ -1,18 +1,16 @@
 package li.vin.net.utils;
 
-import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.BaseAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import li.vin.net.Page;
 import li.vin.net.VinliItem;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.android.app.AppObservable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
 public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter {
@@ -72,27 +70,37 @@ public abstract class PageAdapter<T extends VinliItem> extends BaseAdapter {
     return pages.isEmpty() || pages.get(pages.size() - 1).hasNextPage();
   }
 
-  public Subscription subscribe(Object context, Observable<Page<T>> observable) {
+  public Subscription subscribe(@NonNull Observable<Page<T>> observable) {
+    return subscribe(null, observable);
+  }
+
+  /** Use {@link #subscribe(Observable)} instead. */
+  @Deprecated
+  public Subscription subscribe(Object context, @NonNull Observable<Page<T>> observable) {
     if (!pages.isEmpty()) {
       pages.clear();
       count = 0;
       this.notifyDataSetChanged();
     }
 
-    return bind(context, observable).subscribe(subscriber);
+    return bind(observable).subscribe(subscriber);
   }
 
+  public Subscription loadNext() {
+    return loadNext(null);
+  }
+
+  /** Use {@link #loadNext()} instead. */
+  @Deprecated
   public Subscription loadNext(Object context) {
     if (hasNext()) {
-      return bind(context, pages.get(pages.size() - 1).loadNextPage()).subscribe(subscriber);
+      return bind(pages.get(pages.size() - 1).loadNextPage()).subscribe(subscriber);
     } else {
       return Subscriptions.empty();
     }
   }
 
-  private static final <T extends VinliItem> Observable<Page<T>> bind(Object context, Observable<Page<T>> observable) {
-    return context instanceof Activity
-        ? AppObservable.bindActivity((Activity) context, observable)
-        : AppObservable.bindFragment(context, observable);
+  private static <T extends VinliItem> Observable<Page<T>> bind(@NonNull Observable<Page<T>> observable) {
+    return observable.observeOn(AndroidSchedulers.mainThread());
   }
 }

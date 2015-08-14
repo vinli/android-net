@@ -1,6 +1,6 @@
 package li.vin.net;
 
-import android.app.Activity;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,8 +8,6 @@ import java.util.Set;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
-import rx.android.app.AppObservable;
-import rx.android.internal.Assertions;
 import rx.android.schedulers.AndroidSchedulers;
 
 /**
@@ -20,28 +18,24 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 /*package*/ final class ObserverManager {
 
-  /** Register an observer. Binding is optional, if nonnull is assumed to be an Activity or
-   * Fragment. Always observes on the UI thread. Will throw an unchecked exception if observer is
-   * already registered. */
+  /** Register an observer. Always observes on the UI thread. Will throw an unchecked exception
+   * if observer is already registered. */
   /*package*/ static <T> void registerObserver(@NonNull Observer<T> cb,
-      @NonNull Observable<T> observable, Object binding) {
-    Assertions.assertUiThread();
-    Subscription sub;
-    if (binding instanceof Activity) {
-      sub = AppObservable.bindActivity((Activity) binding, observable).subscribe(cb);
-    } else if (binding != null) {
-      sub = AppObservable.bindFragment(binding, observable).subscribe(cb);
-    } else {
-      sub = observable.observeOn(AndroidSchedulers.mainThread()).subscribe(cb);
+      @NonNull Observable<T> observable) {
+    if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+      throw new IllegalStateException("Must be called on UI thread.");
     }
+    Subscription sub = observable.observeOn(AndroidSchedulers.mainThread()).subscribe(cb);
     if (!callbacks().add(new CallbackSubscriptionTuple(cb, sub))) {
       throw new IllegalStateException("callback already registered.");
     }
   }
 
   /** Permissively attempt to unregister an already-registered observer. */
-  /*package*/ static void unregisterObserver(@NonNull Observer<?> cb) {
-    Assertions.assertUiThread();
+  /*package*/ static <T> void unregisterObserver(@NonNull Observer<T> cb) {
+    if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+      throw new IllegalStateException("Must be called on UI thread.");
+    }
     for (Iterator<CallbackSubscriptionTuple> i=callbacks().iterator(); i.hasNext(); ) {
       CallbackSubscriptionTuple cbSub = i.next();
       if (cbSub.cb.equals(cb)) {
