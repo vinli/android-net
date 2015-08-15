@@ -43,6 +43,10 @@ install {
                     id 'kturney'
                     name 'Kyle Turney'
                 }
+                developer {
+                    id 'cmc5788'
+                    name 'Christopher Casey'
+                }
             }
         }
     }
