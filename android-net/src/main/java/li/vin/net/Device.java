@@ -3,14 +3,12 @@ package li.vin.net;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.util.Date;
-
-import auto.parcel.AutoParcel;
+import java.util.List;
 import rx.Observable;
 
 @AutoParcel
@@ -23,6 +21,19 @@ public abstract class Device implements VinliItem {
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Device_Links.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Device.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Device.class));
+  }
+
+  @SuppressWarnings("unused") private static String toListJson(@NonNull List<Device> devices) {
+    return Vinli.curApp().gson().toJson(devices, new TypeToken<List<Device>>(){}.getType());
+  }
+
+  @SuppressWarnings("unused") private static List<Device> fromListJson(@NonNull String devices) {
+    return Vinli.curApp().gson().fromJson(devices, new TypeToken<List<Device>>() {}.getType());
+  }
+
+  @SuppressWarnings("unused") private static Device createDevice(final String id,
+      final String name, final String chipId, final String icon) {
+    return new AutoParcel_Device(id, new AutoParcel_Device_Links("","","",""), name, chipId, icon);
   }
 
   /*package*/ abstract Links links();
