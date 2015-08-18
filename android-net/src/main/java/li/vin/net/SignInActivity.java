@@ -72,19 +72,25 @@ public class SignInActivity extends Activity {
         Log.d(TAG, "shouldOverrideUrlLoading: " + url);
 
         if (url.startsWith(redirectUri)) {
-          final HttpUrl uri = HttpUrl.parse(url);
-          final String[] fragmentPieces = uri.fragment().split("&");
 
           String error = null;
           String accessToken = null;
-          for (String piece : fragmentPieces) {
-            if (piece.startsWith("access_token=")) {
-              accessToken = piece.substring("access_token=".length());
-              break;
-            } else if (piece.startsWith("error=")) {
-              error = piece.substring("error=".length());
-              break;
+
+          try {
+            final HttpUrl uri = HttpUrl.parse(url);
+            final String[] fragmentPieces = uri.fragment().split("&");
+            for (String piece : fragmentPieces) {
+              if (piece.startsWith("access_token=")) {
+                accessToken = piece.substring("access_token=".length());
+                break;
+              } else if (piece.startsWith("error=")) {
+                error = piece.substring("error=".length());
+                break;
+              }
             }
+          } catch (Exception e) {
+            error = "redirect parse error: " + e;
+            Log.e(TAG, error);
           }
 
           Intent resultIntent;
@@ -106,8 +112,8 @@ public class SignInActivity extends Activity {
 
           try {
             pendingIntent.send(SignInActivity.this, 0, resultIntent);
-          } catch (PendingIntent.CanceledException e) {
-            Log.d(TAG, "pending intent was canceled by caller.");
+          } catch (Exception e) {
+            Log.d(TAG, "pending intent send error: " + e);
           }
 
           return true;
