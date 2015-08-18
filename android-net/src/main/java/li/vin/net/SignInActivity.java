@@ -90,7 +90,6 @@ public class SignInActivity extends Activity {
             }
           } catch (Exception e) {
             error = "redirect parse error: " + e;
-            Log.e(TAG, error);
           }
 
           Intent resultIntent;
