@@ -31,6 +31,14 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().gson().fromJson(devices, new TypeToken<List<Device>>() {}.getType());
   }
 
+  @SuppressWarnings("unused") private static String toJson(@NonNull Device device) {
+    return Vinli.curApp().gson().toJson(device);
+  }
+
+  @SuppressWarnings("unused") private static Device fromJson(@NonNull String device) {
+    return Vinli.curApp().gson().fromJson(device, Device.class);
+  }
+
   @SuppressWarnings("unused") private static Device createDevice(final String id,
       final String name, final String chipId, final String icon) {
     return new AutoParcel_Device(id, new AutoParcel_Device_Links("","","",""), name, chipId, icon);
