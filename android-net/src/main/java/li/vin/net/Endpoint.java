@@ -26,7 +26,7 @@ import com.squareup.okhttp.HttpUrl;
     Endpoint.domain = domain;
   }
 
-  private final HttpUrl.Builder mUrl;
+  private final HttpUrl mUrl;
   private final String subDomain;
 
   private Endpoint(String subDomain) {
@@ -34,7 +34,8 @@ import com.squareup.okhttp.HttpUrl;
     mUrl = new HttpUrl.Builder()
         .scheme("https")
         .addPathSegment("api")
-        .addPathSegment("v1");
+        .addPathSegment("v1")
+        .build();
   }
 
   @Override public String getName() {
@@ -42,7 +43,7 @@ import com.squareup.okhttp.HttpUrl;
   }
 
   @Override public String getUrl() {
-    return mUrl.host(subDomain + domain()).toString();
+    return mUrl.newBuilder().host(subDomain + domain()).toString();
   }
 
 }

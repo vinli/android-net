@@ -22,12 +22,13 @@ public class SignInActivity extends Activity {
   private static final String ACTION_ERROR = "li.vin.net.signIn.ERROR";
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
 
-  private static final HttpUrl.Builder OAUTH_ENPOINT = new HttpUrl.Builder()
+  private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder()
       .scheme("https")
       .addPathSegment("oauth")
       .addPathSegment("authorization")
       .addPathSegment("new")
-      .addQueryParameter("response_type", "token");
+      .addQueryParameter("response_type", "token")
+      .build();
 
   /*protected*/ static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
       @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
@@ -122,10 +123,10 @@ public class SignInActivity extends Activity {
       }
     });
 
-    final String url = OAUTH_ENPOINT
+    final String url = OAUTH_ENPOINT.newBuilder()
         .host("auth" + Endpoint.domain())
-        .addQueryParameter("client_id", clientId)
-        .addQueryParameter("redirect_uri", redirectUri)
+        .setQueryParameter("client_id", clientId)
+        .setQueryParameter("redirect_uri", redirectUri)
         .toString();
 
     Log.d("SignInActivity", "loading url: " + url);
