@@ -24,6 +24,7 @@ public class SignInActivity extends Activity {
 
   private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder()
       .scheme("https")
+      .host("auth" + Endpoint.domain())
       .addPathSegment("oauth")
       .addPathSegment("authorization")
       .addPathSegment("new")
