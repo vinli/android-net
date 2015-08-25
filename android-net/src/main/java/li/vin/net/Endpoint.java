@@ -33,6 +33,7 @@ import com.squareup.okhttp.HttpUrl;
     this.subDomain = subDomain;
     mUrl = new HttpUrl.Builder()
         .scheme("https")
+        .host(subDomain + domain())
         .addPathSegment("api")
         .addPathSegment("v1")
         .build();
