@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -118,6 +119,14 @@ public class SignInActivity extends Activity {
           }
 
           return true;
+        }
+
+        if (url.toLowerCase().contains("sign-up")) {
+          try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+          } catch (Exception e) {
+            Log.d(TAG, "failed to launch sign up url", e);
+          } return true;
         }
 
         return false;
