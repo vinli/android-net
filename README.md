@@ -8,11 +8,13 @@ Vinli Android Net SDK
 
 An Android client for interacting with the Vinli backend from within your application.
 
-Build
+Download
+--------
 
------------
-
-[![Build Status](https://travis-ci.org/vinli/android-net.svg?branch=master)](https://travis-ci.org/vinli/android-net)
+You can also depend on this library through Gradle from jcenter:
+```groovy
+compile 'com.squareup:otto:1.3.8'
+```
 
 Conventions
 -----------
