@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -16,6 +17,7 @@ public abstract class User implements VinliItem {
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(User.class, AutoParcelAdapter.create(AutoParcel_User.class));
+    gb.registerTypeAdapter(Settings.class, AutoParcelAdapter.create(AutoParcel_User_Settings.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(User.class));
   }
 
@@ -25,4 +27,14 @@ public abstract class User implements VinliItem {
   @Nullable public abstract String image();
   @NonNull public abstract String phone();
   @NonNull public abstract String createdAt();
+  @Nullable public abstract Settings settings();
+
+  /*package*/ User() { }
+
+  @AutoParcel
+  public static abstract class Settings implements Parcelable {
+    @Nullable public abstract String unit();
+
+    /*package*/ Settings() { }
+  }
 }
