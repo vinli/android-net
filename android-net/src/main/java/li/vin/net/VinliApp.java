@@ -27,7 +27,11 @@ public final class VinliApp {
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
 
+  private final String mAccessToken;
+
   /*protected*/ VinliApp(@NonNull String accessToken) {
+    mAccessToken = accessToken;
+
     final GsonBuilder gsonB = new GsonBuilder();
 
     final Client client = new OkClient();
@@ -59,8 +63,7 @@ public final class VinliApp {
 
     final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
 
-    final RestAdapter platformAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.PLATFORM)
+    final RestAdapter platformAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.PLATFORM)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -71,8 +74,7 @@ public final class VinliApp {
     mDevices = platformAdapter.create(Devices.class);
     mVehicles = platformAdapter.create(Vehicles.class);
 
-    mDiagnostics = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.DIAGNOSTICS)
+    mDiagnostics = new RestAdapter.Builder().setEndpoint(Endpoint.DIAGNOSTICS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -81,8 +83,7 @@ public final class VinliApp {
         .build()
         .create(Diagnostics.class);
 
-    mRules = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.RULES)
+    mRules = new RestAdapter.Builder().setEndpoint(Endpoint.RULES)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -91,8 +92,7 @@ public final class VinliApp {
         .build()
         .create(Rules.class);
 
-    final RestAdapter eventsAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.EVENTS)
+    final RestAdapter eventsAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.EVENTS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -103,8 +103,7 @@ public final class VinliApp {
     mEvents = eventsAdapter.create(Events.class);
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
 
-    final RestAdapter telemAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.TELEMETRY)
+    final RestAdapter telemAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.TELEMETRY)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -115,8 +114,7 @@ public final class VinliApp {
     mLocations = telemAdapter.create(Locations.class);
     mSnapshots = telemAdapter.create(Snapshots.class);
 
-    mUsers = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.AUTH)
+    mUsers = new RestAdapter.Builder().setEndpoint(Endpoint.AUTH)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -125,8 +123,7 @@ public final class VinliApp {
         .build()
         .create(Users.class);
 
-    mTrips = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.TRIPS)
+    mTrips = new RestAdapter.Builder().setEndpoint(Endpoint.TRIPS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -136,6 +133,10 @@ public final class VinliApp {
         .create(Trips.class);
   }
 
+  public String getAccessToken() {
+    return mAccessToken;
+  }
+
   public Observable<Page<Device>> devices() {
     return mDevices.devices(null, null);
   }
@@ -143,9 +144,7 @@ public final class VinliApp {
   /**
    * Pass null for default
    */
-  public Observable<Page<Device>> devices(
-      @Nullable Integer limit,
-      @Nullable Integer offset) {
+  public Observable<Page<Device>> devices(@Nullable Integer limit, @Nullable Integer offset) {
     return mDevices.devices(limit, offset);
   }
 
@@ -221,7 +220,8 @@ public final class VinliApp {
       mBearer = "Bearer " + accessToken;
     }
 
-    @Override public void intercept(RequestFacade request) {
+    @Override
+    public void intercept(RequestFacade request) {
       request.addHeader(AUTH, mBearer);
     }
   }
