@@ -1,6 +1,5 @@
 package li.vin.net;
 
-import java.util.List;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
@@ -15,7 +14,7 @@ import rx.Observable;
 public interface Distances {
 
   @GET("/vehicles/{vehicleId}/distances")
-  Observable<List<Distance>> distances(
+  Observable<TimeSeries<Distance>> distances(
       @Path("vehicleId") String vehicleId,
       @Query("from") String from,
       @Query("until") String until);

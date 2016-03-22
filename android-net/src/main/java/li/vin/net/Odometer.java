@@ -19,7 +19,7 @@ import rx.Observable;
  */
 @AutoParcel
 public abstract class Odometer implements VinliItem{
-  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Event>>() { }.getType();
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Odometer>>() { }.getType();
   /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Odometer>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
@@ -38,6 +38,10 @@ public abstract class Odometer implements VinliItem{
 
   public static final Seed.Saver create() {
     return new AutoParcel_Odometer_Seed.Builder();
+  }
+
+  public Observable<Void> delete(){
+    return Vinli.curApp().distances().deleteOdometerReport(id());
   }
 
   @AutoParcel

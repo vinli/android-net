@@ -1,12 +1,11 @@
 package li.vin.net;
 
 import android.support.annotation.Nullable;
+import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
-
-import auto.parcel.AutoParcel;
+import java.util.List;
 import rx.Observable;
 
 @AutoParcel
@@ -34,6 +33,18 @@ public abstract class Vehicle implements VinliItem {
       @Nullable Integer limit,
       @Nullable Integer offset) {
     return Vinli.curApp().trips().vehicleTrips(id(), limit, offset);
+  }
+
+  public Observable<TimeSeries<Distance>> distances(){
+    return distances(null, null);
+  }
+
+  public Observable<TimeSeries<Distance>> distances(@Nullable String from, @Nullable String until){
+    return Vinli.curApp().distances().distances(id(), from, until);
+  }
+
+  public Observable<TimeSeries<Odometer>> odometerReports(){
+    return Vinli.curApp().distances().odometerReports(id());
   }
 
   /*package*/ Vehicle() { }
