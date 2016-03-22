@@ -189,6 +189,10 @@ public final class VinliApp {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
   }
 
+  public Observable<Odometer> odometerReport(@NonNull String odometerId){
+    return mDistances.odometerReport(odometerId).map(Wrapped.<Odometer>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }
