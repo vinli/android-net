@@ -21,16 +21,16 @@ public interface Distances {
       @Query("until") String until);
 
   @POST("/vehicles/{vehicleId}/odometers")
-  Observable<Object> createOdometerReport(
+  Observable<Wrapped<Odometer>> createOdometerReport(
       @Path("vehicleId") String vehicleId,
-      @Body Object odometer);
+      @Body Odometer.Seed odometerSeed);
 
   @GET("/vehicles/{vehicleId}/odometers")
-  Observable<Object> odometerReports(
+  Observable<TimeSeries<Odometer>> odometerReports(
       @Path("vehicleId") String vehicleId);
 
   @GET("/odometers/{odometerId}")
-  Observable<Object> odometerReport(
+  Observable<Wrapped<Odometer>> odometerReport(
       @Path("odometerId") String odometerId);
 
   @DELETE("/odometers/{odometerId}")

@@ -23,6 +23,7 @@ public final class VinliApp {
   private final Subscriptions mSubscriptions;
   private final Users mUsers;
   private final Trips mTrips;
+  private final Distances mDistances;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -48,6 +49,7 @@ public final class VinliApp {
     Notification.registerGson(gsonB);
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
+    Distance.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -134,6 +136,16 @@ public final class VinliApp {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Trips.class);
+
+    mDistances = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.DISTANCE)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Distances.class);
   }
 
   public Observable<Page<Device>> devices() {
@@ -203,6 +215,10 @@ public final class VinliApp {
 
   /*package*/ Trips trips() {
     return mTrips;
+  }
+
+  /*package*/ Distances distances(){
+    return mDistances;
   }
 
   /*package*/ LinkLoader linkLoader() {

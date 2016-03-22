@@ -10,7 +10,8 @@ import com.squareup.okhttp.HttpUrl;
   PLATFORM("platform"),
   RULES("rules"),
   TELEMETRY("telemetry"),
-  TRIPS("trips");
+  TRIPS("trips"),
+  DISTANCE("distance");
 
   /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";
   /*package*/ static final String DOMAIN_DEV = "-dev.vin.li";
