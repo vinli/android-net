@@ -51,7 +51,7 @@ public abstract class Odometer implements VinliItem{
   public static abstract class Seed{
     @NonNull public abstract Double reading();
     @Nullable public abstract String date();
-    @NonNull public abstract String unit();
+    @NonNull public abstract DistanceUnit unit();
     @NonNull public abstract String vehicleId();
 
 
@@ -59,7 +59,7 @@ public abstract class Odometer implements VinliItem{
     public static abstract class Saver{
       public abstract Saver reading(@NonNull Double reading);
       public abstract Saver date(@Nullable String date);
-      public abstract Saver unit(@NonNull String unit);
+      public abstract Saver unit(@NonNull DistanceUnit unit);
       public abstract Saver vehicleId(@NonNull String vehicleId);
 
       /*package*/ Saver() { }
@@ -90,7 +90,7 @@ public abstract class Odometer implements VinliItem{
           if(date != null){
             out.name("date").value(value.date());
           }
-          out.name("unit").value(value.unit());
+          out.name("unit").value(value.unit().getDistanceUnitStr());
         out.endObject();
       }
 

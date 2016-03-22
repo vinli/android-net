@@ -34,7 +34,7 @@ public interface Distances {
       @Path("odometerId") String odometerId);
 
   @DELETE("/odometers/{odometerId}")
-  Observable<Object> deleteOdometerReport(
+  Observable<Void> deleteOdometerReport(
       @Path("odometerId") String odometerId);
 
   @POST("/vehicles/{vehicleId}/odometer_triggers")
