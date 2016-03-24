@@ -35,11 +35,11 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<DistanceList> distances(){
-    return distances(null, null);
+    return distances(null, null, null);
   }
 
-  public Observable<DistanceList> distances(@Nullable String from, @Nullable String until){
-    return Vinli.curApp().distances().distances(id(), from, until);
+  public Observable<DistanceList> distances(@Nullable String from, @Nullable String until, @Nullable DistanceUnit unit){
+    return Vinli.curApp().distances().distances(id(), from, until, (unit == null) ? null : unit.getDistanceUnitStr());
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(){

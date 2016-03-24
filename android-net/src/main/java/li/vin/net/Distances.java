@@ -3,6 +3,7 @@ package li.vin.net;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -14,7 +15,8 @@ public interface Distances {
   Observable<DistanceList> distances(
       @Path("vehicleId") String vehicleId,
       @Query("from") String from,
-      @Query("until") String until);
+      @Query("until") String until,
+      @Header("x-vinli-unit") String unit);
 
   @POST("/vehicles/{vehicleId}/odometers")
   Observable<Wrapped<Odometer>> createOdometerReport(
