@@ -46,5 +46,9 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().distances().odometerReports(id());
   }
 
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(){
+    return Vinli.curApp().distances().odometerTriggers(id());
+  }
+
   /*package*/ Vehicle() { }
 }

@@ -51,6 +51,7 @@ public final class VinliApp {
     Trip.registerGson(gsonB);
     DistanceList.registerGson(gsonB);
     Odometer.registerGson(gsonB);
+    OdometerTrigger.registerGson(gsonB);
 
     mGson = gsonB.create();
 
@@ -192,6 +193,10 @@ public final class VinliApp {
 
   public Observable<Odometer> odometerReport(@NonNull String odometerId){
     return mDistances.odometerReport(odometerId).map(Wrapped.<Odometer>pluckItem());
+  }
+
+  public Observable<OdometerTrigger> odometerTrigger(@NonNull String odometerTriggerId){
+    return mDistances.odometerTrigger(odometerTriggerId).map(Wrapped.<OdometerTrigger>pluckItem());
   }
 
   /*package*/ Vehicles vehicles() {

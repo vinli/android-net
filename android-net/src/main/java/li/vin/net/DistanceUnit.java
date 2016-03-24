@@ -1,8 +1,5 @@
 package li.vin.net;
 
-/**
- * Created by tbrown on 3/22/16.
- */
 public enum DistanceUnit {
   KILOMETERS("km"),
   METERS("m"),
@@ -14,7 +11,7 @@ public enum DistanceUnit {
     this.unitStr = unit;
   }
 
-  public String getDistanceUnitStr(){
+  /*package*/ String getDistanceUnitStr(){
     return this.unitStr;
   }
 

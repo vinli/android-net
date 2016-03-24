@@ -13,29 +13,51 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import rx.Observable;
 
-/**
- * Created by tbrown on 3/24/16.
- */
 @AutoParcel
 public abstract class OdometerTrigger implements VinliItem{
-  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Odometer>>() { }.getType();
-  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Odometer>>() { }.getType();
+
+  public enum TriggerType{
+    SPECIFIC("specific"),
+    FROM_NOW("from_now"),
+    MILESTONE("milestone");
+
+    private String typeStr;
+
+    private TriggerType(String unit){
+      this.typeStr = unit;
+    }
+
+    /*package*/ String getTriggerTypeStr(){
+      return this.typeStr;
+    }
+  }
+
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<OdometerTrigger>>() { }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<OdometerTrigger>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(OdometerTrigger.class, AutoParcelAdapter.create(AutoParcel_OdometerTrigger.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_OdometerTrigger_Links.class));
     gb.registerTypeAdapter(AutoParcel_OdometerTrigger_Seed.class, new Seed.Adapter());
 
-    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Odometer.class));
-    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Odometer.class));
+    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(OdometerTrigger.class));
+    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, OdometerTrigger.class));
   }
 
   public abstract String vehicleId();
-  public abstract String type();
+  public abstract TriggerType type();
   public abstract Double threshold();
   public abstract Double events();
 
   /*package*/ abstract Links links();
+
+  public static final Seed.Saver create() {
+    return new AutoParcel_OdometerTrigger_Seed.Builder();
+  }
+
+  public Observable<Void> delete(){
+    return Vinli.curApp().distances().deleteOdometerTrigger(id());
+  }
 
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
@@ -47,7 +69,7 @@ public abstract class OdometerTrigger implements VinliItem{
   @AutoParcel
   public static abstract class Seed{
     @NonNull public abstract String vehicleId();
-    @NonNull public abstract String type();
+    @NonNull public abstract TriggerType type();
     @NonNull public abstract Double threshold();
     @NonNull public abstract DistanceUnit unit();
 
@@ -56,7 +78,7 @@ public abstract class OdometerTrigger implements VinliItem{
     @AutoParcel.Builder
     public static abstract class Saver{
       public abstract Saver vehicleId(@NonNull String vehicleId);
-      public abstract Saver type(@NonNull String type);
+      public abstract Saver type(@NonNull TriggerType type);
       public abstract Saver threshold(@NonNull Double threshold);
       public abstract Saver unit(@NonNull DistanceUnit unit);
 
@@ -82,7 +104,7 @@ public abstract class OdometerTrigger implements VinliItem{
 
         out.beginObject();
           out.name("odometerTrigger").beginObject();
-            out.name("type").value(value.type());
+            out.name("type").value(value.type().getTriggerTypeStr());
             out.name("threshold").value(value.threshold());
             out.name("unit").value(value.unit().getDistanceUnitStr());
           out.endObject();
@@ -94,5 +116,4 @@ public abstract class OdometerTrigger implements VinliItem{
       }
     }
   }
-
 }

@@ -5,10 +5,6 @@ import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import java.util.List;
 
-/**
- * Created by tbrown on 3/22/16.
- */
-
 @AutoParcel
 public abstract class DistanceList implements VinliItem{
 

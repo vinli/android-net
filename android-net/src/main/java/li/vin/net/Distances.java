@@ -8,9 +8,6 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import rx.Observable;
 
-/**
- * Created by tbrown on 3/22/16.
- */
 public interface Distances {
 
   @GET("/vehicles/{vehicleId}/distances")
