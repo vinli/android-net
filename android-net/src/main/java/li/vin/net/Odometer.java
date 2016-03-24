@@ -26,6 +26,7 @@ public abstract class Odometer implements VinliItem{
     gb.registerTypeAdapter(Odometer.class, AutoParcelAdapter.create(AutoParcel_Odometer.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Odometer_Links.class));
     gb.registerTypeAdapter(AutoParcel_Odometer_Seed.class, new Seed.Adapter());
+
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Odometer.class));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Odometer.class));
   }
@@ -58,6 +59,7 @@ public abstract class Odometer implements VinliItem{
     @NonNull public abstract DistanceUnit unit();
     @NonNull public abstract String vehicleId();
 
+    /*package*/ Seed() { }
 
     @AutoParcel.Builder
     public static abstract class Saver{
@@ -66,7 +68,7 @@ public abstract class Odometer implements VinliItem{
       public abstract Saver unit(@NonNull DistanceUnit unit);
       public abstract Saver vehicleId(@NonNull String vehicleId);
 
-      /*package*/ Saver() { }
+      /*package*/ Saver() {}
 
       /*package*/ abstract Seed autoBuild();
 
@@ -87,14 +89,15 @@ public abstract class Odometer implements VinliItem{
         }
 
         out.beginObject();
-        out.name("odometer").beginObject();
-          out.name("reading").value(value.reading());
+          out.name("odometer").beginObject();
+            out.name("reading").value(value.reading());
 
-          final String date = value.date();
-          if(date != null){
-            out.name("date").value(value.date());
-          }
-          out.name("unit").value(value.unit().getDistanceUnitStr());
+            final String date = value.date();
+            if(date != null){
+              out.name("date").value(value.date());
+            }
+            out.name("unit").value(value.unit().getDistanceUnitStr());
+          out.endObject();
         out.endObject();
       }
 
