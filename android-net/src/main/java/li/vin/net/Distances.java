@@ -37,19 +37,19 @@ public interface Distances {
       @Path("odometerId") String odometerId);
 
   @POST("/vehicles/{vehicleId}/odometer_triggers")
-  Observable<Object> createOdometerTrigger(
+  Observable<Wrapped<OdometerTrigger>> createOdometerTrigger(
       @Path("vehicleId") String vehicleId,
-      @Body Object odometerTrigger);
+      @Body OdometerTrigger.Seed odometerTrigger);
 
   @GET("/odometer_triggers/{odometerTriggerId}")
-  Observable<Object> odometerTrigger(
+  Observable<Wrapped<OdometerTrigger>> odometerTrigger(
       @Path("odometerTriggerId") String odometerTriggerId);
 
   @DELETE("/odometer_triggers/{odometerTriggerId}")
-  Observable<Object> deleteOdometerTrigger(
+  Observable<Void> deleteOdometerTrigger(
       @Path("odometerTriggerId") String odometerTriggerId);
 
   @GET("/vehicles/{vehicleId}/odometer_triggers")
-  Observable<Object> odometerTriggers(
+  Observable<TimeSeries<OdometerTrigger>> odometerTriggers(
       @Path("vehicleId") String vehicleId);
 }
