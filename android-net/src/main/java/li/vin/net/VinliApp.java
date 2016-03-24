@@ -50,6 +50,7 @@ public final class VinliApp {
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
     DistanceList.registerGson(gsonB);
+    Odometer.registerGson(gsonB);
 
     mGson = gsonB.create();
 
