@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -30,18 +31,31 @@ public abstract class OdometerTrigger implements VinliItem{
     /*package*/ String getTriggerTypeStr(){
       return this.typeStr;
     }
+
+    /*package*/ static TriggerType getEnumFromString(String str){
+      switch(str){
+        case "specific":
+          return SPECIFIC;
+        case "from_now":
+          return FROM_NOW;
+        case "milestone":
+          return MILESTONE;
+        default:
+          throw new IllegalArgumentException("str is not a valid string to be used for TriggerType");
+      }
+    }
   }
 
   /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<OdometerTrigger>>() { }.getType();
   /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<OdometerTrigger>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
-    gb.registerTypeAdapter(OdometerTrigger.class, AutoParcelAdapter.create(AutoParcel_OdometerTrigger.class));
+    gb.registerTypeAdapter(OdometerTrigger.class, new OdometerTriggerAdapter());
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_OdometerTrigger_Links.class));
     gb.registerTypeAdapter(AutoParcel_OdometerTrigger_Seed.class, new Seed.Adapter());
 
-    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(OdometerTrigger.class));
-    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, OdometerTrigger.class));
+    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(OdometerTrigger.class, "odometerTrigger"));
+    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, OdometerTrigger.class, "odometerTriggers"));
   }
 
   public abstract String vehicleId();
@@ -64,6 +78,18 @@ public abstract class OdometerTrigger implements VinliItem{
     public abstract String vehicle();
 
     /*package*/ Links() { }
+  }
+
+  @AutoParcel.Builder
+  /*package*/ static abstract class Builder{
+    public abstract Builder id(String id);
+    public abstract Builder vehicleId(String vehicleId);
+    public abstract Builder type(TriggerType type);
+    public abstract Builder threshold(Double threshold);
+    public abstract Builder events(Double events);
+    public abstract Builder links(Links links);
+
+    public abstract OdometerTrigger build();
   }
 
   @AutoParcel
@@ -114,6 +140,40 @@ public abstract class OdometerTrigger implements VinliItem{
       @Override public Seed read(JsonReader in) throws IOException {
         throw new UnsupportedOperationException("reading a OdometerTriggerSeed is not supported");
       }
+    }
+  }
+
+  private static final class OdometerTriggerAdapter extends TypeAdapter<OdometerTrigger> {
+    private Gson gson;
+
+    @Override public void write(JsonWriter out, OdometerTrigger value) throws IOException {
+      throw new UnsupportedOperationException("writing an OdometerTrigger is not supported");
+    }
+
+    @Override public OdometerTrigger read(JsonReader in) throws IOException {
+      if (gson == null) {
+        gson = Vinli.curApp().gson();
+      }
+
+      final OdometerTrigger.Builder b = new AutoParcel_OdometerTrigger.Builder();
+
+      in.beginObject();
+      while (in.hasNext()) {
+        final String name = in.nextName();
+
+        switch (name) {
+          case "id": b.id(in.nextString()); break;
+          case "vehicleId": b.vehicleId(in.nextString()); break;
+          case "type": b.type(TriggerType.getEnumFromString(in.nextString())); break;
+          case "threshold": b.threshold(in.nextDouble()); break;
+          case "events": b.events(in.nextDouble()); break;
+          case "links": b.links(gson.<OdometerTrigger.Links>fromJson(in, Links.class)); break;
+          default: throw new JsonParseException("unknown rule key " + name);
+        }
+      }
+      in.endObject();
+
+      return b.build();
     }
   }
 }
