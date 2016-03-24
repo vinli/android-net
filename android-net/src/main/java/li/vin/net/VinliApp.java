@@ -49,7 +49,7 @@ public final class VinliApp {
     Notification.registerGson(gsonB);
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
-    Distance.registerGson(gsonB);
+    DistanceList.registerGson(gsonB);
 
     mGson = gsonB.create();
 

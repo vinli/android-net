@@ -14,7 +14,7 @@ import rx.Observable;
 public interface Distances {
 
   @GET("/vehicles/{vehicleId}/distances")
-  Observable<TimeSeries<Distance>> distances(
+  Observable<DistanceList> distances(
       @Path("vehicleId") String vehicleId,
       @Query("from") String from,
       @Query("until") String until);
