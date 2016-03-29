@@ -93,6 +93,19 @@ public final class StreamMessage {
     };
   }
 
+  public static Func1<StreamMessage, Observable<Coordinate>> coordinate(){
+    return new Func1<StreamMessage, Observable<Coordinate>>() {
+      @Override
+      public Observable<Coordinate> call(StreamMessage message) {
+        Coordinate coordinate = message.coord();
+        if(coordinate == null){
+          return Observable.empty();
+        }
+        return Observable.just(coordinate);
+      }
+    };
+  }
+
   /*
   {
     "type": "pub",
