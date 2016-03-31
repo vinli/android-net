@@ -19,7 +19,15 @@ public final class StreamMessage {
     RPM("rpm"), //
     VEHICLE_SPEED("vehicleSpeed"), //
     MASS_AIRFLOW("massAirFlow"), //
-    CALCULATED_ENGINE_LOAD("calculatedLoadValue");
+    CALCULATED_ENGINE_LOAD("calculatedLoadValue"),
+    ENGINE_COOLANT_TEMP("coolantTemp"),
+    THROTTLE_POSITION("absoluteThrottleSensorPosition"),
+    TIME_SINCE_ENGINE_START("runTimeSinceEngineStart"),
+    FUEL_PRESSURE("fuelPressure"),
+    INTAKE_AIR_TEMP("intakeAirTemperature"),
+    INTAKE_MANIFOLD_PRESSURE("intakeManifoldPressure"),
+    TIMING_ADVANCE("timingAdvance"),
+    FUEL_RAIL_PRESSURE("fuelRailPressure");
 
     @NonNull private final String name;
 
