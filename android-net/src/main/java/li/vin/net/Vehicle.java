@@ -42,6 +42,14 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().distances().distances(id(), from, until, (unit == null) ? null : unit.getDistanceUnitStr());
   }
 
+  public Observable<DistanceList.Distance> bestDistance(){
+    return bestDistance(null);
+  }
+
+  public Observable<DistanceList.Distance> bestDistance(@Nullable DistanceUnit unit){
+    return Vinli.curApp().distances().bestDistance(id(), (unit == null) ? null : unit.getDistanceUnitStr()).map(Wrapped.<DistanceList.Distance>pluckItem());
+  }
+
   public Observable<TimeSeries<Odometer>> odometerReports(){
     return Vinli.curApp().distances().odometerReports(id());
   }

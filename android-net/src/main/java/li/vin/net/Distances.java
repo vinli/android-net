@@ -18,6 +18,11 @@ public interface Distances {
       @Query("until") String until,
       @Header("x-vinli-unit") String unit);
 
+  @GET("/vehicles/{vehicleId}/distances/_best")
+  Observable<Wrapped<DistanceList.Distance>> bestDistance(
+      @Path("vehicleId") String vehicleId,
+      @Header("x-vinli-unit") String unit);
+
   @POST("/vehicles/{vehicleId}/odometers")
   Observable<Wrapped<Odometer>> createOdometerReport(
       @Path("vehicleId") String vehicleId,
