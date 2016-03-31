@@ -14,7 +14,7 @@ public interface Distances {
   @GET("/vehicles/{vehicleId}/distances")
   Observable<DistanceList> distances(
       @Path("vehicleId") String vehicleId,
-      @Query("from") String from,
+      @Query("since") String since,
       @Query("until") String until,
       @Header("x-vinli-unit") String unit);
 
@@ -30,7 +30,9 @@ public interface Distances {
 
   @GET("/vehicles/{vehicleId}/odometers")
   Observable<TimeSeries<Odometer>> odometerReports(
-      @Path("vehicleId") String vehicleId);
+      @Path("vehicleId") String vehicleId,
+      @Query("since") String since,
+      @Query("until") String until);
 
   @GET("/odometers/{odometerId}")
   Observable<Wrapped<Odometer>> odometerReport(
@@ -55,5 +57,7 @@ public interface Distances {
 
   @GET("/vehicles/{vehicleId}/odometer_triggers")
   Observable<TimeSeries<OdometerTrigger>> odometerTriggers(
-      @Path("vehicleId") String vehicleId);
+      @Path("vehicleId") String vehicleId,
+      @Query("since") String since,
+      @Query("until") String until);
 }

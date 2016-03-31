@@ -38,8 +38,8 @@ public abstract class Vehicle implements VinliItem {
     return distances(null, null, null);
   }
 
-  public Observable<DistanceList> distances(@Nullable String from, @Nullable String until, @Nullable DistanceUnit unit){
-    return Vinli.curApp().distances().distances(id(), from, until, (unit == null) ? null : unit.getDistanceUnitStr());
+  public Observable<DistanceList> distances(@Nullable String since, @Nullable String until, @Nullable DistanceUnit unit){
+    return Vinli.curApp().distances().distances(id(), since, until, (unit == null) ? null : unit.getDistanceUnitStr());
   }
 
   public Observable<DistanceList.Distance> bestDistance(){
@@ -51,11 +51,19 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(){
-    return Vinli.curApp().distances().odometerReports(id());
+    return odometerReports(null, null);
+  }
+
+  public Observable<TimeSeries<Odometer>> odometerReports(@Nullable String since, @Nullable String until){
+    return Vinli.curApp().distances().odometerReports(id(), since, until);
   }
 
   public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(){
-    return Vinli.curApp().distances().odometerTriggers(id());
+    return odometerTriggers(null, null);
+  }
+
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable String since, @Nullable String until){
+    return Vinli.curApp().distances().odometerTriggers(id(), since, until);
   }
 
   /*package*/ Vehicle() { }
