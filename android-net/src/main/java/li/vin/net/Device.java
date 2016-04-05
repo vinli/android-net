@@ -164,7 +164,7 @@ public abstract class Device implements VinliItem {
               if(parametricFilters != null && parametricFilters.size() > 0){
                 for(StreamMessage.ParametricFilter.Seed filter : parametricFilters){
                   buffer.clear();
-                  buffer.writeString(gson.toJson(filter), UTF8);
+                  buffer.writeString(gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class), UTF8);
                   webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
                 }
               }

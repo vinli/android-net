@@ -459,6 +459,7 @@ public final class StreamMessage {
     public abstract String parameter();
     public abstract Float min();
     public abstract Float max();
+    public abstract String deviceId();
 
     /*package*/ ParametricFilter(){}
 
@@ -476,6 +477,7 @@ public final class StreamMessage {
       @NonNull public abstract String parameter();
       @Nullable public abstract Float min();
       @Nullable public abstract Float max();
+      @Nullable public abstract String deviceId();
 
       /*package*/ Seed(){}
 
@@ -484,6 +486,7 @@ public final class StreamMessage {
         public abstract Builder parameter(@NonNull String parameter);
         public abstract Builder min(@Nullable Float min);
         public abstract Builder max(@Nullable Float max);
+        public abstract Builder deviceId(@Nullable String deviceId);
 
         public abstract Seed build();
 
@@ -502,6 +505,9 @@ public final class StreamMessage {
 
           out.beginObject();
             out.name("type").value("filter");
+            if(value.deviceId() != null){
+              out.name("id").value(value.deviceId());
+            }
             out.name("filter").beginObject();
               out.name("type").value(value.type);
               out.name("parameter").value(value.parameter());
