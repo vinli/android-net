@@ -5,10 +5,13 @@ import android.support.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import auto.parcel.AutoParcel;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -440,5 +443,89 @@ public final class StreamMessage {
       }
     }
     return ja;
+  }
+
+  @AutoParcel
+  public static abstract class ParametricFilter{
+
+    /*package*/ static final String TYPE = "parametric";
+    public abstract String parameter();
+    public abstract Float min();
+    public abstract Float max();
+
+    /*package*/ ParametricFilter(){}
+
+    public static final Seed.Builder create(){
+      return new AutoParcel_StreamMessage_ParametricFilter_Seed.Builder();
+    }
+
+    @AutoParcel
+    public static abstract class Seed{
+      private final String type = ParametricFilter.TYPE;
+      @NonNull public abstract String parameter();
+      @Nullable public abstract Float min();
+      @Nullable public abstract Float max();
+
+      /*package*/ Seed(){}
+
+      @AutoParcel.Builder
+      public static abstract class Builder{
+        public abstract Builder parameter(@NonNull String parameter);
+        public abstract Builder min(@Nullable Float min);
+        public abstract Builder max(@Nullable Float max);
+
+        public abstract Seed build();
+
+        /*package*/ Builder(){}
+      }
+    }
+  }
+
+  @AutoParcel
+  public static abstract class GeometricFilter{
+
+    public enum Direction{
+      INSIDE("inside"),
+      OUTSIDE("outside");
+
+      private String str;
+
+      private Direction(String str){
+        this.str = str;
+      }
+
+      /*package*/ String getDirectionAsString(){
+        return this.str;
+      }
+    }
+
+    /*package*/ static final String TYPE = "geometric";
+    public abstract Direction direction();
+    public abstract List<Coordinate> geometry();
+
+    /*package*/ GeometricFilter(){}
+
+    public static final Seed.Builder create(){
+      return new AutoParcel_StreamMessage_GeometricFilter_Seed.Builder();
+    }
+
+    @AutoParcel
+    public static abstract class Seed{
+      private final String type = GeometricFilter.TYPE;
+      @NonNull public abstract Direction direction();
+      @NonNull public abstract List<Coordinate> geometry();
+
+      /*package*/ Seed(){}
+
+      @AutoParcel.Builder
+      public static abstract class Builder{
+        public abstract Builder direction(@NonNull Direction direction);
+        public abstract Builder geometry(@NonNull List<Coordinate> geometry);
+
+        public abstract Seed build();
+
+        /*package*/ Builder(){}
+      }
+    }
   }
 }
