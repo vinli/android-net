@@ -82,7 +82,11 @@ public abstract class Device implements VinliItem {
   /*package*/ Device() {
   }
 
-  public Observable<StreamMessage> stream() {
+  public Observable<StreamMessage> stream(){
+    return stream(null, null);
+  }
+
+  public Observable<StreamMessage> stream(List<StreamMessage.ParametricFilter> parametricFilters, StreamMessage.GeometricFilter geometricFilter) {
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(final Subscriber<? super StreamMessage> subscriber) {

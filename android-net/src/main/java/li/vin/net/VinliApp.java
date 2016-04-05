@@ -52,6 +52,8 @@ public final class VinliApp {
     Notification.registerGson(gsonB);
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
+    StreamMessage.ParametricFilter.registerGson(gsonB);
+    StreamMessage.GeometricFilter.registerGson(gsonB);
 
     mGson = gsonB.create();
 

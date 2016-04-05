@@ -2,8 +2,15 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.JsonWriter;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.stream.JsonReader;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -455,6 +462,10 @@ public final class StreamMessage {
 
     /*package*/ ParametricFilter(){}
 
+    /*package*/ static final void registerGson(GsonBuilder gb) {
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_ParametricFilter_Seed.class, new Seed.Adapter());
+    }
+
     public static final Seed.Builder create(){
       return new AutoParcel_StreamMessage_ParametricFilter_Seed.Builder();
     }
@@ -477,6 +488,36 @@ public final class StreamMessage {
         public abstract Seed build();
 
         /*package*/ Builder(){}
+      }
+
+      /*package*/ static final class Adapter extends TypeAdapter<ParametricFilter.Seed>{
+
+        private Gson gson;
+
+        @Override
+        public void write(com.google.gson.stream.JsonWriter out, Seed value) throws IOException {
+          if (gson == null) {
+            gson = Vinli.curApp().gson();
+          }
+
+          out.beginObject();
+            out.name("type").value("filter");
+            out.name("filter").beginObject();
+              out.name("type").value(value.type);
+              out.name("parameter").value(value.parameter());
+              if(value.min() != null){
+                out.name("min").value(value.min());
+              }
+              if(value.max() != null){
+                out.name("max").value(value.max());
+              }
+            out.endObject();
+          out.endObject();
+        }
+
+        @Override public ParametricFilter.Seed read(JsonReader in) throws IOException {
+          throw new UnsupportedOperationException("reading a ParametricFilter.Seed is not supported");
+        }
       }
     }
   }
@@ -505,6 +546,10 @@ public final class StreamMessage {
 
     /*package*/ GeometricFilter(){}
 
+    /*package*/ static final void registerGson(GsonBuilder gb) {
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometricFilter_Seed.class, new Seed.Adapter());
+    }
+
     public static final Seed.Builder create(){
       return new AutoParcel_StreamMessage_GeometricFilter_Seed.Builder();
     }
@@ -525,6 +570,45 @@ public final class StreamMessage {
         public abstract Seed build();
 
         /*package*/ Builder(){}
+      }
+
+      /*package*/ static final class Adapter extends TypeAdapter<GeometricFilter.Seed>{
+
+        private Gson gson;
+
+        @Override
+        public void write(com.google.gson.stream.JsonWriter out, Seed value) throws IOException {
+          if (gson == null) {
+            gson = Vinli.curApp().gson();
+          }
+
+          out.beginObject();
+            out.name("type").value("filter");
+            out.name("filter").beginObject();
+              out.name("type").value(value.type);
+              out.name("direction").value(value.direction().getDirectionAsString());
+              out.name("geometry").beginObject();
+                out.name("type").value("FeatureCollection");
+                out.name("features").beginArray();
+                  for(Coordinate coord : value.geometry()){
+                    out.beginObject();
+                      out.name("type").name("Feature");
+                      out.name("properties").beginObject().endObject();
+                      out.name("geometry").beginObject();
+                        out.name("type").name("Point");
+                        out.name("coordinates").value(gson.toJson(coord));
+                      out.endObject();
+                    out.endObject();
+                  }
+                out.endArray();
+              out.endObject();
+            out.endObject();
+          out.endObject();
+        }
+
+        @Override public GeometricFilter.Seed read(JsonReader in) throws IOException {
+          throw new UnsupportedOperationException("reading a GeometricFilter.Seed is not supported");
+        }
       }
     }
   }
