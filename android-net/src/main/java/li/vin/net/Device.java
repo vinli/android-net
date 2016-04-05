@@ -86,7 +86,7 @@ public abstract class Device implements VinliItem {
     return stream(null, null);
   }
 
-  public Observable<StreamMessage> stream(List<StreamMessage.ParametricFilter> parametricFilters, StreamMessage.GeometricFilter geometricFilter) {
+  public Observable<StreamMessage> stream(@Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters, @Nullable final StreamMessage.GeometricFilter.Seed geometricFilter) {
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(final Subscriber<? super StreamMessage> subscriber) {
@@ -111,7 +111,7 @@ public abstract class Device implements VinliItem {
         final String message = String.format( //
             "{\"type\":\"sub\",\"subject\":{\"type\":\"device\",\"id\":\"%s\"}}", deviceId);
 
-        final Gson gson = new Gson();
+        final Gson gson = Vinli.curApp().gson();
 
         final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -154,6 +154,20 @@ public abstract class Device implements VinliItem {
             buffer.writeString(message, UTF8);
             try {
               webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+
+              if(geometricFilter != null){
+                buffer.clear();
+                buffer.writeString(gson.toJson(geometricFilter), UTF8);
+                webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+              }
+
+              if(parametricFilters != null && parametricFilters.size() > 0){
+                for(StreamMessage.ParametricFilter.Seed filter : parametricFilters){
+                  buffer.clear();
+                  buffer.writeString(gson.toJson(filter), UTF8);
+                  webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+                }
+              }
             } catch (IOException ioe) {
               cleanup.run();
               if (!subscriber.isUnsubscribed()) {

@@ -463,7 +463,7 @@ public final class StreamMessage {
     /*package*/ ParametricFilter(){}
 
     /*package*/ static final void registerGson(GsonBuilder gb) {
-      gb.registerTypeAdapter(AutoParcel_StreamMessage_ParametricFilter_Seed.class, new Seed.Adapter());
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_ParametricFilter.Seed.class, new Seed.Adapter());
     }
 
     public static final Seed.Builder create(){
@@ -547,7 +547,7 @@ public final class StreamMessage {
     /*package*/ GeometricFilter(){}
 
     /*package*/ static final void registerGson(GsonBuilder gb) {
-      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometricFilter_Seed.class, new Seed.Adapter());
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometricFilter.Seed.class, new Seed.Adapter());
     }
 
     public static final Seed.Builder create(){
