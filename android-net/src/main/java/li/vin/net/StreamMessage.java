@@ -548,7 +548,8 @@ public final class StreamMessage {
 
     /*package*/ static final String TYPE = "geometric";
     public abstract Direction direction();
-    public abstract List<Coordinate> geometry();
+    public abstract List<Coordinate.Seed> geometry();
+    public abstract String deviceId();
 
     /*package*/ GeometricFilter(){}
 
@@ -564,14 +565,16 @@ public final class StreamMessage {
     public static abstract class Seed{
       private final String type = GeometricFilter.TYPE;
       @NonNull public abstract Direction direction();
-      @NonNull public abstract List<Coordinate> geometry();
+      @NonNull public abstract List<Coordinate.Seed> geometry();
+      @Nullable public abstract String deviceId();
 
       /*package*/ Seed(){}
 
       @AutoParcel.Builder
       public static abstract class Builder{
         public abstract Builder direction(@NonNull Direction direction);
-        public abstract Builder geometry(@NonNull List<Coordinate> geometry);
+        public abstract Builder geometry(@NonNull List<Coordinate.Seed> geometry);
+        public abstract Builder deviceId(@Nullable String deviceId);
 
         public abstract Seed build();
 
@@ -590,19 +593,22 @@ public final class StreamMessage {
 
           out.beginObject();
             out.name("type").value("filter");
+            if(value.deviceId() != null){
+              out.name("id").value(value.deviceId());
+            }
             out.name("filter").beginObject();
               out.name("type").value(value.type);
               out.name("direction").value(value.direction().getDirectionAsString());
               out.name("geometry").beginObject();
                 out.name("type").value("FeatureCollection");
                 out.name("features").beginArray();
-                  for(Coordinate coord : value.geometry()){
+                  for(Coordinate.Seed seed : value.geometry()){
                     out.beginObject();
                       out.name("type").name("Feature");
                       out.name("properties").beginObject().endObject();
                       out.name("geometry").beginObject();
                         out.name("type").name("Point");
-                        out.name("coordinates").value(gson.toJson(coord));
+                        out.name("coordinates").value(gson.toJson(seed));
                       out.endObject();
                     out.endObject();
                   }
