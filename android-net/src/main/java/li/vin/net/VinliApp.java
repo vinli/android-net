@@ -24,7 +24,7 @@ public final class VinliApp {
   private final Users mUsers;
   private final Trips mTrips;
 
-  /*package*/ final Gson mGson;
+  private final Gson mGson;
   private final LinkLoader mLinkLoader;
 
   private final String mAccessToken;
