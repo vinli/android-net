@@ -86,7 +86,7 @@ public abstract class Device implements VinliItem {
     return stream(null, null);
   }
 
-  public Observable<StreamMessage> stream(@Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters, @Nullable final StreamMessage.GeometricFilter.Seed geometricFilter) {
+  public Observable<StreamMessage> stream(@Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters, @Nullable final StreamMessage.GeometryFilter.Seed geometryFilter) {
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(final Subscriber<? super StreamMessage> subscriber) {
@@ -155,9 +155,9 @@ public abstract class Device implements VinliItem {
             try {
               webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
 
-              if(geometricFilter != null){
+              if(geometryFilter != null){
                 buffer.clear();
-                buffer.writeString(gson.toJson(geometricFilter, StreamMessage.GeometricFilter.Seed.class), UTF8);
+                buffer.writeString(gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class), UTF8);
                 webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
               }
 

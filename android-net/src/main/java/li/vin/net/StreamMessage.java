@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.JsonWriter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -529,7 +528,7 @@ public final class StreamMessage {
   }
 
   @AutoParcel
-  public static abstract class GeometricFilter{
+  public static abstract class GeometryFilter {
 
     public enum Direction{
       INSIDE("inside"),
@@ -551,19 +550,19 @@ public final class StreamMessage {
     public abstract List<Coordinate.Seed> geometry();
     public abstract String deviceId();
 
-    /*package*/ GeometricFilter(){}
+    /*package*/ GeometryFilter(){}
 
     /*package*/ static final void registerGson(GsonBuilder gb) {
-      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometricFilter.Seed.class, new Seed.Adapter());
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometryFilter.Seed.class, new Seed.Adapter());
     }
 
     public static final Seed.Builder create(){
-      return new AutoParcel_StreamMessage_GeometricFilter_Seed.Builder();
+      return new AutoParcel_StreamMessage_GeometryFilter_Seed.Builder();
     }
 
     @AutoParcel
     public static abstract class Seed{
-      private final String type = GeometricFilter.TYPE;
+      private final String type = GeometryFilter.TYPE;
       @NonNull public abstract Direction direction();
       @NonNull public abstract List<Coordinate.Seed> geometry();
       @Nullable public abstract String deviceId();
@@ -581,7 +580,7 @@ public final class StreamMessage {
         /*package*/ Builder(){}
       }
 
-      /*package*/ static final class Adapter extends TypeAdapter<GeometricFilter.Seed>{
+      /*package*/ static final class Adapter extends TypeAdapter<GeometryFilter.Seed>{
 
         private Gson gson;
 
@@ -611,8 +610,8 @@ public final class StreamMessage {
           out.endObject();
         }
 
-        @Override public GeometricFilter.Seed read(JsonReader in) throws IOException {
-          throw new UnsupportedOperationException("reading a GeometricFilter.Seed is not supported");
+        @Override public GeometryFilter.Seed read(JsonReader in) throws IOException {
+          throw new UnsupportedOperationException("reading a GeometryFilter.Seed is not supported");
         }
       }
     }

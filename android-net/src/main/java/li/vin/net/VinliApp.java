@@ -53,7 +53,7 @@ public final class VinliApp {
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
     StreamMessage.ParametricFilter.registerGson(gsonB);
-    StreamMessage.GeometricFilter.registerGson(gsonB);
+    StreamMessage.GeometryFilter.registerGson(gsonB);
 
     mGson = gsonB.create();
 
