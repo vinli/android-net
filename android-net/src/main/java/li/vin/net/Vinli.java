@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+
 import rx.Observable;
 import rx.Observer;
 
@@ -15,8 +19,17 @@ public final class Vinli {
   /*protected*/ static final String SIGN_IN_ERROR = "li.vin.net.Vinli#SIGN_IN_ERROR";
   /*protected*/ static final String ACCESS_TOKEN = "li.vin.net.Vinli#ACCESS_TOKEN";
 
+  @SuppressWarnings("deprecation")
   public static void signIn(@NonNull Activity context, @NonNull String clientId,
       @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
+
+    CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(context);
+    CookieManager cookieManager = CookieManager.getInstance();
+    cookieManager.removeAllCookie();
+    if (Build.VERSION.SDK_INT >= 21) cookieManager.removeAllCookies(null);
+    cookieSyncManager.sync();
+    if (Build.VERSION.SDK_INT >= 21) cookieManager.flush();
+
     context.startActivity(SignInActivity.newIntent(context, clientId, redirectUri, pendingIntent));
   }
 
