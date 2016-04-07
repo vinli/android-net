@@ -157,7 +157,7 @@ public abstract class Device implements VinliItem {
 
               if(geometricFilter != null){
                 buffer.clear();
-                buffer.writeString(gson.toJson(geometricFilter), UTF8);
+                buffer.writeString(gson.toJson(geometricFilter, StreamMessage.GeometricFilter.Seed.class), UTF8);
                 webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
               }
 

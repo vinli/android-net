@@ -546,7 +546,7 @@ public final class StreamMessage {
       }
     }
 
-    /*package*/ static final String TYPE = "geometric";
+    /*package*/ static final String TYPE = "geometry";
     public abstract Direction direction();
     public abstract List<Coordinate.Seed> geometry();
     public abstract String deviceId();
@@ -600,19 +600,12 @@ public final class StreamMessage {
               out.name("type").value(value.type);
               out.name("direction").value(value.direction().getDirectionAsString());
               out.name("geometry").beginObject();
-                out.name("type").value("FeatureCollection");
-                out.name("features").beginArray();
+                out.name("type").value("Polygon");
+                out.name("coordinates").beginArray().beginArray();
                   for(Coordinate.Seed seed : value.geometry()){
-                    out.beginObject();
-                      out.name("type").name("Feature");
-                      out.name("properties").beginObject().endObject();
-                      out.name("geometry").beginObject();
-                        out.name("type").name("Point");
-                        out.name("coordinates").value(gson.toJson(seed));
-                      out.endObject();
-                    out.endObject();
+                    gson.toJson(seed, Coordinate.Seed.class, out);
                   }
-                out.endArray();
+                out.endArray().endArray();
               out.endObject();
             out.endObject();
           out.endObject();
