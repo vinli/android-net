@@ -29,13 +29,8 @@ public final class VinliApp {
 
   private final String mAccessToken;
 
-  /*protected*/ VinliApp(@NonNull String accessToken) {
-    mAccessToken = accessToken;
-
+  public GsonBuilder gsonBuilder() {
     final GsonBuilder gsonB = new GsonBuilder();
-
-    final Client client = new OkClient();
-    final RestAdapter.Log logger = new AndroidLog("VinliNet");
 
     Device.registerGson(gsonB);
     Rule.registerGson(gsonB);
@@ -55,7 +50,16 @@ public final class VinliApp {
     StreamMessage.ParametricFilter.registerGson(gsonB);
     StreamMessage.GeometryFilter.registerGson(gsonB);
 
-    mGson = gsonB.create();
+    return gsonB;
+  }
+
+  /*protected*/ VinliApp(@NonNull String accessToken) {
+    mAccessToken = accessToken;
+
+    final Client client = new OkClient();
+    final RestAdapter.Log logger = new AndroidLog("VinliNet");
+
+    mGson = gsonBuilder().create();
 
     final GsonConverter gson = new GsonConverter(mGson);
 
