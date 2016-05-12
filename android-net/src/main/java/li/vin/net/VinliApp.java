@@ -23,6 +23,7 @@ public final class VinliApp {
   private final Subscriptions mSubscriptions;
   private final Users mUsers;
   private final Trips mTrips;
+  private final Messages mMessages;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -49,6 +50,7 @@ public final class VinliApp {
     Trip.registerGson(gsonB);
     StreamMessage.ParametricFilter.registerGson(gsonB);
     StreamMessage.GeometryFilter.registerGson(gsonB);
+    Message.registerGson(gsonB);
 
     return gsonB;
   }
@@ -119,6 +121,7 @@ public final class VinliApp {
 
     mLocations = telemAdapter.create(Locations.class);
     mSnapshots = telemAdapter.create(Snapshots.class);
+    mMessages = telemAdapter.create(Messages.class);
 
     mUsers = new RestAdapter.Builder().setEndpoint(Endpoint.AUTH)
         .setLog(logger)
@@ -182,6 +185,10 @@ public final class VinliApp {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
   }
 
+  public Observable<Message> message(@NonNull String messageId){
+    return mMessages.message(messageId).map(Wrapped.<Message>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }
@@ -208,6 +215,10 @@ public final class VinliApp {
 
   /*package*/ Trips trips() {
     return mTrips;
+  }
+
+  /*package*/ Messages messages(){
+    return mMessages;
   }
 
   /*package*/ LinkLoader linkLoader() {

@@ -155,14 +155,14 @@ public abstract class Device implements VinliItem {
             try {
               webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
 
-              if(geometryFilter != null){
+              if (geometryFilter != null) {
                 buffer.clear();
                 buffer.writeString(gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class), UTF8);
                 webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
               }
 
-              if(parametricFilters != null && parametricFilters.size() > 0){
-                for(StreamMessage.ParametricFilter.Seed filter : parametricFilters){
+              if (parametricFilters != null && parametricFilters.size() > 0) {
+                for (StreamMessage.ParametricFilter.Seed filter : parametricFilters) {
                   buffer.clear();
                   buffer.writeString(gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class), UTF8);
                   webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
@@ -309,6 +309,14 @@ public abstract class Device implements VinliItem {
 
   public Observable<Page<Trip>> trips(@Nullable Integer limit, @Nullable Integer offset) {
     return Vinli.curApp().trips().trips(id(), limit, offset);
+  }
+
+  public Observable<TimeSeries<Message>> messages(){
+    return Vinli.curApp().messages().messages(id(), null, null, null);
+  }
+
+  public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until, @Nullable Integer limit){
+    return Vinli.curApp().messages().messages(id(), since, until, limit);
   }
 
   @AutoParcel
