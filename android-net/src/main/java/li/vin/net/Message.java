@@ -27,14 +27,17 @@ import auto.parcel.AutoParcel;
 
 public class Message implements VinliItem {
   /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Message>>() { }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Message>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Message.class));
+    gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Message.class));
   }
 
   public String id;
   public String timestamp;
   private LinkedTreeMap<String, Object> data;
+  /*package*/ Links links;
 
   /*package*/ Message(){
 
@@ -317,4 +320,8 @@ public class Message implements VinliItem {
       return new Message[size];
     }
   };
+
+  static class Links{
+    public String self;
+  }
 }

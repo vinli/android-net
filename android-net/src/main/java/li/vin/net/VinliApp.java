@@ -185,6 +185,10 @@ public final class VinliApp {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
   }
 
+  public Observable<Message> message(@NonNull String messageId){
+    return mMessages.message(messageId).map(Wrapped.<Message>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }

@@ -18,4 +18,8 @@ public interface Messages {
     @Nullable @Query("since") Date since,
     @Nullable @Query("until") Date until,
     @Nullable @Query("limit") Integer limit);
+
+  @GET("/messages/{messageId}")
+  Observable<Wrapped<Message>> message(
+    @NonNull @Path("messageId") String messageId);
 }
