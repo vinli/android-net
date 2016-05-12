@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import auto.parcel.AutoParcel;
+import li.vin.net.Message.AccelData;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -291,115 +292,6 @@ public final class StreamMessage {
     private LinkedTreeMap<String, Object> data;
 
     StreamMessagePayload() {
-    }
-  }
-
-  public static final class AccelData {
-
-    /*
-    "accel": {
-        "maxZ": 6.282417,
-        "maxX": -2.911364,
-        "maxY": -2.489982,
-        "minX": -7.853021,
-        "minY": -10.649463,
-        "minZ": -0.804456
-      }
-     */
-
-    private Double maxX;
-    private Double maxY;
-    private Double maxZ;
-    private Double minX;
-    private Double minY;
-    private Double minZ;
-
-    AccelData() {
-    }
-
-    public double maxX() {
-      if (maxX == null) return 0d;
-      return maxX;
-    }
-
-    public double maxY() {
-      if (maxY == null) return 0d;
-      return maxY;
-    }
-
-    public double maxZ() {
-      if (maxZ == null) return 0d;
-      return maxZ;
-    }
-
-    public double minX() {
-      if (minX == null) return 0d;
-      return minX;
-    }
-
-    public double minY() {
-      if (minY == null) return 0d;
-      return minY;
-    }
-
-    public double minZ() {
-      if (minZ == null) return 0d;
-      return minZ;
-    }
-
-    @Override
-    public String toString() {
-      return "AccelData{" +
-          "maxX=" + maxX +
-          ", maxY=" + maxY +
-          ", maxZ=" + maxZ +
-          ", minX=" + minX +
-          ", minY=" + minY +
-          ", minZ=" + minZ +
-          '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      AccelData accelData = (AccelData) o;
-      return !(maxX != null
-          ? !maxX.equals(accelData.maxX)
-          : accelData.maxX != null) && !(maxY != null
-          ? !maxY.equals(accelData.maxY)
-          : accelData.maxY != null) && !(maxZ != null
-          ? !maxZ.equals(accelData.maxZ)
-          : accelData.maxZ != null) && !(minX != null
-          ? !minX.equals(accelData.minX)
-          : accelData.minX != null) && !(minY != null
-          ? !minY.equals(accelData.minY)
-          : accelData.minY != null) && !(minZ != null
-          ? !minZ.equals(accelData.minZ)
-          : accelData.minZ != null);
-    }
-
-    @Override
-    public int hashCode() {
-      int result = maxX != null
-          ? maxX.hashCode()
-          : 0;
-      result = 31 * result + (maxY != null
-          ? maxY.hashCode()
-          : 0);
-      result = 31 * result + (maxZ != null
-          ? maxZ.hashCode()
-          : 0);
-      result = 31 * result + (minX != null
-          ? minX.hashCode()
-          : 0);
-      result = 31 * result + (minY != null
-          ? minY.hashCode()
-          : 0);
-      result = 31 * result + (minZ != null
-          ? minZ.hashCode()
-          : 0);
-      return result;
     }
   }
 
