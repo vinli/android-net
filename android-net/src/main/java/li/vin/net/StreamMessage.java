@@ -171,6 +171,11 @@ public final class StreamMessage {
   }
 
   @Nullable
+  public String getType(){
+    return this.type;
+  }
+
+  @Nullable
   public AccelData accel() {
     try {
       return new Gson().fromJson(rawVal("accel"), AccelData.class);
