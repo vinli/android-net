@@ -17,7 +17,8 @@ public interface Messages {
     @NonNull @Path("deviceId") String deviceId,
     @Nullable @Query("since") Date since,
     @Nullable @Query("until") Date until,
-    @Nullable @Query("limit") Integer limit);
+    @Nullable @Query("limit") Integer limit,
+    @Nullable @Query("sortDir") String sortDir);
 
   @GET("/messages/{messageId}")
   Observable<Wrapped<Message>> message(

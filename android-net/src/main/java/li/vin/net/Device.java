@@ -312,11 +312,11 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Message>> messages(){
-    return Vinli.curApp().messages().messages(id(), null, null, null);
+    return Vinli.curApp().messages().messages(id(), null, null, null, null);
   }
 
-  public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until, @Nullable Integer limit){
-    return Vinli.curApp().messages().messages(id(), since, until, limit);
+  public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+    return Vinli.curApp().messages().messages(id(), since, until, limit, sortDir);
   }
 
   @AutoParcel
