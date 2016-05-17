@@ -40,6 +40,8 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
     public Observable<? extends VinliItem> call(TimeSeries<? extends VinliItem> tTimeSeries) {
       if (tTimeSeries.hasPrior()) {
         return tTimeSeries.observeItems().concatWith(tTimeSeries.loadPrior().flatMap(ALL_ITEMS));
+      }else if(tTimeSeries.hasNext()){
+        return tTimeSeries.observeItems().concatWith(tTimeSeries.loadNext().flatMap(ALL_ITEMS));
       }
 
       return tTimeSeries.observeItems();
@@ -99,9 +101,28 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
     return Vinli.curApp().linkLoader().read(link, type());
   }
 
+  public Observable<TimeSeries<T>> loadNext(){
+    final Meta.Pagination.Links links = meta().pagination().links();
+    if(links == null){
+      return Observable.error(new IOException("no links"));
+    }
+
+    final String link = links.next();
+    if(link == null){
+      return Observable.error(new IOException("no next link"));
+    }
+
+    return Vinli.curApp().linkLoader().read(link, type());
+  }
+
   public boolean hasPrior() {
     final Meta.Pagination.Links links = meta().pagination().links();
     return links != null && links.prior() != null;
+  }
+
+  public boolean hasNext(){
+    final Meta.Pagination.Links links = meta().pagination().links();
+    return links != null && links.next() != null;
   }
 
   /*package*/ TimeSeries() { }
@@ -120,6 +141,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
       @AutoParcel
       public static abstract class Links implements Parcelable {
         @Nullable public abstract String prior();
+        @Nullable public abstract String next();
       }
     }
   }
