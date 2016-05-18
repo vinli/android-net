@@ -1,6 +1,8 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
+
 import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +18,7 @@ public abstract class Trip implements VinliItem {
     gb.registerTypeAdapter(Trip.class, AutoParcelAdapter.create(AutoParcel_Trip.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Trip_Links.class));
     gb.registerTypeAdapter(Stats.class, AutoParcelAdapter.create(AutoParcel_Trip_Stats.class));
+    gb.registerTypeAdapter(Point.class, AutoParcelAdapter.create(AutoParcel_Trip_Point.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Trip.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Trip.class));
   }
@@ -24,6 +27,9 @@ public abstract class Trip implements VinliItem {
   public abstract String status();
   public abstract String vehicleId();
   public abstract String deviceId();
+  public abstract Point startPoint();
+  public abstract Point stopPoint();
+  @Nullable public abstract String preview();
   public abstract Stats stats();
 
   public Observable<Device> device() {
@@ -80,5 +86,12 @@ public abstract class Trip implements VinliItem {
     public abstract int messageCount();
     public abstract float stdDevMovingSpeed();
     public abstract int stopCount();
+  }
+
+  @AutoParcel
+  public static abstract class Point implements Parcelable{
+    public abstract Coordinate coordinates();
+
+    /*package*/ Point() { }
   }
 }
