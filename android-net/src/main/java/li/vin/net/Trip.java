@@ -27,8 +27,8 @@ public abstract class Trip implements VinliItem {
   public abstract String status();
   public abstract String vehicleId();
   public abstract String deviceId();
-  public abstract Point startPoint();
-  public abstract Point stopPoint();
+  @Nullable public abstract Point startPoint();
+  @Nullable public abstract Point stopPoint();
   @Nullable public abstract String preview();
   public abstract Stats stats();
 
