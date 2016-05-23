@@ -303,12 +303,16 @@ public abstract class Device implements VinliItem {
         .map(Wrapped.<Subscription>pluckItem());
   }
 
-  public Observable<Page<Trip>> trips() {
-    return Vinli.curApp().trips().trips(id(), null, null);
+  public Observable<TimeSeries<Trip>> trips() {
+    return Vinli.curApp().trips().trips(id(), null, null, null, null);
   }
 
-  public Observable<Page<Trip>> trips(@Nullable Integer limit, @Nullable Integer offset) {
-    return Vinli.curApp().trips().trips(id(), limit, offset);
+  public Observable<TimeSeries<Trip>> trips(
+      @Nullable Date since,
+      @Nullable Date until,
+      @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().trips().trips(id(), since, until, limit, sortDir);
   }
 
   public Observable<TimeSeries<Message>> messages(){
