@@ -1,9 +1,11 @@
 package li.vin.net;
 
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,15 +18,26 @@ import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.Buffer;
 import okio.BufferedSource;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 @AutoParcel
 public abstract class Device implements VinliItem {
@@ -73,20 +86,24 @@ public abstract class Device implements VinliItem {
   /*package*/
   abstract Links links();
 
-  @Nullable public abstract String name();
+  @Nullable
+  public abstract String name();
 
   public abstract String chipId();
 
-  @Nullable public abstract String icon();
+  @Nullable
+  public abstract String icon();
 
   /*package*/ Device() {
   }
 
-  public Observable<StreamMessage> stream(){
+  public Observable<StreamMessage> stream() {
     return stream(null, null);
   }
 
-  public Observable<StreamMessage> stream(@Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters, @Nullable final StreamMessage.GeometryFilter.Seed geometryFilter) {
+  public Observable<StreamMessage> stream(
+      @Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters,
+      @Nullable final StreamMessage.GeometryFilter.Seed geometryFilter) {
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(final Subscriber<? super StreamMessage> subscriber) {
@@ -134,95 +151,240 @@ public abstract class Device implements VinliItem {
           }
         }));
 
-        WebSocketCall call = WebSocketCall.create(new OkHttpClient(), new Request.Builder() //
-            .url(String.format("wss://stream%s/api/v1/messages?token=%s", Endpoint.domain(), token)) //
-            .addHeader("Accept", "application/json") //
-            .addHeader("Content-Type", "application/json") //
-            .build());
-
-        call.enqueue(new WebSocketListener() {
+        final Runnable startup = new Runnable() {
           @Override
-          public void onOpen(WebSocket webSocket, Response response) {
-            webSocketRef.set(webSocket);
+          public void run() {
+            if (subscriber.isUnsubscribed()) return;
 
-            if (subscriber.isUnsubscribed()) {
-              cleanup.run();
-              return;
-            }
+            cleanup.run();
 
-            Buffer buffer = new Buffer();
-            buffer.writeString(message, UTF8);
-            try {
-              webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+            WebSocketCall call = WebSocketCall.create(new OkHttpClient(), new Request.Builder() //
+                .url(String.format("wss://stream%s/api/v1/messages?token=%s", Endpoint.domain(),
+                    token)) //
+                .addHeader("Accept", "application/json") //
+                .addHeader("Content-Type", "application/json") //
+                .build());
 
-              if (geometryFilter != null) {
-                buffer.clear();
-                buffer.writeString(gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class), UTF8);
-                webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
-              }
+            call.enqueue(new WebSocketListener() {
+              @Override
+              public void onOpen(WebSocket webSocket, Response response) {
+                webSocketRef.set(webSocket);
 
-              if (parametricFilters != null && parametricFilters.size() > 0) {
-                for (StreamMessage.ParametricFilter.Seed filter : parametricFilters) {
-                  buffer.clear();
-                  buffer.writeString(gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class), UTF8);
+                if (subscriber.isUnsubscribed()) {
+                  cleanup.run();
+                  return;
+                }
+
+                Buffer buffer = new Buffer();
+                buffer.writeString(message, UTF8);
+                try {
                   webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+
+                  if (geometryFilter != null) {
+                    buffer.clear();
+                    buffer.writeString(
+                        gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class), UTF8);
+                    webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+                  }
+
+                  if (parametricFilters != null && parametricFilters.size() > 0) {
+                    for (StreamMessage.ParametricFilter.Seed filter : parametricFilters) {
+                      buffer.clear();
+                      buffer.writeString(
+                          gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class), UTF8);
+                      webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+                    }
+                  }
+                } catch (IOException ioe) {
+                  cleanup.run();
+                  if (!subscriber.isUnsubscribed()) {
+                    subscriber.onError(ioe);
+                  }
                 }
               }
-            } catch (IOException ioe) {
-              cleanup.run();
-              if (!subscriber.isUnsubscribed()) {
-                subscriber.onError(ioe);
-              }
-            }
-          }
 
-          @Override
-          public void onFailure(IOException ioe, Response response) {
-            cleanup.run();
-            if (!subscriber.isUnsubscribed()) {
-              subscriber.onError(ioe);
-            }
-          }
-
-          @Override
-          public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
-              throws IOException {
-            try {
-              if (subscriber.isUnsubscribed()) {
+              @Override
+              public void onFailure(IOException ioe, Response response) {
                 cleanup.run();
-                return;
+                if (!subscriber.isUnsubscribed()) {
+                  subscriber.onError(ioe);
+                }
               }
 
-              if (type == WebSocket.PayloadType.TEXT) {
+              @Override
+              public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
+                  throws IOException {
                 try {
-                  subscriber.onNext(gson.fromJson(payload.readString(UTF8), StreamMessage.class));
-                } catch (IOException ioe) {
-                  throw ioe;
+                  if (subscriber.isUnsubscribed()) {
+                    cleanup.run();
+                    return;
+                  }
+
+                  if (type == WebSocket.PayloadType.TEXT) {
+                    try {
+                      subscriber.onNext(
+                          gson.fromJson(payload.readString(UTF8), StreamMessage.class));
+                    } catch (IOException ioe) {
+                      throw ioe;
+                    } catch (Exception ignored) {
+                    }
+                  }
+                } finally {
+                  payload.close();
+                }
+              }
+
+              @Override
+              public void onPong(Buffer payload) {
+                if (subscriber.isUnsubscribed()) {
+                  cleanup.run();
+                }
+              }
+
+              @Override
+              public void onClose(int code, String reason) {
+                cleanup.run();
+                if (!subscriber.isUnsubscribed()) {
+                  subscriber.onCompleted();
+                }
+              }
+            });
+          }
+        };
+
+        startup.run();
+
+        String chipId = chipId();
+        if (chipId != null && (chipId = chipId.trim()).length() != 0) {
+          final AtomicInteger udpNextCounter = new AtomicInteger(0);
+          subscriber.add(makeUdpStream(chipId) //
+              .timeout(15, TimeUnit.SECONDS) //
+              .doOnNext(new Action1<StreamMessage>() {
+                @Override
+                public void call(StreamMessage message) {
+                  if (udpNextCounter.incrementAndGet() >= 5) {
+                    // stop the websocket if we have a hotspot to fall back on
+                    udpNextCounter.set(Integer.MIN_VALUE);
+                    cleanup.run();
+                  }
+                }
+              }) //
+              .doOnError(new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                  if (udpNextCounter.get() != 0) {
+                    // restart the websocket in case it had been previously stopped
+                    udpNextCounter.set(0);
+                    startup.run();
+                  }
+                }
+              }) //
+              .retry(new Func2<Integer, Throwable, Boolean>() {
+                @Override
+                public Boolean call(Integer integer, Throwable throwable) {
+                  // always retry the UDP stream if it was just a timeout.
+                  // otherwise, something unexpected happen, abort completely.
+                  return (throwable instanceof TimeoutException);
+                }
+              }) //
+              .subscribe());
+        }
+      }
+    });
+  }
+
+  private static Observable<StreamMessage> makeUdpStream(@NonNull final String chipId) {
+    final String connId = UUID.randomUUID().toString();
+    return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
+      @Override
+      public void call(Subscriber<? super StreamMessage> subscriber) {
+        if (subscriber.isUnsubscribed()) return;
+
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+          subscriber.onError(new IllegalThreadStateException( //
+              "Cannot stream UDP on main thread."));
+          return;
+        }
+
+        AtomicBoolean chipIdFound = new AtomicBoolean(false);
+
+        while (true) {
+          // ---
+          byte[] read = new byte[256];
+          DatagramSocket udpSocket = null;
+          InetAddress hostAddr = null;
+
+          try {
+            udpSocket = new DatagramSocket(54321);
+            udpSocket.setSoTimeout(1000);
+            hostAddr = InetAddress.getByName("192.168.1.1");
+
+            for (int i = 0; ; i++) {
+              // ---
+              if (i % 10 == 0) {
+                byte[] msg = String.format("vvv%s", connId).getBytes();
+                try {
+                  udpSocket.send(new DatagramPacket(msg, msg.length, hostAddr, 54321));
                 } catch (Exception ignored) {
                 }
               }
-            } finally {
-              payload.close();
+
+              String result = null;
+              try {
+                DatagramPacket recv = new DatagramPacket(read, read.length);
+                udpSocket.receive(recv);
+                result = new String(recv.getData(), recv.getOffset(), recv.getLength()).trim();
+              } catch (Exception ignored) {
+              }
+
+              if (result != null && !result.isEmpty()) {
+                if (!chipIdFound.get()) {
+                  if (result.startsWith("I:") && result.substring(2).equals(chipId)) {
+                    chipIdFound.set(true);
+                  }
+                }
+                if (chipIdFound.get()) {
+                  // TODO parse the line - just log it and onNext an empty result for now.
+                  // need a solution that turns raw lines from the OBD into StreamMessage -
+                  // probably dropping a chunk of the bluetooth SDK into here for parsing.
+                  Log.e("VVV", result); // remove this when parsing exists
+                  if (subscriber.isUnsubscribed()) return;
+                  subscriber.onNext(new StreamMessage());
+                }
+              }
+
+              if (subscriber.isUnsubscribed()) return;
+              // ---
+            }
+          } catch (Exception ignored) {
+            // no-op
+          } finally {
+            if (udpSocket != null && hostAddr != null) {
+              try {
+                byte[] msg = String.format("vvk%s", connId).getBytes();
+                udpSocket.send(new DatagramPacket(msg, msg.length, hostAddr, 54321));
+              } catch (Exception ignored) {
+              }
+            }
+
+            try {
+              Thread.sleep(500);
+            } catch (Exception ignored) {
+            }
+
+            if (udpSocket != null) {
+              try {
+                udpSocket.close();
+              } catch (Exception ignored) {
+              }
             }
           }
 
-          @Override
-          public void onPong(Buffer payload) {
-            if (subscriber.isUnsubscribed()) {
-              cleanup.run();
-            }
-          }
-
-          @Override
-          public void onClose(int code, String reason) {
-            cleanup.run();
-            if (!subscriber.isUnsubscribed()) {
-              subscriber.onCompleted();
-            }
-          }
-        });
+          if (subscriber.isUnsubscribed()) return;
+          // ---
+        }
       }
-    });
+    }).subscribeOn(Schedulers.io());
   }
 
   public Observable<Page<Vehicle>> vehicles() {
@@ -307,19 +469,17 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().trips().trips(id(), null, null, null, null);
   }
 
-  public Observable<TimeSeries<Trip>> trips(
-      @Nullable Date since,
-      @Nullable Date until,
-      @Nullable Integer limit,
-      @Nullable String sortDir) {
+  public Observable<TimeSeries<Trip>> trips(@Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
     return Vinli.curApp().trips().trips(id(), since, until, limit, sortDir);
   }
 
-  public Observable<TimeSeries<Message>> messages(){
+  public Observable<TimeSeries<Message>> messages() {
     return Vinli.curApp().messages().messages(id(), null, null, null, null);
   }
 
-  public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+  public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
     return Vinli.curApp().messages().messages(id(), since, until, limit, sortDir);
   }
 
