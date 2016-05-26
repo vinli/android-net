@@ -12,7 +12,7 @@ import rx.Observable;
 @AutoParcel
 public abstract class Trip implements VinliItem {
   /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Trip>>() { }.getType();
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Trip>>() { }.getType();
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Trip>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Trip.class, AutoParcelAdapter.create(AutoParcel_Trip.class));
@@ -20,7 +20,7 @@ public abstract class Trip implements VinliItem {
     gb.registerTypeAdapter(Stats.class, AutoParcelAdapter.create(AutoParcel_Trip_Stats.class));
     gb.registerTypeAdapter(Point.class, AutoParcelAdapter.create(AutoParcel_Trip_Point.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Trip.class));
-    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Trip.class));
+    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Trip.class));
   }
   public abstract String start();
   public abstract String stop();
