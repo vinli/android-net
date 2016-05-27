@@ -36,6 +36,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
@@ -144,9 +145,26 @@ public abstract class Device implements VinliItem {
           }
         };
 
+        final AtomicBoolean suspend = new AtomicBoolean(false);
+
+        final Func1<WebSocket, Boolean> handleSuspend = new Func1<WebSocket, Boolean>() {
+          @Override
+          public Boolean call(WebSocket webSocket) {
+            if (suspend.get()) {
+              try {
+                webSocket.close(1000, "CLOSE_NORMAL");
+              } catch (Exception ignored) {
+              }
+              return true;
+            }
+            return false;
+          }
+        };
+
         subscriber.add(rx.subscriptions.Subscriptions.create(new Action0() {
           @Override
           public void call() {
+            suspend.set(false);
             cleanup.run();
           }
         }));
@@ -168,6 +186,8 @@ public abstract class Device implements VinliItem {
             call.enqueue(new WebSocketListener() {
               @Override
               public void onOpen(WebSocket webSocket, Response response) {
+                if (handleSuspend.call(webSocket)) return;
+
                 webSocketRef.set(webSocket);
 
                 if (subscriber.isUnsubscribed()) {
@@ -214,6 +234,8 @@ public abstract class Device implements VinliItem {
               @Override
               public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
                   throws IOException {
+                if (handleSuspend.call(webSocketRef.get())) return;
+
                 try {
                   if (subscriber.isUnsubscribed()) {
                     cleanup.run();
@@ -236,6 +258,8 @@ public abstract class Device implements VinliItem {
 
               @Override
               public void onPong(Buffer payload) {
+                if (handleSuspend.call(webSocketRef.get())) return;
+
                 if (subscriber.isUnsubscribed()) {
                   cleanup.run();
                 }
@@ -243,6 +267,8 @@ public abstract class Device implements VinliItem {
 
               @Override
               public void onClose(int code, String reason) {
+                if (handleSuspend.call(webSocketRef.get())) return;
+
                 cleanup.run();
                 if (!subscriber.isUnsubscribed()) {
                   subscriber.onCompleted();
@@ -257,15 +283,16 @@ public abstract class Device implements VinliItem {
         String chipId = chipId();
         if (chipId != null && (chipId = chipId.trim()).length() != 0) {
           final AtomicInteger udpNextCounter = new AtomicInteger(0);
+
           subscriber.add(makeUdpStream(chipId) //
               .timeout(15, TimeUnit.SECONDS) //
               .doOnNext(new Action1<StreamMessage>() {
                 @Override
                 public void call(StreamMessage message) {
                   if (udpNextCounter.incrementAndGet() >= 5) {
-                    // stop the websocket if we have a hotspot to fall back on
+                    // suspend the websocket if we have a hotspot stream running
                     udpNextCounter.set(Integer.MIN_VALUE);
-                    cleanup.run();
+                    suspend.set(true);
                   }
                 }
               }) //
@@ -273,7 +300,7 @@ public abstract class Device implements VinliItem {
                 @Override
                 public void call(Throwable throwable) {
                   if (udpNextCounter.get() != 0) {
-                    // restart the websocket in case it had been previously stopped
+                    // restart the websocket if it had been previously stopped
                     udpNextCounter.set(0);
                     startup.run();
                   }
@@ -283,7 +310,7 @@ public abstract class Device implements VinliItem {
                 @Override
                 public Boolean call(Integer integer, Throwable throwable) {
                   // always retry the UDP stream if it was just a timeout.
-                  // otherwise, something unexpected happen, abort completely.
+                  // otherwise, something unexpected happened, abort completely.
                   return (throwable instanceof TimeoutException);
                 }
               }) //
@@ -338,16 +365,28 @@ public abstract class Device implements VinliItem {
               }
 
               if (result != null && !result.isEmpty()) {
-                if (!chipIdFound.get()) {
-                  if (result.startsWith("I:") && result.substring(2).equals(chipId)) {
-                    chipIdFound.set(true);
+                int idIndex = result.indexOf('#');
+                String id = idIndex != -1
+                    ? result.substring(0, idIndex)
+                    : null;
+
+                if (!chipIdFound.get() && chipId.equals(id)) {
+                  chipIdFound.set(true);
+                }
+
+                if (idIndex != -1) {
+                  if (idIndex == result.length() - 1) {
+                    result = null;
+                  } else {
+                    result = result.substring(idIndex + 1);
                   }
                 }
-                if (chipIdFound.get()) {
+
+                if (result != null && chipIdFound.get()) {
                   // TODO parse the line - just log it and onNext an empty result for now.
                   // need a solution that turns raw lines from the OBD into StreamMessage -
                   // probably dropping a chunk of the bluetooth SDK into here for parsing.
-                  Log.e("VVV", result); // remove this when parsing exists
+                  Log.e("VVV", "id:" + id + ":" + result); // remove this when parsing exists
                   if (subscriber.isUnsubscribed()) return;
                   subscriber.onNext(new StreamMessage());
                 }
