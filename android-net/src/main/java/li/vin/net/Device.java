@@ -5,11 +5,11 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.duktape.Duktape;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -28,11 +28,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.Buffer;
 import okio.BufferedSource;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -225,6 +225,8 @@ public abstract class Device implements VinliItem {
 
               @Override
               public void onFailure(IOException ioe, Response response) {
+                if (handleSuspend.call(webSocketRef.get())) return;
+
                 cleanup.run();
                 if (!subscriber.isUnsubscribed()) {
                   subscriber.onError(ioe);
@@ -234,9 +236,9 @@ public abstract class Device implements VinliItem {
               @Override
               public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
                   throws IOException {
-                if (handleSuspend.call(webSocketRef.get())) return;
-
                 try {
+                  if (handleSuspend.call(webSocketRef.get())) return;
+
                   if (subscriber.isUnsubscribed()) {
                     cleanup.run();
                     return;
@@ -278,50 +280,162 @@ public abstract class Device implements VinliItem {
           }
         };
 
-        startup.run();
-
         String chipId = chipId();
-        if (chipId != null && (chipId = chipId.trim()).length() != 0) {
-          final AtomicInteger udpNextCounter = new AtomicInteger(0);
-
-          subscriber.add(makeUdpStream(chipId) //
-              .timeout(15, TimeUnit.SECONDS) //
-              .doOnNext(new Action1<StreamMessage>() {
-                @Override
-                public void call(StreamMessage message) {
-                  if (udpNextCounter.incrementAndGet() >= 5) {
-                    // suspend the websocket if we have a hotspot stream running
-                    udpNextCounter.set(Integer.MIN_VALUE);
-                    suspend.set(true);
-                  }
-                }
-              }) //
-              .doOnError(new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                  if (udpNextCounter.get() != 0) {
-                    // restart the websocket if it had been previously stopped
-                    udpNextCounter.set(0);
-                    startup.run();
-                  }
-                }
-              }) //
-              .retry(new Func2<Integer, Throwable, Boolean>() {
-                @Override
-                public Boolean call(Integer integer, Throwable throwable) {
-                  // always retry the UDP stream if it was just a timeout.
-                  // otherwise, something unexpected happened, abort completely.
-                  return (throwable instanceof TimeoutException);
-                }
-              }) //
-              .subscribe());
+        if (chipId == null || (chipId = chipId.trim()).length() == 0) {
+          // If we don't have a valid chip ID, start the websocket and return.
+          startup.run();
+          return;
         }
+
+        // If we do have a valid chip id, let's try to find a UDP stream as an alternative to the
+        // websocket streaming - faster, more battery efficient, better info available.
+
+        try {
+          // Acquire Duktape to keep its static instance refcounted to the whole stream instead
+          // of each UDP session to avoid the need to excessively create and close Duktape
+          // instances. Also, if for any reason Duktape cannot be acquired, this lets us know
+          // that UDP streaming won't work out, so we can go ahead and proceed with the websocket
+          // approach and bail out early on UDP.
+          acquireDuktape();
+          subscriber.add(rx.subscriptions.Subscriptions.create(new Action0() {
+            @Override
+            public void call() {
+              releaseDuktape();
+            }
+          }));
+        } catch (Exception any) {
+          // If Duktape can't be acquired, start the websocket and return.
+          startup.run();
+          return;
+        }
+
+        try {
+          // We can afford to wait 2 seconds before starting the websocket to see if we can get
+          // an immediate response over UDP. If so, it's more efficient to never start the web-
+          // socket than to start it then immediately suspend.
+          final Scheduler.Worker worker = Schedulers.io().createWorker();
+          subscriber.add(worker);
+          worker.schedule(new Action0() {
+            @Override
+            public void call() {
+              if (!worker.isUnsubscribed()) worker.unsubscribe();
+              if (!subscriber.isUnsubscribed() && !suspend.get()) {
+                startup.run();
+              }
+            }
+          }, 2, TimeUnit.SECONDS);
+        } catch (Exception any) {
+          // Shouldn't happen, but if it does, we can start the websocket right away and it will be
+          // suspended later if the UDP streaming kicks in.
+          startup.run();
+        }
+
+        subscriber.add(makeUdpStream(chipId) //
+            // time without UDP stream data before starting or restarting websocket
+            .timeout(15, TimeUnit.SECONDS) //
+            .doOnNext(new Action1<StreamMessage>() {
+              @Override
+              public void call(StreamMessage message) {
+                // suspend the websocket if we have a UDP stream running
+                suspend.set(true);
+              }
+            }) //
+            .doOnError(new Action1<Throwable>() {
+              @Override
+              public void call(Throwable throwable) {
+                // timed out, or something else went wrong:
+                // restart the websocket if it had been previously suspended
+                if (suspend.get()) startup.run();
+              }
+            }) //
+            .retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
+              @Override
+              public Observable<?> call(Observable<? extends Throwable> errs) {
+                // exponential backoff on retries getting response over UDP. Each time we timeout
+                // with no data over UDP, wait a little longer before warming up a new UDP socket
+                // and trying again.
+                return errs //
+                    .flatMap(new Func1<Throwable, Observable<?>>() {
+                      @Override
+                      public Observable<?> call(Throwable throwable) {
+                        if (throwable instanceof TimeoutException) {
+                          return null;
+                        }
+                        // don't retry if it's not a timeout exception - something unknown went
+                        // wrong, and we should have acounted for everything, so it's safer not
+                        // to retry at all.
+                        return Observable.error(throwable);
+                      }
+                    }) //
+                    .zipWith(Observable.range(1, 8), new Func2<Object, Integer, Integer>() {
+                      @Override
+                      public Integer call(Object o, Integer i) {
+                        // retry up to 8 times...
+                        return i;
+                      }
+                    }) //
+                    .flatMap(new Func1<Integer, Observable<?>>() {
+                      @Override
+                      public Observable<?> call(Integer retryCount) {
+                        // backing off 2 ^ n seconds each time
+                        return Observable.timer( //
+                            (long) Math.pow(2, retryCount), TimeUnit.SECONDS);
+                      }
+                    });
+              }
+            }) //
+            .subscribe());
       }
     });
   }
 
+  // --- singleton Duktape JS interpreter inst with threadsafe refcounting semantics
+
+  private static final Object duktapeRefLock = new Object();
+  private static int duktapeRefCtr = 0;
+  private static Duktape duktape;
+
+  private static void releaseDuktape() {
+    synchronized (duktapeRefLock) {
+      duktapeRefCtr--;
+      if (duktapeRefCtr < 0) duktapeRefCtr = 0;
+      if (duktapeRefCtr == 0) {
+        if (duktape == null) throw new IllegalStateException("try to release null duktape");
+        try {
+          duktape.close();
+        } catch (Exception ignored) {
+        }
+        duktape = null;
+      }
+    }
+  }
+
+  @NonNull
+  private static Duktape acquireDuktape() {
+    synchronized (duktapeRefLock) {
+      duktapeRefCtr++;
+      if (duktapeRefCtr == 1) {
+        try {
+          Duktape dt = Duktape.create();
+          dt.evaluate(ObdJsLib.lib());
+          return dt;
+        } catch (Exception e) {
+          duktapeRefCtr = 0;
+          throw e;
+        }
+      }
+      if (duktape == null) {
+        duktapeRefCtr = 0;
+        throw new IllegalStateException("try to acquire null duktape");
+      }
+      return duktape;
+    }
+  }
+
+  // ---
+
+  /** Stream all the UDP things. */
   private static Observable<StreamMessage> makeUdpStream(@NonNull final String chipId) {
-    final String connId = UUID.randomUUID().toString();
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(Subscriber<? super StreamMessage> subscriber) {
@@ -333,6 +447,7 @@ public abstract class Device implements VinliItem {
           return;
         }
 
+        String connId = UUID.randomUUID().toString();
         AtomicBoolean chipIdFound = new AtomicBoolean(false);
 
         while (true) {
@@ -340,15 +455,17 @@ public abstract class Device implements VinliItem {
           byte[] read = new byte[256];
           DatagramSocket udpSocket = null;
           InetAddress hostAddr = null;
+          Duktape duktape = null;
 
           try {
-            udpSocket = new DatagramSocket(54321);
+            udpSocket = new DatagramSocket(); // choose any available port
             udpSocket.setSoTimeout(1000);
             hostAddr = InetAddress.getByName("192.168.1.1");
+            duktape = acquireDuktape();
 
             for (int i = 0; ; i++) {
               // ---
-              if (i % 10 == 0) {
+              if (i % 20 == 0) {
                 byte[] msg = String.format("vvv%s", connId).getBytes();
                 try {
                   udpSocket.send(new DatagramPacket(msg, msg.length, hostAddr, 54321));
@@ -383,12 +500,8 @@ public abstract class Device implements VinliItem {
                 }
 
                 if (result != null && chipIdFound.get()) {
-                  // TODO parse the line - just log it and onNext an empty result for now.
-                  // need a solution that turns raw lines from the OBD into StreamMessage -
-                  // probably dropping a chunk of the bluetooth SDK into here for parsing.
-                  Log.e("VVV", "id:" + id + ":" + result); // remove this when parsing exists
                   if (subscriber.isUnsubscribed()) return;
-                  subscriber.onNext(new StreamMessage());
+                  StreamMessage.processRawLine(result, duktape, subscriber);
                 }
               }
 
@@ -414,6 +527,13 @@ public abstract class Device implements VinliItem {
             if (udpSocket != null) {
               try {
                 udpSocket.close();
+              } catch (Exception ignored) {
+              }
+            }
+
+            if (duktape != null) {
+              try {
+                releaseDuktape();
               } catch (Exception ignored) {
               }
             }

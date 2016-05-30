@@ -4,33 +4,27 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import auto.parcel.AutoParcel;
-
 public class Message implements VinliItem {
-  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Message>>() { }.getType();
-  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Message>>() { }.getType();
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Message>>() {
+  }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Message>>() {
+  }.getType();
 
-  /*package*/ static final void registerGson(GsonBuilder gb) {
-    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Message.class));
+  /*package*/
+  static final void registerGson(GsonBuilder gb) {
+    gb.registerTypeAdapter(TIME_SERIES_TYPE,
+        TimeSeries.Adapter.create(TIME_SERIES_TYPE, Message.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Message.class));
   }
 
@@ -39,11 +33,11 @@ public class Message implements VinliItem {
   private LinkedTreeMap<String, Object> data;
   /*package*/ Links links;
 
-  /*package*/ Message(){
+  /*package*/ Message() {
 
   }
 
-  /*package*/ Message(Parcel in){
+  /*package*/ Message(Parcel in) {
     Gson gson = new Gson();
     Message message = gson.fromJson(in.readString(), Message.class);
     this.id = message.id();
@@ -51,7 +45,7 @@ public class Message implements VinliItem {
     this.data = message.data;
   }
 
-  public String id(){
+  public String id() {
     return id;
   }
 
@@ -208,6 +202,15 @@ public class Message implements VinliItem {
     private Double minY;
     private Double minZ;
 
+    AccelData(double maxX, double maxY, double maxZ, double minX, double minY, double minZ) {
+      this.maxX = maxX;
+      this.maxY = maxY;
+      this.maxZ = maxZ;
+      this.minX = minX;
+      this.minY = minY;
+      this.minZ = minZ;
+    }
+
     AccelData() {
     }
 
@@ -308,20 +311,20 @@ public class Message implements VinliItem {
     dest.writeString(gson.toJson(this, Message.class));
   }
 
-  private static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>(){
+  private static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
 
     @Override
-    public Message createFromParcel(Parcel in){
+    public Message createFromParcel(Parcel in) {
       return new Message(in);
     }
 
     @Override
-    public Message[] newArray(int size){
+    public Message[] newArray(int size) {
       return new Message[size];
     }
   };
 
-  static class Links{
+  static class Links {
     public String self;
   }
 }

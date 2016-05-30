@@ -2,24 +2,31 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import android.util.Log;
+import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
-
+import com.squareup.duktape.Duktape;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import li.vin.net.Message.AccelData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import auto.parcel.AutoParcel;
-import li.vin.net.Message.AccelData;
+import org.json.JSONTokener;
 import rx.Observable;
+import rx.Subscriber;
 import rx.functions.Func1;
 
 public final class StreamMessage {
@@ -111,12 +118,12 @@ public final class StreamMessage {
     };
   }
 
-  public static Func1<StreamMessage, Observable<Coordinate>> coordinate(){
+  public static Func1<StreamMessage, Observable<Coordinate>> coordinate() {
     return new Func1<StreamMessage, Observable<Coordinate>>() {
       @Override
       public Observable<Coordinate> call(StreamMessage message) {
         Coordinate coordinate = message.coord();
-        if(coordinate == null){
+        if (coordinate == null) {
           return Observable.empty();
         }
         return Observable.just(coordinate);
@@ -163,6 +170,182 @@ public final class StreamMessage {
   }
    */
 
+  private static final float ACCEL_CONVERT = (9.807f / 16384f);
+
+  /*package*/
+  static void processRawLine(@Nullable String line, @NonNull Duktape dt, //
+      @NonNull Subscriber<? super StreamMessage> subscriber) {
+    if (subscriber.isUnsubscribed()) return; // sanity
+    // no empty lines, min valid line length is 2
+    if (line == null || (line = line.trim()).length() < 2) return;
+
+    String pfx;
+    int colonIndex = line.indexOf(':');
+    if (colonIndex != -1) {
+      if (colonIndex == line.length() - 1) return; // can't end with colon
+      pfx = line.substring(0, colonIndex);
+      line = line.substring(colonIndex + 1);
+    } else if (line.length() == 2) {
+      pfx = line;
+      line = null;
+    } else if (line.startsWith("41")) {
+      pfx = "41";
+      line = line.substring(2);
+    } else {
+      return;
+    }
+
+    if (pfx.equals("41") && line != null && line.length() > 2) {
+      processObd(line.substring(0, 2), line.substring(2), dt, subscriber);
+    } else if (pfx.equals("A") && line != null && line.length() >= 14) {
+      // TODO collision bytes
+
+      float xAccel = Integer.valueOf(line.substring(0, 4), 16).shortValue() * ACCEL_CONVERT;
+      float yAccel = Integer.valueOf(line.substring(4, 8), 16).shortValue() * ACCEL_CONVERT;
+      float zAccel = Integer.valueOf(line.substring(8, 12), 16).shortValue() * ACCEL_CONVERT;
+
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("accel", new AccelData(xAccel, yAccel, zAccel, xAccel, yAccel, zAccel));
+      subscriber.onNext(sm);
+    } else if (pfx.equals("G") && line != null) {
+      try {
+        String[] split = line.split(",");
+        if (split.length == 2) {
+          double lat = Double.parseDouble(split[0]);
+          double lon = Double.parseDouble(split[1]);
+          StreamMessage sm = emptyStreamMessage();
+          LinkedTreeMap<String, Object> loc = new LinkedTreeMap<>();
+          sm.payload.data.put("location", loc);
+          loc.put("type", "Point");
+          loc.put("coordinates", new double[] { lat, lon });
+          subscriber.onNext(sm);
+        }
+      } catch (Exception ignored) {
+      }
+    } else if (pfx.equals("S")) {
+      // TODO signal strength
+    } else if (pfx.equals("SVER") && line != null) {
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("stmVersion", line);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("HVER") && line != null) {
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("heVersion", line);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("BVER") && line != null) {
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("bleVersion", line);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("K") && line != null) {
+      // TODO more structured format, array of PIDs in form 01-xx?
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("supportedPids", line);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("V") && line != null) {
+      if (!line.startsWith("NULL") && line.matches("^[A-Z0-9]{17}$")) {
+        StreamMessage sm = emptyStreamMessage();
+        sm.payload.data.put("vin", line);
+        subscriber.onNext(sm);
+      }
+    } else if (pfx.equals("D") && line != null) {
+      // TODO parse into array of dtcs
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("dtcs", line);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("P0")) {
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("power", Boolean.FALSE);
+      subscriber.onNext(sm);
+    } else if (pfx.equals("P1")) {
+      StreamMessage sm = emptyStreamMessage();
+      sm.payload.data.put("power", Boolean.TRUE);
+      subscriber.onNext(sm);
+    }
+  }
+
+  private static void processObd(String key, String val, Duktape dt,
+      Subscriber<? super StreamMessage> subscriber) {
+    try {
+      // normal obd data
+      long nano = System.nanoTime();
+      String eval = dt.evaluate( //
+          String.format("JSON.stringify(mainlib.translate('01-%1$s', '%2$s'));", key, val));
+      nano = System.nanoTime() - nano;
+      Log.e("TESTO", "eval took " + TimeUnit.NANOSECONDS.toMillis(nano) + "ms, result=" + eval);
+
+      JSONArray arr;
+      Object json = new JSONTokener(eval).nextValue();
+      if (json instanceof JSONObject) {
+        arr = new JSONArray();
+        arr.put(json);
+      } else if (json instanceof JSONArray) {
+        arr = (JSONArray) json;
+      } else {
+        throw new RuntimeException("not json.");
+      }
+
+      for (int i = 0; i < arr.length(); i++) {
+
+        JSONObject jobj = null;
+        try {
+          jobj = arr.getJSONObject(i);
+        } catch (Exception ignored) {
+        }
+        if (jobj == null) continue;
+
+        String k = null;
+        try {
+          k = jobj.getString("key");
+        } catch (Exception ignored) {
+        }
+        if (k == null) continue;
+
+        String type = null;
+        try {
+          type = jobj.getString("dataType");
+        } catch (Exception ignored) {
+        }
+        if (type == null) continue;
+
+        if (type.equalsIgnoreCase("decimal")) {
+          try {
+            double ret = jobj.getDouble("value");
+            StreamMessage sm = emptyStreamMessage();
+            sm.payload.data.put(k, ret);
+            if (!subscriber.isUnsubscribed()) subscriber.onNext(sm);
+          } catch (Exception ignored) {
+          }
+        } else /*if (type.equalsIgnoreCase("string"))*/ {
+          try {
+            String ret = jobj.getString("value");
+            StreamMessage sm = emptyStreamMessage();
+            sm.payload.data.put(k, ret);
+            if (!subscriber.isUnsubscribed()) subscriber.onNext(sm);
+          } catch (Exception ignored) {
+          }
+        }
+      }
+    } catch (Exception ignored) {
+    }
+  }
+
+  private static final SimpleDateFormat VINLI_DATE_FMT;
+
+  static {
+    VINLI_DATE_FMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+    VINLI_DATE_FMT.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
+
+  @NonNull
+  private static StreamMessage emptyStreamMessage() {
+    StreamMessage sm = new StreamMessage();
+    sm.payload = new StreamMessagePayload();
+    sm.payload.id = UUID.randomUUID().toString();
+    sm.payload.timestamp = VINLI_DATE_FMT.format(new Date());
+    sm.payload.data = new LinkedTreeMap<>();
+    return sm;
+  }
+
   private String type;
   private StreamMessageSubject subject;
   private StreamMessagePayload payload;
@@ -171,7 +354,7 @@ public final class StreamMessage {
   }
 
   @Nullable
-  public String getType(){
+  public String getType() {
     return this.type;
   }
 
@@ -349,47 +532,67 @@ public final class StreamMessage {
   }
 
   @AutoParcel
-  public static abstract class ParametricFilter{
+  public static abstract class ParametricFilter {
 
     /*package*/ static final String TYPE = "parametric";
+
     public abstract String parameter();
+
     public abstract Float min();
+
     public abstract Float max();
+
     public abstract String deviceId();
 
-    /*package*/ ParametricFilter(){}
-
-    /*package*/ static final void registerGson(GsonBuilder gb) {
-      gb.registerTypeAdapter(AutoParcel_StreamMessage_ParametricFilter.Seed.class, new Seed.Adapter());
+    /*package*/ ParametricFilter() {
     }
 
-    public static final Seed.Builder create(){
+    /*package*/
+    static final void registerGson(GsonBuilder gb) {
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_ParametricFilter.Seed.class,
+          new Seed.Adapter());
+    }
+
+    public static final Seed.Builder create() {
       return new AutoParcel_StreamMessage_ParametricFilter_Seed.Builder();
     }
 
     @AutoParcel
-    public static abstract class Seed{
+    public static abstract class Seed {
       private final String type = ParametricFilter.TYPE;
-      @NonNull public abstract String parameter();
-      @Nullable public abstract Float min();
-      @Nullable public abstract Float max();
-      @Nullable public abstract String deviceId();
 
-      /*package*/ Seed(){}
+      @NonNull
+      public abstract String parameter();
+
+      @Nullable
+      public abstract Float min();
+
+      @Nullable
+      public abstract Float max();
+
+      @Nullable
+      public abstract String deviceId();
+
+      /*package*/ Seed() {
+      }
 
       @AutoParcel.Builder
-      public static abstract class Builder{
+      public static abstract class Builder {
         public abstract Builder parameter(@NonNull String parameter);
+
         public abstract Builder min(@Nullable Float min);
+
         public abstract Builder max(@Nullable Float max);
+
         public abstract Builder deviceId(@Nullable String deviceId);
 
         public abstract Seed build();
 
-        /*package*/ Builder(){}
+        /*package*/ Builder() {
+        }
       }
 
-      /*package*/ static final class Adapter extends TypeAdapter<ParametricFilter.Seed>{
+      /*package*/ static final class Adapter extends TypeAdapter<ParametricFilter.Seed> {
 
         private Gson gson;
 
@@ -400,25 +603,27 @@ public final class StreamMessage {
           }
 
           out.beginObject();
-            out.name("type").value("filter");
-            if(value.deviceId() != null){
-              out.name("id").value(value.deviceId());
-            }
-            out.name("filter").beginObject();
-              out.name("type").value(value.type);
-              out.name("parameter").value(value.parameter());
-              if(value.min() != null){
-                out.name("min").value(value.min());
-              }
-              if(value.max() != null){
-                out.name("max").value(value.max());
-              }
-            out.endObject();
+          out.name("type").value("filter");
+          if (value.deviceId() != null) {
+            out.name("id").value(value.deviceId());
+          }
+          out.name("filter").beginObject();
+          out.name("type").value(value.type);
+          out.name("parameter").value(value.parameter());
+          if (value.min() != null) {
+            out.name("min").value(value.min());
+          }
+          if (value.max() != null) {
+            out.name("max").value(value.max());
+          }
+          out.endObject();
           out.endObject();
         }
 
-        @Override public ParametricFilter.Seed read(JsonReader in) throws IOException {
-          throw new UnsupportedOperationException("reading a ParametricFilter.Seed is not supported");
+        @Override
+        public ParametricFilter.Seed read(JsonReader in) throws IOException {
+          throw new UnsupportedOperationException(
+              "reading a ParametricFilter.Seed is not supported");
         }
       }
     }
@@ -427,57 +632,73 @@ public final class StreamMessage {
   @AutoParcel
   public static abstract class GeometryFilter {
 
-    public enum Direction{
+    public enum Direction {
       INSIDE("inside"),
       OUTSIDE("outside");
 
       private String str;
 
-      private Direction(String str){
+      private Direction(String str) {
         this.str = str;
       }
 
-      /*package*/ String getDirectionAsString(){
+      /*package*/ String getDirectionAsString() {
         return this.str;
       }
     }
 
     /*package*/ static final String TYPE = "geometry";
+
     public abstract Direction direction();
+
     public abstract List<Coordinate.Seed> geometry();
+
     public abstract String deviceId();
 
-    /*package*/ GeometryFilter(){}
-
-    /*package*/ static final void registerGson(GsonBuilder gb) {
-      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometryFilter.Seed.class, new Seed.Adapter());
+    /*package*/ GeometryFilter() {
     }
 
-    public static final Seed.Builder create(){
+    /*package*/
+    static final void registerGson(GsonBuilder gb) {
+      gb.registerTypeAdapter(AutoParcel_StreamMessage_GeometryFilter.Seed.class,
+          new Seed.Adapter());
+    }
+
+    public static final Seed.Builder create() {
       return new AutoParcel_StreamMessage_GeometryFilter_Seed.Builder();
     }
 
     @AutoParcel
-    public static abstract class Seed{
+    public static abstract class Seed {
       private final String type = GeometryFilter.TYPE;
-      @NonNull public abstract Direction direction();
-      @NonNull public abstract List<Coordinate.Seed> geometry();
-      @Nullable public abstract String deviceId();
 
-      /*package*/ Seed(){}
+      @NonNull
+      public abstract Direction direction();
+
+      @NonNull
+      public abstract List<Coordinate.Seed> geometry();
+
+      @Nullable
+      public abstract String deviceId();
+
+      /*package*/ Seed() {
+      }
 
       @AutoParcel.Builder
-      public static abstract class Builder{
+      public static abstract class Builder {
         public abstract Builder direction(@NonNull Direction direction);
+
         public abstract Builder geometry(@NonNull List<Coordinate.Seed> geometry);
+
         public abstract Builder deviceId(@Nullable String deviceId);
 
         public abstract Seed build();
 
-        /*package*/ Builder(){}
+        /*package*/ Builder() {
+        }
       }
 
-      /*package*/ static final class Adapter extends TypeAdapter<GeometryFilter.Seed>{
+      /*package*/ static final class Adapter extends TypeAdapter<GeometryFilter.Seed> {
 
         private Gson gson;
 
@@ -488,26 +709,27 @@ public final class StreamMessage {
           }
 
           out.beginObject();
-            out.name("type").value("filter");
-            if(value.deviceId() != null){
-              out.name("id").value(value.deviceId());
-            }
-            out.name("filter").beginObject();
-              out.name("type").value(value.type);
-              out.name("direction").value(value.direction().getDirectionAsString());
-              out.name("geometry").beginObject();
-                out.name("type").value("Polygon");
-                out.name("coordinates").beginArray().beginArray();
-                  for(Coordinate.Seed seed : value.geometry()){
-                    gson.toJson(seed, Coordinate.Seed.class, out);
-                  }
-                out.endArray().endArray();
-              out.endObject();
-            out.endObject();
+          out.name("type").value("filter");
+          if (value.deviceId() != null) {
+            out.name("id").value(value.deviceId());
+          }
+          out.name("filter").beginObject();
+          out.name("type").value(value.type);
+          out.name("direction").value(value.direction().getDirectionAsString());
+          out.name("geometry").beginObject();
+          out.name("type").value("Polygon");
+          out.name("coordinates").beginArray().beginArray();
+          for (Coordinate.Seed seed : value.geometry()) {
+            gson.toJson(seed, Coordinate.Seed.class, out);
+          }
+          out.endArray().endArray();
+          out.endObject();
+          out.endObject();
           out.endObject();
         }
 
-        @Override public GeometryFilter.Seed read(JsonReader in) throws IOException {
+        @Override
+        public GeometryFilter.Seed read(JsonReader in) throws IOException {
           throw new UnsupportedOperationException("reading a GeometryFilter.Seed is not supported");
         }
       }
