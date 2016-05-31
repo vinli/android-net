@@ -334,6 +334,7 @@ public final class StreamMessage {
   private static StreamMessage emptyStreamMessage() {
     StreamMessage sm = new StreamMessage();
     sm.payload = new StreamMessagePayload();
+    sm.type = "pub";
     sm.payload.id = UUID.randomUUID().toString();
     sm.payload.timestamp = VINLI_DATE_FMT.format(new Date());
     sm.payload.data = new LinkedTreeMap<>();
