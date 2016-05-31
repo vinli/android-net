@@ -425,9 +425,10 @@ public abstract class Device implements VinliItem {
       duktapeRefCtr++;
       if (duktapeRefCtr == 1) {
         try {
-          Duktape dt = Duktape.create();
-          dt.evaluate(ObdJsLib.lib());
-          return dt;
+          if (duktape != null) throw new IllegalStateException("try to create w/ nonnull duktape");
+          duktape = Duktape.create();
+          duktape.evaluate(ObdJsLib.lib());
+          return duktape;
         } catch (Exception e) {
           duktapeRefCtr = 0;
           throw e;
