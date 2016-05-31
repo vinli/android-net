@@ -347,7 +347,7 @@ public abstract class Device implements VinliItem {
               public void call(Throwable throwable) {
                 // timed out, or something else went wrong:
                 // restart the websocket if it had been previously suspended
-                if (suspend.get()) startup.run();
+                if (suspend.compareAndSet(true, false)) startup.run();
               }
             }) //
             .retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
