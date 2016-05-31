@@ -9,7 +9,6 @@ import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.duktape.Duktape;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -402,7 +401,7 @@ public abstract class Device implements VinliItem {
 
   private static final Object duktapeRefLock = new Object();
   private static int duktapeRefCtr = 0;
-  private static Duktape duktape;
+  private static Duktaper duktape;
 
   private static void releaseDuktape() {
     synchronized (duktapeRefLock) {
@@ -420,13 +419,13 @@ public abstract class Device implements VinliItem {
   }
 
   @NonNull
-  private static Duktape acquireDuktape() {
+  private static Duktaper acquireDuktape() {
     synchronized (duktapeRefLock) {
       duktapeRefCtr++;
       if (duktapeRefCtr == 1) {
         try {
           if (duktape != null) throw new IllegalStateException("try to create w/ nonnull duktape");
-          duktape = Duktape.create();
+          duktape = Duktaper.create();
           duktape.evaluate(ObdJsLib.lib());
           return duktape;
         } catch (Exception e) {
@@ -465,7 +464,7 @@ public abstract class Device implements VinliItem {
           byte[] read = new byte[256];
           DatagramSocket udpSocket = null;
           InetAddress hostAddr = null;
-          Duktape duktape = null;
+          Duktaper duktape = null;
 
           try {
             udpSocket = new DatagramSocket(); // choose any available port

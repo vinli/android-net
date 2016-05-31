@@ -9,7 +9,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
-import com.squareup.duktape.Duktape;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -173,7 +172,7 @@ public final class StreamMessage {
   private static final float ACCEL_CONVERT = (9.807f / 16384f);
 
   /*package*/
-  static void processRawLine(@Nullable String line, @NonNull Duktape dt, //
+  static void processRawLine(@Nullable String line, @NonNull Duktaper dt, //
       @NonNull Subscriber<? super StreamMessage> subscriber) {
     if (subscriber.isUnsubscribed()) return; // sanity
     // no empty lines, min valid line length is 2
@@ -263,7 +262,7 @@ public final class StreamMessage {
     }
   }
 
-  private static void processObd(String key, String val, Duktape dt,
+  private static void processObd(String key, String val, Duktaper dt,
       Subscriber<? super StreamMessage> subscriber) {
     try {
       // normal obd data
