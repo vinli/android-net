@@ -16,6 +16,7 @@ import com.squareup.okhttp.ws.WebSocket;
 import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.lang.reflect.Type;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -28,12 +29,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.Buffer;
 import okio.BufferedSource;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
+import rx.exceptions.Exceptions;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -104,6 +107,7 @@ public abstract class Device implements VinliItem {
   public Observable<StreamMessage> stream(
       @Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters,
       @Nullable final StreamMessage.GeometryFilter.Seed geometryFilter) {
+    final AtomicLong lastStreamData = new AtomicLong(System.currentTimeMillis());
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
       public void call(final Subscriber<? super StreamMessage> subscriber) {
@@ -168,6 +172,13 @@ public abstract class Device implements VinliItem {
           }
         }));
 
+        final Runnable recordActivity = new Runnable() {
+          @Override
+          public void run() {
+            lastStreamData.set(System.currentTimeMillis());
+          }
+        };
+
         final Runnable startup = new Runnable() {
           @Override
           public void run() {
@@ -185,6 +196,8 @@ public abstract class Device implements VinliItem {
             call.enqueue(new WebSocketListener() {
               @Override
               public void onOpen(WebSocket webSocket, Response response) {
+                recordActivity.run();
+
                 if (handleSuspend.call(webSocket)) return;
 
                 webSocketRef.set(webSocket);
@@ -236,6 +249,8 @@ public abstract class Device implements VinliItem {
               public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
                   throws IOException {
                 try {
+                  recordActivity.run();
+
                   if (handleSuspend.call(webSocketRef.get())) return;
 
                   if (subscriber.isUnsubscribed()) {
@@ -261,6 +276,8 @@ public abstract class Device implements VinliItem {
 
               @Override
               public void onPong(Buffer payload) {
+                recordActivity.run();
+
                 if (handleSuspend.call(webSocketRef.get())) return;
 
                 if (subscriber.isUnsubscribed()) {
@@ -343,6 +360,7 @@ public abstract class Device implements VinliItem {
                 suspend.set(true);
                 // send the UDP data to the main stream subscriber
                 consectiveUdpTimeouts.set(0); // valid data resets consecutive timeouts
+                recordActivity.run(); // valid stream data
                 if (!subscriber.isUnsubscribed()) subscriber.onNext(message);
               }
             }) //
@@ -392,6 +410,18 @@ public abstract class Device implements VinliItem {
               }
             }) //
             .subscribe());
+      }
+    }).retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
+      @Override
+      public Observable<?> call(Observable<? extends Throwable> errs) {
+        return errs.flatMap(new Func1<Object, Observable<?>>() {
+          @Override
+          public Observable<?> call(Object o) {
+            long msSinceLastStreamData = System.currentTimeMillis() - lastStreamData.get();
+            long wait = Math.min(30, msSinceLastStreamData / 1000);
+            return Observable.timer(wait, TimeUnit.SECONDS);
+          }
+        });
       }
     });
   }
@@ -456,10 +486,12 @@ public abstract class Device implements VinliItem {
         }
 
         String connId = UUID.randomUUID().toString();
+
         AtomicBoolean chipIdFound = new AtomicBoolean(false);
 
         while (true) {
           // ---
+
           byte[] read = new byte[256];
           DatagramSocket udpSocket = null;
           InetAddress hostAddr = null;
@@ -477,7 +509,8 @@ public abstract class Device implements VinliItem {
                 byte[] msg = String.format("vvv%s", connId).getBytes();
                 try {
                   udpSocket.send(new DatagramPacket(msg, msg.length, hostAddr, 54321));
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                  throw Exceptions.propagate(e);
                 }
               }
 
@@ -486,7 +519,10 @@ public abstract class Device implements VinliItem {
                 DatagramPacket recv = new DatagramPacket(read, read.length);
                 udpSocket.receive(recv);
                 result = new String(recv.getData(), recv.getOffset(), recv.getLength()).trim();
-              } catch (Exception ignored) {
+              } catch (Exception e) {
+                if (!(e instanceof InterruptedIOException)) {
+                  throw Exceptions.propagate(e);
+                }
               }
 
               if (result != null && !result.isEmpty()) {
