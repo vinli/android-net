@@ -214,7 +214,7 @@ public final class StreamMessage {
           LinkedTreeMap<String, Object> loc = new LinkedTreeMap<>();
           sm.payload.data.put("location", loc);
           loc.put("type", "Point");
-          loc.put("coordinates", new double[] { lon, lat });
+          loc.put("coordinates", new Object[] { lon, lat });
           subscriber.onNext(sm);
         }
       } catch (Exception ignored) {
