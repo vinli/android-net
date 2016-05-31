@@ -338,6 +338,8 @@ public abstract class Device implements VinliItem {
               public void call(StreamMessage message) {
                 // suspend the websocket if we have a UDP stream running
                 suspend.set(true);
+                // send the UDP data to the main stream subscriber
+                if (!subscriber.isUnsubscribed()) subscriber.onNext(message);
               }
             }) //
             .doOnError(new Action1<Throwable>() {
@@ -382,6 +384,13 @@ public abstract class Device implements VinliItem {
                             (long) Math.pow(2, retryCount), TimeUnit.SECONDS);
                       }
                     });
+              }
+            }) //
+            .onErrorReturn(new Func1<Throwable, StreamMessage>() {
+              @Override
+              public StreamMessage call(Throwable throwable) {
+                // ignore errors so we can safely subscribe
+                return null;
               }
             }) //
             .subscribe());
