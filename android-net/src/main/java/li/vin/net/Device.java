@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import okio.Buffer;
 import okio.BufferedSource;
@@ -36,7 +37,6 @@ import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 @AutoParcel
@@ -245,8 +245,10 @@ public abstract class Device implements VinliItem {
 
                   if (type == WebSocket.PayloadType.TEXT) {
                     try {
-                      subscriber.onNext(
-                          gson.fromJson(payload.readString(UTF8), StreamMessage.class));
+                      String payloadStr = payload.readString(UTF8);
+                      if (payloadStr != null && !payloadStr.isEmpty()) {
+                        subscriber.onNext(gson.fromJson(payloadStr, StreamMessage.class));
+                      }
                     } catch (IOException ioe) {
                       throw ioe;
                     } catch (Exception ignored) {
@@ -329,15 +331,18 @@ public abstract class Device implements VinliItem {
           startup.run();
         }
 
+        final AtomicInteger consectiveUdpTimeouts = new AtomicInteger();
+
         subscriber.add(makeUdpStream(chipId) //
             // time without UDP stream data before starting or restarting websocket
-            .timeout(15, TimeUnit.SECONDS) //
+            .timeout(8, TimeUnit.SECONDS) //
             .doOnNext(new Action1<StreamMessage>() {
               @Override
               public void call(StreamMessage message) {
                 // suspend the websocket if we have a UDP stream running
                 suspend.set(true);
                 // send the UDP data to the main stream subscriber
+                consectiveUdpTimeouts.set(0); // valid data resets consecutive timeouts
                 if (!subscriber.isUnsubscribed()) subscriber.onNext(message);
               }
             }) //
@@ -360,6 +365,7 @@ public abstract class Device implements VinliItem {
                       @Override
                       public Observable<?> call(Throwable throwable) {
                         if (throwable instanceof TimeoutException) {
+                          consectiveUdpTimeouts.incrementAndGet();
                           return null;
                         }
                         // don't retry if it's not a timeout exception - something unknown went
@@ -368,19 +374,12 @@ public abstract class Device implements VinliItem {
                         return Observable.error(throwable);
                       }
                     }) //
-                    .zipWith(Observable.range(1, 8), new Func2<Object, Integer, Integer>() {
+                    .flatMap(new Func1<Object, Observable<?>>() {
                       @Override
-                      public Integer call(Object o, Integer i) {
-                        // retry up to 8 times...
-                        return i;
-                      }
-                    }) //
-                    .flatMap(new Func1<Integer, Observable<?>>() {
-                      @Override
-                      public Observable<?> call(Integer retryCount) {
-                        // backing off 2 ^ n seconds each time
-                        return Observable.timer( //
-                            (long) Math.pow(2, retryCount), TimeUnit.SECONDS);
+                      public Observable<?> call(Object o) {
+                        // wait #timeouts since last data ^ 3, capped at 64 secs, before retrying
+                        long wait = (long) Math.pow(Math.min(consectiveUdpTimeouts.get(), 4), 3);
+                        return Observable.timer(wait, TimeUnit.SECONDS);
                       }
                     });
               }
@@ -534,6 +533,10 @@ public abstract class Device implements VinliItem {
             }
 
             if (udpSocket != null) {
+              try {
+                udpSocket.disconnect();
+              } catch (Exception ignored) {
+              }
               try {
                 udpSocket.close();
               } catch (Exception ignored) {

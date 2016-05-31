@@ -2,7 +2,6 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,7 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import li.vin.net.Message.AccelData;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -266,11 +264,8 @@ public final class StreamMessage {
       Subscriber<? super StreamMessage> subscriber) {
     try {
       // normal obd data
-      long nano = System.nanoTime();
       String eval = dt.evaluate( //
           String.format("JSON.stringify(mainlib.translate('01-%1$s', '%2$s'));", key, val));
-      nano = System.nanoTime() - nano;
-      Log.e("TESTO", "eval took " + TimeUnit.NANOSECONDS.toMillis(nano) + "ms, result=" + eval);
 
       JSONArray arr;
       Object json = new JSONTokener(eval).nextValue();
