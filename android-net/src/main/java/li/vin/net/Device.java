@@ -384,7 +384,7 @@ public abstract class Device implements VinliItem {
                       public Observable<?> call(Throwable throwable) {
                         if (throwable instanceof TimeoutException) {
                           consectiveUdpTimeouts.incrementAndGet();
-                          return null;
+                          return Observable.just(null);
                         }
                         // don't retry if it's not a timeout exception - something unknown went
                         // wrong, and we should have acounted for everything, so it's safer not
