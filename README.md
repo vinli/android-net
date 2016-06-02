@@ -8,7 +8,7 @@ Download
 
 You can also depend on this library through Gradle from jcenter:
 ```groovy
-compile 'li.vin:android-net:1.0.0-beta.5'
+compile 'li.vin:android-net:1.0.17'
 ```
 
 Conventions
