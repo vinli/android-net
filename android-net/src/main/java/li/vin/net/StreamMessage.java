@@ -2,6 +2,7 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,9 +13,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import li.vin.net.Message.AccelData;
@@ -195,15 +198,25 @@ public final class StreamMessage {
     if (pfx.equals("41") && line != null && line.length() > 2) {
       processObd(line.substring(0, 2), line.substring(2), dt, subscriber);
     } else if (pfx.equals("A") && line != null && line.length() >= 14) {
-      // TODO collision bytes
-
-      float xAccel = Integer.valueOf(line.substring(0, 4), 16).shortValue() * ACCEL_CONVERT;
-      float yAccel = Integer.valueOf(line.substring(4, 8), 16).shortValue() * ACCEL_CONVERT;
-      float zAccel = Integer.valueOf(line.substring(8, 12), 16).shortValue() * ACCEL_CONVERT;
-
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("accel", new AccelData(xAccel, yAccel, zAccel, xAccel, yAccel, zAccel));
-      subscriber.onNext(sm);
+      boolean accelFound = false;
+      try {
+        sm.payload.data.put("udpCollision",
+            Integer.valueOf(line.substring(line.length() - 2), 16) == 0
+                ? Boolean.FALSE
+                : Boolean.TRUE);
+        accelFound = true;
+      } catch (Exception ignored) {
+      }
+      try {
+        float xAccel = Integer.valueOf(line.substring(0, 4), 16).shortValue() * ACCEL_CONVERT;
+        float yAccel = Integer.valueOf(line.substring(4, 8), 16).shortValue() * ACCEL_CONVERT;
+        float zAccel = Integer.valueOf(line.substring(8, 12), 16).shortValue() * ACCEL_CONVERT;
+        sm.payload.data.put("accel", new AccelData(xAccel, yAccel, zAccel, xAccel, yAccel, zAccel));
+        accelFound = true;
+      } catch (Exception ignored) {
+      }
+      if (accelFound) subscriber.onNext(sm);
     } else if (pfx.equals("G") && line != null) {
       try {
         String[] split = line.split(",");
@@ -219,43 +232,85 @@ public final class StreamMessage {
         }
       } catch (Exception ignored) {
       }
-    } else if (pfx.equals("S")) {
-      // TODO signal strength
+    } else if (pfx.equals("S") && line != null) {
+      StreamMessage sm = emptyStreamMessage();
+      String[] split = line.split(",");
+      boolean sigFound = false;
+      if (split.length > 0) {
+        String sigType = split[0];
+        if (sigType != null && !(sigType = sigType.trim()).isEmpty() && //
+            !sigType.equalsIgnoreCase("null")) {
+          sm.payload.data.put("udpSignalType", sigType);
+          sigFound = true;
+        }
+      }
+      if (split.length > 1) {
+        try {
+          sm.payload.data.put("udpSignalStrength", Integer.parseInt(split[1].trim()));
+          sigFound = true;
+        } catch (Exception ignored) {
+        }
+      }
+      if (sigFound) subscriber.onNext(sm);
+    } else if (pfx.equals("B") && line != null && line.length() == 4) {
+      StreamMessage sm = emptyStreamMessage();
+      boolean voltageFound = false;
+      try {
+        sm.payload.data.put("udpBatteryVoltage", Integer.valueOf(line, 16) * 0.006);
+        voltageFound = true;
+      } catch (Exception ignored) {
+      }
+      if (voltageFound) subscriber.onNext(sm);
     } else if (pfx.equals("SVER") && line != null) {
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("stmVersion", line);
+      sm.payload.data.put("udpStmVersion", line);
       subscriber.onNext(sm);
     } else if (pfx.equals("HVER") && line != null) {
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("heVersion", line);
+      sm.payload.data.put("udpHeVersion", line);
       subscriber.onNext(sm);
     } else if (pfx.equals("BVER") && line != null) {
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("bleVersion", line);
+      sm.payload.data.put("udpBleVersion", line);
       subscriber.onNext(sm);
     } else if (pfx.equals("K") && line != null) {
-      // TODO more structured format, array of PIDs in form 01-xx?
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("supportedPids", line);
-      subscriber.onNext(sm);
+      boolean supportedPidsFound = false;
+      try {
+        sm.payload.data.put("udpSupportedPids", new SupportedPids(line).getSupport());
+        supportedPidsFound = true;
+      } catch (Exception ignored) {
+      }
+      if (supportedPidsFound) subscriber.onNext(sm);
     } else if (pfx.equals("V") && line != null) {
       if (!line.startsWith("NULL") && line.matches("^[A-Z0-9]{17}$")) {
         StreamMessage sm = emptyStreamMessage();
-        sm.payload.data.put("vin", line);
+        sm.payload.data.put("udpVin", line);
         subscriber.onNext(sm);
       }
     } else if (pfx.equals("D") && line != null) {
-      // TODO parse into array of dtcs
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("dtcs", line);
-      subscriber.onNext(sm);
+      boolean foundDtcs = false;
+      try {
+        String[] split = line.split(",");
+        Set<String> dtcs = new HashSet<>();
+        for (String s : split) {
+          if (s != null && TextUtils.getTrimmedLength(s) != 0) {
+            dtcs.add(s);
+          }
+        }
+        sm.payload.data.put("udpDtcs", dtcs.toArray(new String[dtcs.size()]));
+        foundDtcs = true;
+      } catch (Exception ignored) {
+      }
+      if (foundDtcs) subscriber.onNext(sm);
     } else if (pfx.equals("P0")) {
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("power", Boolean.FALSE);
+      sm.payload.data.put("udpPower", Boolean.FALSE);
       subscriber.onNext(sm);
     } else if (pfx.equals("P1")) {
       StreamMessage sm = emptyStreamMessage();
-      sm.payload.data.put("power", Boolean.TRUE);
+      sm.payload.data.put("udpPower", Boolean.TRUE);
       subscriber.onNext(sm);
     }
   }
