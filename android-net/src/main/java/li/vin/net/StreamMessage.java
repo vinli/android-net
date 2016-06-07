@@ -443,6 +443,11 @@ public final class StreamMessage {
   }
 
   @Nullable
+  public String timestamp(){
+    return (payload == null) ? null : payload.timestamp;
+  }
+
+  @Nullable
   public String rawVal(@NonNull String key) {
     try {
       if (payload == null || payload.data == null) return null;
