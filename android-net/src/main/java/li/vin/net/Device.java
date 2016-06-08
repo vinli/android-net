@@ -268,8 +268,8 @@ public abstract class Device implements VinliItem {
                       if (payloadStr != null && !payloadStr.isEmpty()) {
                         StreamMessage streamMessage = gson.fromJson(payloadStr, StreamMessage.class);
 
-                        synchronized (bearingCalculator){
-                          if(streamMessage.coord() != null){
+                        if(streamMessage.coord() != null){
+                          synchronized (bearingCalculator){
                             bearingCalculator.addCoordinate(streamMessage.coord(), streamMessage.timestamp());
                             streamMessage.setBearing(bearingCalculator.currentBearing());
                           }
@@ -376,8 +376,8 @@ public abstract class Device implements VinliItem {
                 recordActivity.run(); // valid stream data
                 if (!subscriber.isUnsubscribed()) {
 
-                  synchronized (bearingCalculator){
-                    if(message.coord() != null){
+                  if(message.coord() != null){
+                    synchronized (bearingCalculator){
                       bearingCalculator.addCoordinate(message.coord(), message.timestamp());
                       message.setBearing(bearingCalculator.currentBearing());
                     }
