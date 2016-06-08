@@ -131,6 +131,19 @@ public final class StreamMessage {
     };
   }
 
+  public static Func1<StreamMessage, Observable<Double>> onlyWithBearing(){
+    return new Func1<StreamMessage, Observable<Double>>() {
+      @Override
+      public Observable<Double> call(StreamMessage streamMessage) {
+        Double val = streamMessage.bearing();
+        if(val == null){
+          return Observable.empty();
+        }
+        return Observable.just(val);
+      }
+    };
+  }
+
   /*
   {
     "type": "pub",
@@ -399,6 +412,7 @@ public final class StreamMessage {
   private String type;
   private StreamMessageSubject subject;
   private StreamMessagePayload payload;
+  private Double bearing;
 
   StreamMessage() {
   }
@@ -445,6 +459,15 @@ public final class StreamMessage {
   @Nullable
   public String timestamp(){
     return (payload == null) ? null : payload.timestamp;
+  }
+
+  @Nullable
+  public Double bearing(){
+    return bearing;
+  }
+
+  /*package*/ void setBearing(Double bearing){
+    this.bearing = bearing;
   }
 
   @Nullable

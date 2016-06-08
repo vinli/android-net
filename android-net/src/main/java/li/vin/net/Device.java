@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
 import okio.Buffer;
 import okio.BufferedSource;
 import rx.Observable;
@@ -107,6 +108,9 @@ public abstract class Device implements VinliItem {
   public Observable<StreamMessage> stream(
       @Nullable final List<StreamMessage.ParametricFilter.Seed> parametricFilters,
       @Nullable final StreamMessage.GeometryFilter.Seed geometryFilter) {
+
+    final BearingCalculator bearingCalculator = new BearingCalculator();
+
     final AtomicLong lastStreamData = new AtomicLong(System.currentTimeMillis());
     return Observable.create(new Observable.OnSubscribe<StreamMessage>() {
       @Override
@@ -262,7 +266,16 @@ public abstract class Device implements VinliItem {
                     try {
                       String payloadStr = payload.readString(UTF8);
                       if (payloadStr != null && !payloadStr.isEmpty()) {
-                        subscriber.onNext(gson.fromJson(payloadStr, StreamMessage.class));
+                        StreamMessage streamMessage = gson.fromJson(payloadStr, StreamMessage.class);
+
+                        synchronized (bearingCalculator){
+                          if(streamMessage.coord() != null){
+                            bearingCalculator.addCoordinate(streamMessage.coord(), streamMessage.timestamp());
+                            streamMessage.setBearing(bearingCalculator.currentBearing());
+                          }
+                        }
+
+                        subscriber.onNext(streamMessage);
                       }
                     } catch (IOException ioe) {
                       throw ioe;
@@ -361,7 +374,17 @@ public abstract class Device implements VinliItem {
                 // send the UDP data to the main stream subscriber
                 consectiveUdpTimeouts.set(0); // valid data resets consecutive timeouts
                 recordActivity.run(); // valid stream data
-                if (!subscriber.isUnsubscribed()) subscriber.onNext(message);
+                if (!subscriber.isUnsubscribed()) {
+
+                  synchronized (bearingCalculator){
+                    if(message.coord() != null){
+                      bearingCalculator.addCoordinate(message.coord(), message.timestamp());
+                      message.setBearing(bearingCalculator.currentBearing());
+                    }
+                  }
+
+                  subscriber.onNext(message);
+                }
               }
             }) //
             .doOnError(new Action1<Throwable>() {
