@@ -4,8 +4,16 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import auto.parcel.AutoParcel;
+
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
 import java.lang.reflect.Type;
 import rx.Observable;
 
@@ -18,9 +26,10 @@ public abstract class Trip implements VinliItem {
     gb.registerTypeAdapter(Trip.class, AutoParcelAdapter.create(AutoParcel_Trip.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Trip_Links.class));
     gb.registerTypeAdapter(Stats.class, AutoParcelAdapter.create(AutoParcel_Trip_Stats.class));
-    gb.registerTypeAdapter(Point.class, AutoParcelAdapter.create(AutoParcel_Trip_Point.class));
+//    gb.registerTypeAdapter(Point.class, AutoParcelAdapter.create(AutoParcel_Trip_Point.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Trip.class));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Trip.class));
+    Point.registerGson(gb);
   }
   public abstract String start();
   public abstract String stop();
@@ -90,8 +99,78 @@ public abstract class Trip implements VinliItem {
 
   @AutoParcel
   public static abstract class Point implements Parcelable{
-    public abstract Coordinate coordinates();
+    @Nullable public abstract Coordinate coordinates();
 
     /*package*/ Point() { }
+
+    /*package*/ static final void registerGson(GsonBuilder gb) {
+      gb.registerTypeAdapter(Point.class, new PointAdapter());
+    }
+
+    /*package*/ static final Builder builder() {
+      return new AutoParcel_Trip_Point.Builder();
+    }
+
+    @AutoParcel.Builder
+    /*package*/ interface Builder{
+      Builder coordinates(@Nullable Coordinate coordinate);
+
+      Point build();
+    }
+
+
+    private static final class PointAdapter extends TypeAdapter<Point>{
+      @Override
+      public void write(JsonWriter out, Point value) throws IOException {
+        throw new UnsupportedOperationException("Writing a Point is not supported");
+      }
+
+      @Override
+      public Point read(JsonReader in) throws IOException {
+        Point.Builder b = Point.builder();
+        Gson gson = Vinli.curApp().gson();
+        boolean hasValidCoordinates = false;
+
+        if(in.peek() == JsonToken.NULL){
+          in.nextNull();
+          return null;
+        }
+
+        in.beginObject();
+
+        while(in.hasNext()) {
+          String name = in.nextName();
+
+          switch(name){
+            case "coordinates":
+              if(in.peek() == JsonToken.NULL){
+                in.nextNull();
+                b.coordinates(null);
+                hasValidCoordinates = false;
+              }else{
+                b.coordinates(gson.<Coordinate>fromJson(in, Coordinate.class));
+                hasValidCoordinates = true;
+              }
+              break;
+            case "type":
+              if(in.peek() == JsonToken.NULL){
+                in.nextNull();
+              }else{
+                in.nextString();
+              }
+              break;
+          }
+        }
+
+        in.endObject();
+
+        if(!hasValidCoordinates){
+          return null;
+        }
+
+        return b.build();
+      }
+    }
+
   }
 }
