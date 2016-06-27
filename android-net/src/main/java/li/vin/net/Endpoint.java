@@ -15,6 +15,7 @@ import com.squareup.okhttp.HttpUrl;
   /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";
   /*package*/ static final String DOMAIN_DEV = "-dev.vin.li";
   /*package*/ static final String DOMAIN_PROD = ".vin.li";
+  /*package*/ static final String DOMAIN_QA = "-qa.vin.li";
 
   private static String domain = DOMAIN_PROD;
 

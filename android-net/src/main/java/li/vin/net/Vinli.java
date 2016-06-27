@@ -113,5 +113,9 @@ public final class Vinli {
     Endpoint.setDomain(Endpoint.DOMAIN_DEMO);
   }
 
+  private static void setEnvironmentToQA() {
+    Endpoint.setDomain(Endpoint.DOMAIN_QA);
+  }
+
   private Vinli() { }
 }
