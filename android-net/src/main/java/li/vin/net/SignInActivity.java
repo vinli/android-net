@@ -114,6 +114,7 @@ public class SignInActivity extends Activity {
 
           try {
             pendingIntent.send(SignInActivity.this, 0, resultIntent);
+            finish();
           } catch (Exception e) {
             Log.d(TAG, "pending intent send error: " + e);
           }
