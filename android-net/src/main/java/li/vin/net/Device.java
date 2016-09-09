@@ -81,7 +81,7 @@ public abstract class Device implements VinliItem {
   }
 
   @SuppressWarnings("unused")
-  private static Device createDevice(final String id, final String name, final String chipId,
+  /*package*/ static Device createDevice(final String id, final String name, final String chipId,
       final String icon) {
     return new AutoParcel_Device(id, new AutoParcel_Device_Links("", "", "", ""), name, chipId,
         icon);

@@ -30,6 +30,8 @@ public final class VinliApp {
 
   private final String mAccessToken;
 
+  /*package*/ static Client client = new OkClient();
+
   public GsonBuilder gsonBuilder() {
     final GsonBuilder gsonB = new GsonBuilder();
 
@@ -58,7 +60,6 @@ public final class VinliApp {
   /*protected*/ VinliApp(@NonNull String accessToken) {
     mAccessToken = accessToken;
 
-    final Client client = new OkClient();
     final RestAdapter.Log logger = new AndroidLog("VinliNet");
 
     mGson = gsonBuilder().create();
@@ -219,6 +220,10 @@ public final class VinliApp {
 
   /*package*/ Messages messages(){
     return mMessages;
+  }
+
+  /*package*/ Diagnostics diagnostics(){
+    return mDiagnostics;
   }
 
   /*package*/ LinkLoader linkLoader() {

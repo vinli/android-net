@@ -31,6 +31,10 @@ public final class Vinli {
 
   private static VinliApp sApp = null;
 
+  /*package*/ static void setCurrentApp(@NonNull VinliApp vinliApp){
+    sApp = vinliApp;
+  }
+
   public static void clearApp(@NonNull Context context) {
     context.getSharedPreferences(VINLI_PREFS, Context.MODE_PRIVATE)
         .edit()
