@@ -626,7 +626,7 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<Vehicle> vehicle(@NonNull String vehicleId) {
-    return Vinli.curApp().vehicles().vehicle(id(), vehicleId).map(Wrapped.<Vehicle>pluckItem());
+    return Vinli.curApp().vehicle(vehicleId);
   }
 
   public Observable<Vehicle> latestVehicle() {
@@ -642,7 +642,7 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<Rule> rule(@NonNull String ruleId) {
-    return Vinli.curApp().rules().rule(id(), ruleId).map(Wrapped.<Rule>pluckItem());
+    return Vinli.curApp().rule(ruleId);
   }
 
   public Observable<TimeSeries<Event>> events() {

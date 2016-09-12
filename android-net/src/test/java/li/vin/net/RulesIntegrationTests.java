@@ -31,6 +31,8 @@ public class RulesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
@@ -47,28 +49,6 @@ public class RulesIntegrationTests {
   }
 
   @Test
-  public void testGetRuleByDeviceIdAndRuleId(){
-    vinliApp.rules().rule(TestHelper.getDeviceId(), TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Wrapped<Rule>>() {
-      @Override
-      public void onCompleted() {
-      }
-
-      @Override
-      public void onError(Throwable e) {
-        assertTrue(false);
-      }
-
-      @Override
-      public void onNext(Wrapped<Rule> ruleWrapped) {
-        Rule rule = ruleWrapped.item();
-
-        assertTrue(rule.id() != null && rule.id().length() > 0);
-        assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
-      }
-    });
-  }
-
-  @Test
   public void getRuleById(){
     vinliApp.rules().rule(TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Wrapped<Rule>>() {
       @Override
@@ -78,6 +58,8 @@ public class RulesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 

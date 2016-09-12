@@ -31,6 +31,8 @@ public class SnapshotsIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 

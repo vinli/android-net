@@ -31,6 +31,8 @@ public class MessagesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
@@ -56,6 +58,8 @@ public class MessagesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 

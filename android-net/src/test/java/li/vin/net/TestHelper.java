@@ -63,6 +63,18 @@ public class TestHelper {
     return "25903ca5-d4dc-40f9-b506-d4870c51107a";
   }
 
+  public static String getOdometerId(){
+    return "08d9e181-6928-453c-a9a6-295fbc69d7aa";
+  }
+
+  public static String getOdometerTriggerId(){
+    return "9da5f762-f715-4a49-9269-0a3935c96186";
+  }
+
+  public static String getEventId(){
+    return "b91fe5f7-d2ab-483d-a38c-d20b859c4be7";
+  }
+
   public static OkHttpClient configureClient(final OkHttpClient client) {
     final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
 

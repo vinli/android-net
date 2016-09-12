@@ -16,11 +16,6 @@ import rx.Observable;
       @Nullable @Query("limit") Integer limit,
       @Nullable @Query("offset") Integer offset);
 
-  @GET("/devices/{deviceId}/vehicles/{vehicleId}")
-  Observable<Wrapped<Vehicle>> vehicle(
-      @NonNull @Path("deviceId") String deviceId,
-      @NonNull @Path("vehicleId") String vehicleId);
-
   @GET("/vehicles/{vehicleId}")
   Observable<Wrapped<Vehicle>> vehicle(
       @NonNull @Path("vehicleId") String vehicleId);

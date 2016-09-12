@@ -12,6 +12,6 @@ import rx.Observable;
   Observable<Page<Dtc>> codes(@NonNull @Path("vehicleId") String vehicleId);
 
   @GET("/codes")
-  Observable<Wrapped<Dtc.Code>> diagnose(@NonNull @Query("number") String number);
+  Observable<Page<Dtc.Code>> diagnose(@NonNull @Query("number") String number);
 
 }

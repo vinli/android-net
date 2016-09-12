@@ -29,6 +29,8 @@ public class VehiclesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
@@ -54,29 +56,7 @@ public class VehiclesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
-        assertTrue(false);
-      }
-
-      @Override
-      public void onNext(Wrapped<Vehicle> vehicleWrapped) {
-        Vehicle vehicle = vehicleWrapped.item();
-        assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
-        assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
-      }
-    });
-  }
-
-  @Test
-  public void testGetVehicleByDeviceAndVehicleId(){
-    vinliApp.vehicles().vehicle(TestHelper.getDeviceId(), TestHelper.getVehicleId()).toBlocking().subscribe(new Subscriber<Wrapped<Vehicle>>() {
-      @Override
-      public void onCompleted() {
-
-      }
-
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error fetching vehicle by device and vehicle id: " + e.getMessage());
+        System.out.println("Error: " + e.getMessage());
         e.printStackTrace();
         assertTrue(false);
       }

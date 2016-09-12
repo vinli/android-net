@@ -30,6 +30,8 @@ public class DiagnosticsIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
@@ -49,21 +51,26 @@ public class DiagnosticsIntegrationTests {
 
   @Test
   public void testDiagnoseCode(){
-    vinliApp.diagnostics().diagnose("P0301").toBlocking().subscribe(new Subscriber<Wrapped<Dtc.Code>>() {
+    vinliApp.diagnostics().diagnose("P0301").toBlocking().subscribe(new Subscriber<Page<Dtc.Code>>() {
       @Override
       public void onCompleted() {
+
       }
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
       @Override
-      public void onNext(Wrapped<Dtc.Code> codeWrapped) {
-        Dtc.Code code = codeWrapped.item();
+      public void onNext(Page<Dtc.Code> codePage) {
+        assertTrue(codePage.getItems().size() > 0);
 
-        assertTrue(code.make() != null && code.make().length() > 0);
+        for(Dtc.Code code : codePage.getItems()){
+          assertTrue(code.make() != null && code.make().length() > 0);
+        }
       }
     });
   }

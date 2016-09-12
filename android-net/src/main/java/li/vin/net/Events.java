@@ -21,4 +21,7 @@ import rx.Observable;
       @Nullable @Query("until") Date until,
       @Nullable @Query("limit") Integer limit);
 
+  @GET("/events/{eventId}")
+  Observable<Wrapped<Event>> event(@NonNull @Path("eventId") String eventId);
+
 }

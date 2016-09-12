@@ -17,9 +17,11 @@ public abstract class Dtc implements VinliItem {
     gb.registerTypeAdapter(Code.class, AutoParcelAdapter.create(AutoParcel_Dtc_Code.class));
     gb.registerTypeAdapter(Code.TwoByte.class, AutoParcelAdapter.create(AutoParcel_Dtc_Code_TwoByte.class));
     gb.registerTypeAdapter(Code.ThreeByte.class, AutoParcelAdapter.create(AutoParcel_Dtc_Code_ThreeByte.class));
-    gb.registerTypeAdapter(Code.WRAPPED_TYPE, Wrapped.Adapter.create(Code.class));
-    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Dtc.class));
+    gb.registerTypeAdapter(Code.WRAPPED_TYPE, Wrapped.Adapter.create(Code.class, "code"));
+    gb.registerTypeAdapter(Code.PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Code.class, "codes"));
+    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Dtc.class, "codes"));
   }
+
   public abstract String start();
   public abstract String stop();
   public abstract String number();
@@ -52,8 +54,9 @@ public abstract class Dtc implements VinliItem {
   }
 
   @AutoParcel
-  public static abstract class Code implements Parcelable {
+  public static abstract class Code implements VinliItem {
     /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Code>>() { }.getType();
+    /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Code>>() { }.getType();
 
     public abstract String make();
 

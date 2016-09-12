@@ -23,6 +23,7 @@ public final class VinliApp {
   private final Subscriptions mSubscriptions;
   private final Users mUsers;
   private final Trips mTrips;
+  private final Distances mDistances;
   private final Messages mMessages;
 
   private final Gson mGson;
@@ -50,6 +51,10 @@ public final class VinliApp {
     Notification.registerGson(gsonB);
     User.registerGson(gsonB);
     Trip.registerGson(gsonB);
+    DistanceList.registerGson(gsonB);
+    Odometer.registerGson(gsonB);
+    OdometerTrigger.registerGson(gsonB);
+    Dtc.registerGson(gsonB);
     StreamMessage.ParametricFilter.registerGson(gsonB);
     StreamMessage.GeometryFilter.registerGson(gsonB);
     Message.registerGson(gsonB);
@@ -141,6 +146,16 @@ public final class VinliApp {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Trips.class);
+
+    mDistances = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.DISTANCE)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Distances.class);
   }
 
   public String getAccessToken() {
@@ -167,7 +182,7 @@ public final class VinliApp {
   }
 
   public Observable<Dtc.Code> diagnoseDtcCode(String number) {
-    return mDiagnostics.diagnose(number).map(Wrapped.<Dtc.Code>pluckItem());
+    return mDiagnostics.diagnose(number).flatMap(Page.<Dtc.Code>allItems());
   }
 
   public Observable<User> currentUser() {
@@ -184,6 +199,14 @@ public final class VinliApp {
 
   public Observable<Subscription> subscription(@NonNull String subscriptionId) {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
+  }
+
+  public Observable<Odometer> odometerReport(@NonNull String odometerId){
+    return mDistances.odometerReport(odometerId).map(Wrapped.<Odometer>pluckItem());
+  }
+
+  public Observable<OdometerTrigger> odometerTrigger(@NonNull String odometerTriggerId) {
+    return mDistances.odometerTrigger(odometerTriggerId).map(Wrapped.<OdometerTrigger>pluckItem());
   }
 
   public Observable<Message> message(@NonNull String messageId){
@@ -216,6 +239,10 @@ public final class VinliApp {
 
   /*package*/ Trips trips() {
     return mTrips;
+  }
+
+  /*package*/ Distances distances() {
+      return mDistances;
   }
 
   /*package*/ Messages messages(){

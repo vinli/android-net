@@ -31,6 +31,8 @@ public class EventsIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
         assertTrue(false);
       }
 
@@ -46,5 +48,33 @@ public class EventsIntegrationTests {
         }
       }
     });
+  }
+
+  @Test
+  public void testGetEventById(){
+    vinliApp.events().event(TestHelper.getEventId())
+        .map(Wrapped.<Event>pluckItem())
+        .toBlocking()
+        .subscribe(new Subscriber<Event>() {
+          @Override
+          public void onCompleted() {
+
+          }
+
+          @Override
+          public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override
+          public void onNext(Event event) {
+            assertTrue(event.id() != null && event.id().length() > 0);
+            assertTrue(event.timestamp() != null && event.timestamp().length() > 0);
+            assertTrue(event.deviceId() != null && event.deviceId().length() > 0);
+            assertTrue(event.eventType() != null && event.eventType().length() > 0);
+          }
+        });
   }
 }
