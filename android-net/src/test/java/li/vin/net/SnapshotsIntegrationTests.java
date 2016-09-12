@@ -18,11 +18,15 @@ public class SnapshotsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void getSnapshotsByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.snapshots().snapshots(TestHelper.getDeviceId(), "vehicleSpeed", null, null, null, null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Snapshot>>() {
       @Override

@@ -18,11 +18,15 @@ public class DiagnosticsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetCodesByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.diagnostics().codes(TestHelper.getVehicleId()).toBlocking().subscribe(new Subscriber<Page<Dtc>>() {
       @Override
       public void onCompleted() {

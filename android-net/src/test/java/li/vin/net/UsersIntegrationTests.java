@@ -18,6 +18,8 @@ public class UsersIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 

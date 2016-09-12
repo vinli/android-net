@@ -18,6 +18,8 @@ public class DevicesIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
@@ -31,7 +33,6 @@ public class DevicesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
         e.printStackTrace();
         assertTrue(false);
       }
@@ -50,6 +51,8 @@ public class DevicesIntegrationTests {
 
   @Test
   public void testGetDeviceById(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.device(TestHelper.getDeviceId()).toBlocking().subscribe(new Subscriber<Device>() {
       @Override
       public void onCompleted() {
@@ -58,7 +61,6 @@ public class DevicesIntegrationTests {
 
       @Override
       public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
         e.printStackTrace();
         assertTrue(false);
       }

@@ -18,11 +18,15 @@ public class RulesIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetRulesByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.rules().rules(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Rule>>() {
       @Override
       public void onCompleted() {
@@ -50,6 +54,8 @@ public class RulesIntegrationTests {
 
   @Test
   public void getRuleById(){
+    assertTrue(TestHelper.getRuleId() != null);
+
     vinliApp.rules().rule(TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Wrapped<Rule>>() {
       @Override
       public void onCompleted() {

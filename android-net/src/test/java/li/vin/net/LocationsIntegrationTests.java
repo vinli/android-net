@@ -18,11 +18,15 @@ public class LocationsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetLocationsByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.locations().locations(TestHelper.getDeviceId(), null, null, null, null, null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Location>>() {
       @Override

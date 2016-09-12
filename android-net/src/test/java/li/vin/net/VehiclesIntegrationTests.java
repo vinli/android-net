@@ -18,11 +18,15 @@ public class VehiclesIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetVehicleByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.vehicles().vehicles(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Vehicle>>() {
       @Override
       public void onCompleted() {}
@@ -48,6 +52,8 @@ public class VehiclesIntegrationTests {
 
   @Test
   public void testGetVehicleById(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.vehicles().vehicle(TestHelper.getVehicleId()).toBlocking().subscribe(new Subscriber<Wrapped<Vehicle>>() {
       @Override
       public void onCompleted() {

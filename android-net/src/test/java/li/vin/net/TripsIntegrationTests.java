@@ -18,11 +18,14 @@ public class TripsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void getTripsByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
     vinliApp.trips().trips(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Trip>>() {
       @Override
       public void onCompleted() {
@@ -53,6 +56,8 @@ public class TripsIntegrationTests {
 
   @Test
   public void getTripsByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.trips().vehicleTrips(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Trip>>() {
       @Override
       public void onCompleted() {
@@ -83,6 +88,8 @@ public class TripsIntegrationTests {
 
   @Test
   public void getTripById(){
+    assertTrue(TestHelper.getTripId() != null);
+
     vinliApp.trips().trip(TestHelper.getTripId()).toBlocking().subscribe(new Subscriber<Wrapped<Trip>>() {
       @Override
       public void onCompleted() {

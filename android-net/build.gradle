@@ -1,3 +1,7 @@
+def integrationPropertiesFile = rootProject.file("android-net/integration.properties");
+def integrationProperties = new Properties();
+integrationProperties.load(new FileInputStream(integrationPropertiesFile));
+
 buildscript {
     repositories {
         mavenCentral()
@@ -28,6 +32,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "ACCESS_TOKEN", "\"" + integrationProperties['ACCESS_TOKEN'] + "\"")
+            buildConfigField("String", "DEVICE_ID", "\"" + integrationProperties['DEVICE_ID'] + "\"")
+            buildConfigField("String", "SUBSCRIPTION_ID", "\"" + integrationProperties['SUBSCRIPTION_ID'] + "\"")
+            buildConfigField("String", "RULE_ID", "\"" + integrationProperties['RULE_ID'] + "\"")
+            buildConfigField("String", "VEHICLE_ID", "\"" + integrationProperties['VEHICLE_ID'] + "\"")
+            buildConfigField("String", "EVENT_ID", "\"" + integrationProperties['EVENT_ID'] + "\"")
+            buildConfigField("String", "NOTIFICATION_ID", "\"" + integrationProperties['NOTIFICATION_ID'] + "\"")
+            buildConfigField("String", "MESSAGE_ID", "\"" + integrationProperties['MESSAGE_ID'] + "\"")
+            buildConfigField("String", "TRIP_ID", "\"" + integrationProperties['TRIP_ID'] + "\"")
+            buildConfigField("String", "ODO_ID", "\"" + integrationProperties['ODO_ID'] + "\"")
+            buildConfigField("String", "ODO_TRIGGER_ID", "\"" + integrationProperties['ODO_TRIGGER_ID'] + "\"")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

@@ -19,11 +19,15 @@ public class DistancesIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetDistancesByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.distances().distances(TestHelper.getVehicleId(), null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
       @Override
       public void onCompleted() {
@@ -51,6 +55,8 @@ public class DistancesIntegrationTests {
 
   @Test
   public void getBestDistanceByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.distances().bestDistance(TestHelper.getVehicleId(), null).toBlocking().subscribe(new Subscriber<Wrapped<Distance>>() {
       @Override
       public void onCompleted() {
@@ -76,6 +82,8 @@ public class DistancesIntegrationTests {
 
   @Test
   public void getOdometerReportsByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.distances().odometerReports(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
       @Override
       public void onCompleted() {
@@ -104,6 +112,8 @@ public class DistancesIntegrationTests {
 
   @Test
   public void getOdometerById(){
+    assertTrue(TestHelper.getOdometerId() != null);
+
     vinliApp.distances().odometerReport(TestHelper.getOdometerId()).toBlocking().subscribe(new Subscriber<Wrapped<Odometer>>() {
       @Override
       public void onCompleted() {
@@ -131,6 +141,8 @@ public class DistancesIntegrationTests {
 
   @Test
   public void getOdometerTriggersByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
     vinliApp.distances().odometerTriggers(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
       @Override
       public void onCompleted() {
@@ -159,6 +171,8 @@ public class DistancesIntegrationTests {
 
   @Test
   public void getOdometerTriggerById(){
+    assertTrue(TestHelper.getOdometerTriggerId() != null);
+
     vinliApp.distances().odometerTrigger(TestHelper.getOdometerTriggerId()).toBlocking().subscribe(new Subscriber<Wrapped<OdometerTrigger>>() {
       @Override
       public void onCompleted() {

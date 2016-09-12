@@ -18,11 +18,15 @@ public class MessagesIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void getMessagesByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.messages().messages(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Message>>() {
       @Override
       public void onCompleted() {
@@ -50,6 +54,8 @@ public class MessagesIntegrationTests {
 
   @Test
   public void getMessageById(){
+    assertTrue(TestHelper.getMessageId() != null);
+
     vinliApp.messages().message(TestHelper.getMessageId()).toBlocking().subscribe(new Subscriber<Wrapped<Message>>() {
       @Override
       public void onCompleted() {

@@ -18,11 +18,15 @@ public class SubscriptionsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void getSubscriptionByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.subscriptions().subscriptions(TestHelper.getDeviceId(), null, null, null, null).subscribe(new Subscriber<Page<Subscription>>() {
       @Override
       public void onCompleted() {
@@ -50,6 +54,8 @@ public class SubscriptionsIntegrationTests {
 
   @Test
   public void getSubscriptionById(){
+    assertTrue(TestHelper.getSubscriptionId() != null);
+
     vinliApp.subscriptions().subscription(TestHelper.getSubscriptionId()).toBlocking().subscribe(new Subscriber<Wrapped<Subscription>>() {
       @Override
       public void onCompleted() {

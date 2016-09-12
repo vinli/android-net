@@ -35,44 +35,54 @@ public class TestHelper {
     return vinliApp;
   }
 
-  private static String getAccessToken(){
-    return "P_yGeltXI_TvY7yg3EQ7jX_ZBMB2jamKbNZ9K7Ke5EuMYwyyRRvgbQJjsoVJ7b_k";
+  public static String getAccessToken(){
+    String accessToken = BuildConfig.ACCESS_TOKEN;
+    return accessToken.equals("DEFAULT_ACCESS_TOKEN") ? null : accessToken;
   }
 
   public static String getDeviceId(){
-    return "82ea8053-aff0-4f51-b075-bd90fbec9d41";
+    String deviceId = BuildConfig.DEVICE_ID;
+    return deviceId.equals("DEFAULT_DEVICE_ID") ? null : deviceId;
   }
 
   public static String getVehicleId(){
-    return "78659a96-3b9f-4279-9c88-f965b8faa999";
+    String vehicleId = BuildConfig.VEHICLE_ID;
+    return vehicleId.equals("DEFAULT_VEHICLE_ID") ? null : vehicleId;
   }
 
   public static String getTripId(){
-    return "ab2d692a-5361-45af-b791-1071541616b5";
+    String tripId = BuildConfig.TRIP_ID;
+    return tripId.equals("DEFAULT_TRIP_ID") ? null : tripId;
   }
 
   public static String getMessageId(){
-    return "6b2739a7-5fce-4448-9d69-8faa2f8d3ae0";
+    String messageId = BuildConfig.MESSAGE_ID;
+    return messageId.equals("DEFAULT_MESSAGE_ID") ? null : messageId;
   }
 
   public static String getRuleId(){
-    return "02d4e5c7-befe-4293-bcfb-ca4376ab8237";
+    String ruleId = BuildConfig.RULE_ID;
+    return ruleId.equals("DEFAULT_RULE_ID") ? null : ruleId;
   }
 
   public static String getSubscriptionId(){
-    return "25903ca5-d4dc-40f9-b506-d4870c51107a";
+    String subscriptionId = BuildConfig.SUBSCRIPTION_ID;
+    return subscriptionId.equals("DEFAULT_SUBSCRIPTION_ID") ? null : subscriptionId;
   }
 
   public static String getOdometerId(){
-    return "08d9e181-6928-453c-a9a6-295fbc69d7aa";
+    String odometerId = BuildConfig.ODO_ID;
+    return odometerId.equals("DEFAULT_ODO_ID") ? null : odometerId;
   }
 
   public static String getOdometerTriggerId(){
-    return "9da5f762-f715-4a49-9269-0a3935c96186";
+    String odometerTriggerId = BuildConfig.ODO_TRIGGER_ID;
+    return odometerTriggerId.equals("DEFAULT_ODO_TRIGGER_ID") ? null : odometerTriggerId;
   }
 
   public static String getEventId(){
-    return "b91fe5f7-d2ab-483d-a38c-d20b859c4be7";
+    String eventId = BuildConfig.EVENT_ID;
+    return eventId.equals("DEFAULT_EVENT_ID") ? null : eventId;
   }
 
   public static OkHttpClient configureClient(final OkHttpClient client) {

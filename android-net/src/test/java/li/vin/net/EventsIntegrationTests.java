@@ -18,11 +18,15 @@ public class EventsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void testGetEventsByDeviceId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
     vinliApp.events().events(TestHelper.getDeviceId(), null, null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Event>>() {
 
       @Override
@@ -52,6 +56,8 @@ public class EventsIntegrationTests {
 
   @Test
   public void testGetEventById(){
+    assertTrue(TestHelper.getEventId() != null);
+
     vinliApp.events().event(TestHelper.getEventId())
         .map(Wrapped.<Event>pluckItem())
         .toBlocking()

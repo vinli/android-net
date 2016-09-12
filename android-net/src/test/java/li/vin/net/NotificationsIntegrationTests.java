@@ -20,11 +20,15 @@ public class NotificationsIntegrationTests {
 
   @Before
   public void setup(){
+    assertTrue(TestHelper.getAccessToken() != null);
+
     vinliApp = TestHelper.getVinliApp();
   }
 
   @Test
   public void getNoficationsFromEvent(){
+    assertTrue(TestHelper.getEventId() != null);
+
     vinliApp.events().event(TestHelper.getEventId())
         .map(Wrapped.<Event>pluckItem())
         .flatMap(new Func1<Event, Observable<Page<Notification>>>() {
