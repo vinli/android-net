@@ -45,9 +45,15 @@ android {
 }
 
 dependencies {
+
+    compile 'com.squareup.duktape:duktape-android:0.9.5'
+
     compile 'com.squareup.okhttp:okhttp:2.4.+'
+    compile 'com.squareup.okhttp:okhttp-ws:2.4.+'
     compile 'com.squareup.retrofit:retrofit:1.9.+'
     compile 'io.reactivex:rxandroid:1.+'
+    compile 'io.reactivex:rxjava:1.+'
+    compile 'com.google.code.gson:gson:2.+'
     compile 'com.android.support:support-annotations:22.2.+'
     compile 'com.github.frankiesardo:auto-parcel:0.3'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3'

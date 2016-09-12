@@ -5,6 +5,9 @@ import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.Date;
+
+import auto.parcel.AutoParcel;
 import rx.Observable;
 
 @AutoParcel
@@ -18,20 +21,22 @@ public abstract class Vehicle implements VinliItem {
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Vehicle.class));
   }
 
-  public abstract String make();
-  public abstract String model();
-  public abstract String year();
-  public abstract String trim();
-  public abstract String vin();
+  @Nullable public abstract String make();
+  @Nullable public abstract String model();
+  @Nullable public abstract String year();
+  @Nullable public abstract String trim();
+  @Nullable public abstract String vin();
 
-  public Observable<Page<Trip>> trips() {
-    return Vinli.curApp().trips().vehicleTrips(id(), null, null);
+  public Observable<TimeSeries<Trip>> trips() {
+    return Vinli.curApp().trips().vehicleTrips(id(), null, null, null, null);
   }
 
-  public Observable<Page<Trip>> trips(
+  public Observable<TimeSeries<Trip>> trips(
+      @Nullable Date since,
+      @Nullable Date until,
       @Nullable Integer limit,
-      @Nullable Integer offset) {
-    return Vinli.curApp().trips().vehicleTrips(id(), limit, offset);
+      @Nullable String sortDir) {
+    return Vinli.curApp().trips().vehicleTrips(id(), since, until, limit, sortDir);
   }
 
   public Observable<DistanceList> distances(){

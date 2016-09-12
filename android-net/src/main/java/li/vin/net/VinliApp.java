@@ -24,15 +24,15 @@ public final class VinliApp {
   private final Users mUsers;
   private final Trips mTrips;
   private final Distances mDistances;
+  private final Messages mMessages;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
 
-  /*protected*/ VinliApp(@NonNull String accessToken) {
-    final GsonBuilder gsonB = new GsonBuilder();
+  private final String mAccessToken;
 
-    final Client client = new OkClient();
-    final RestAdapter.Log logger = new AndroidLog("VinliNet");
+  public GsonBuilder gsonBuilder() {
+    final GsonBuilder gsonB = new GsonBuilder();
 
     Device.registerGson(gsonB);
     Rule.registerGson(gsonB);
@@ -52,8 +52,20 @@ public final class VinliApp {
     DistanceList.registerGson(gsonB);
     Odometer.registerGson(gsonB);
     OdometerTrigger.registerGson(gsonB);
+    StreamMessage.ParametricFilter.registerGson(gsonB);
+    StreamMessage.GeometryFilter.registerGson(gsonB);
+    Message.registerGson(gsonB);
 
-    mGson = gsonB.create();
+    return gsonB;
+  }
+
+  /*protected*/ VinliApp(@NonNull String accessToken) {
+    mAccessToken = accessToken;
+
+    final Client client = new OkClient();
+    final RestAdapter.Log logger = new AndroidLog("VinliNet");
+
+    mGson = gsonBuilder().create();
 
     final GsonConverter gson = new GsonConverter(mGson);
 
@@ -63,8 +75,7 @@ public final class VinliApp {
 
     final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
 
-    final RestAdapter platformAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.PLATFORM)
+    final RestAdapter platformAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.PLATFORM)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -75,8 +86,7 @@ public final class VinliApp {
     mDevices = platformAdapter.create(Devices.class);
     mVehicles = platformAdapter.create(Vehicles.class);
 
-    mDiagnostics = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.DIAGNOSTICS)
+    mDiagnostics = new RestAdapter.Builder().setEndpoint(Endpoint.DIAGNOSTICS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -85,8 +95,7 @@ public final class VinliApp {
         .build()
         .create(Diagnostics.class);
 
-    mRules = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.RULES)
+    mRules = new RestAdapter.Builder().setEndpoint(Endpoint.RULES)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -95,8 +104,7 @@ public final class VinliApp {
         .build()
         .create(Rules.class);
 
-    final RestAdapter eventsAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.EVENTS)
+    final RestAdapter eventsAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.EVENTS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -107,8 +115,7 @@ public final class VinliApp {
     mEvents = eventsAdapter.create(Events.class);
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
 
-    final RestAdapter telemAdapter = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.TELEMETRY)
+    final RestAdapter telemAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.TELEMETRY)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -118,9 +125,9 @@ public final class VinliApp {
 
     mLocations = telemAdapter.create(Locations.class);
     mSnapshots = telemAdapter.create(Snapshots.class);
+    mMessages = telemAdapter.create(Messages.class);
 
-    mUsers = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.AUTH)
+    mUsers = new RestAdapter.Builder().setEndpoint(Endpoint.AUTH)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -129,8 +136,7 @@ public final class VinliApp {
         .build()
         .create(Users.class);
 
-    mTrips = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.TRIPS)
+    mTrips = new RestAdapter.Builder().setEndpoint(Endpoint.TRIPS)
         .setLog(logger)
         .setLogLevel(logLevel)
         .setClient(client)
@@ -150,6 +156,10 @@ public final class VinliApp {
         .create(Distances.class);
   }
 
+  public String getAccessToken() {
+    return mAccessToken;
+  }
+
   public Observable<Page<Device>> devices() {
     return mDevices.devices(null, null);
   }
@@ -157,9 +167,7 @@ public final class VinliApp {
   /**
    * Pass null for default
    */
-  public Observable<Page<Device>> devices(
-      @Nullable Integer limit,
-      @Nullable Integer offset) {
+  public Observable<Page<Device>> devices(@Nullable Integer limit, @Nullable Integer offset) {
     return mDevices.devices(limit, offset);
   }
 
@@ -195,8 +203,12 @@ public final class VinliApp {
     return mDistances.odometerReport(odometerId).map(Wrapped.<Odometer>pluckItem());
   }
 
-  public Observable<OdometerTrigger> odometerTrigger(@NonNull String odometerTriggerId){
+  public Observable<OdometerTrigger> odometerTrigger(@NonNull String odometerTriggerId) {
     return mDistances.odometerTrigger(odometerTriggerId).map(Wrapped.<OdometerTrigger>pluckItem());
+  }
+
+  public Observable<Message> message(@NonNull String messageId){
+    return mMessages.message(messageId).map(Wrapped.<Message>pluckItem());
   }
 
   /*package*/ Vehicles vehicles() {
@@ -227,8 +239,12 @@ public final class VinliApp {
     return mTrips;
   }
 
-  /*package*/ Distances distances(){
-    return mDistances;
+  /*package*/ Distances distances() {
+      return mDistances;
+  }
+
+  /*package*/ Messages messages(){
+    return mMessages;
   }
 
   /*package*/ LinkLoader linkLoader() {
@@ -247,7 +263,8 @@ public final class VinliApp {
       mBearer = "Bearer " + accessToken;
     }
 
-    @Override public void intercept(RequestFacade request) {
+    @Override
+    public void intercept(RequestFacade request) {
       request.addHeader(AUTH, mBearer);
     }
   }
