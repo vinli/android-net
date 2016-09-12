@@ -42,7 +42,7 @@ public class SnapshotsIntegrationTests {
 
         for(Snapshot snapshot : snapshotTimeSeries.getItems()){
           assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
-          assertTrue(snapshot.dataKeys() != null && snapshot.dataKeys().size() > 0);
+          assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
         }
       }
     });
