@@ -1,9 +1,9 @@
 package li.vin.net;
 
 import android.support.annotation.Nullable;
+import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.util.Date;
 
@@ -37,6 +37,38 @@ public abstract class Vehicle implements VinliItem {
       @Nullable Integer limit,
       @Nullable String sortDir) {
     return Vinli.curApp().trips().vehicleTrips(id(), since, until, limit, sortDir);
+  }
+
+  public Observable<DistanceList> distances(){
+    return distances(null, null, null);
+  }
+
+  public Observable<DistanceList> distances(@Nullable String since, @Nullable String until, @Nullable DistanceUnit unit){
+    return Vinli.curApp().distances().distances(id(), since, until, (unit == null) ? null : unit.getDistanceUnitStr());
+  }
+
+  public Observable<DistanceList.Distance> bestDistance(){
+    return bestDistance(null);
+  }
+
+  public Observable<DistanceList.Distance> bestDistance(@Nullable DistanceUnit unit){
+    return Vinli.curApp().distances().bestDistance(id(), (unit == null) ? null : unit.getDistanceUnitStr()).map(Wrapped.<DistanceList.Distance>pluckItem());
+  }
+
+  public Observable<TimeSeries<Odometer>> odometerReports(){
+    return odometerReports(null, null);
+  }
+
+  public Observable<TimeSeries<Odometer>> odometerReports(@Nullable String since, @Nullable String until){
+    return Vinli.curApp().distances().odometerReports(id(), since, until);
+  }
+
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(){
+    return odometerTriggers(null, null);
+  }
+
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable String since, @Nullable String until){
+    return Vinli.curApp().distances().odometerTriggers(id(), since, until);
   }
 
   /*package*/ Vehicle() { }
