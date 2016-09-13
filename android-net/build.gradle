@@ -82,4 +82,7 @@ dependencies {
 }
 
 apply from: file('../gradle/mavenize.gradle')
-apply from: file('../gradle/bintray-upload.gradle')
+
+if(!integrationProperties['CI_ENV']) {
+    apply from: file('../gradle/bintray-upload.gradle')
+}
