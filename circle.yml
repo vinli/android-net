@@ -11,3 +11,5 @@ dependencies:
 test:
   override:
     - .build/android-net/test.sh
+  post:
+    - .build/android-net/posttest.sh
