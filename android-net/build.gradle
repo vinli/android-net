@@ -21,12 +21,12 @@ apply from: file('../gradle/javadoc.gradle')
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -71,7 +71,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.+'
     compile 'io.reactivex:rxjava:1.+'
     compile 'com.google.code.gson:gson:2.+'
-    compile 'com.android.support:support-annotations:22.2.+'
+    compile 'com.android.support:support-annotations:24.2.1'
     compile 'com.github.frankiesardo:auto-parcel:0.3'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
