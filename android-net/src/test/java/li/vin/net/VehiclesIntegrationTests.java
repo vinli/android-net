@@ -10,69 +10,93 @@ import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 22)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 22)
 public class VehiclesIntegrationTests {
 
   public VinliApp vinliApp;
 
-  @Before
-  public void setup(){
+  @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
   }
 
-  @Test
-  public void testGetVehicleByDeviceId(){
+  @Test public void testGetVehicleByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.vehicles().vehicles(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Vehicle>>() {
-      @Override
-      public void onCompleted() {}
+    vinliApp.vehicles()
+        .vehicles(TestHelper.getDeviceId(), null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Vehicle>>() {
+          @Override public void onCompleted() {
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Page<Vehicle> vehiclePage) {
-        assertTrue(vehiclePage.getItems().size() > 0);
+          @Override public void onNext(Page<Vehicle> vehiclePage) {
+            assertTrue(vehiclePage.getItems().size() > 0);
 
-        for(Vehicle vehicle : vehiclePage.getItems()){
-          assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
-          assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
-        }
-      }
-    });
+            for (Vehicle vehicle : vehiclePage.getItems()) {
+              assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+              assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+            }
+          }
+        });
   }
 
-  @Test
-  public void testGetVehicleById(){
+  @Test public void testGetVehicleWithLimitOffsetByDeviceId() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.vehicles()
+        .vehicles(TestHelper.getDeviceId(), 5, 1)
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Vehicle>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Page<Vehicle> vehiclePage) {
+            assertTrue(vehiclePage.getItems().size() <= 5);
+
+            for (Vehicle vehicle : vehiclePage.getItems()) {
+              assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+              assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+            }
+          }
+        });
+  }
+
+  @Test public void testGetVehicleById() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.vehicles().vehicle(TestHelper.getVehicleId()).toBlocking().subscribe(new Subscriber<Wrapped<Vehicle>>() {
-      @Override
-      public void onCompleted() {
+    vinliApp.vehicles()
+        .vehicle(TestHelper.getVehicleId())
+        .toBlocking()
+        .subscribe(new Subscriber<Wrapped<Vehicle>>() {
+          @Override public void onCompleted() {
 
-      }
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Wrapped<Vehicle> vehicleWrapped) {
-        Vehicle vehicle = vehicleWrapped.item();
-        assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
-        assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
-      }
-    });
+          @Override public void onNext(Wrapped<Vehicle> vehicleWrapped) {
+            Vehicle vehicle = vehicleWrapped.item();
+            assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+            assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+          }
+        });
   }
 }

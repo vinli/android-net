@@ -9,73 +9,99 @@ import org.robolectric.annotation.Config;
 import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
+import static li.vin.net.TestHelper.getDeviceId;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 22)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 22)
 public class MessagesIntegrationTests {
 
   public VinliApp vinliApp;
 
-  @Before
-  public void setup(){
+  @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
   }
 
-  @Test
-  public void getMessagesByDeviceId(){
-    assertTrue(TestHelper.getDeviceId() != null);
+  @Test public void getMessagesByDeviceId() {
+    assertTrue(getDeviceId() != null);
 
-    vinliApp.messages().messages(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Message>>() {
-      @Override
-      public void onCompleted() {
+    vinliApp.messages()
+        .messages(getDeviceId(), null, null, null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
 
-      }
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(TimeSeries<Message> messageTimeSeries) {
-        assertTrue(messageTimeSeries.getItems().size() > 0);
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            assertTrue(messageTimeSeries.getItems().size() > 0);
 
-        for(Message message : messageTimeSeries.getItems()){
-          assertTrue(message.id() != null && message.id().length() > 0);
-          assertTrue(message.timestamp != null && message.timestamp.length() > 0);
-        }
-      }
-    });
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+          }
+        });
   }
 
-  @Test
-  public void getMessageById(){
+  @Test public void getMessagesWithSinceUntilLimitByDeviceId() {
+    assertTrue(getDeviceId() != null);
+
+    vinliApp.messages()
+        .messages(getDeviceId(), 0L, System.currentTimeMillis(), 5, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            assertTrue(messageTimeSeries.getItems().size() > 0);
+            assertTrue(messageTimeSeries.getItems().size() <= 5);
+
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+          }
+        });
+  }
+
+  @Test public void getMessageById() {
     assertTrue(TestHelper.getMessageId() != null);
 
-    vinliApp.messages().message(TestHelper.getMessageId()).toBlocking().subscribe(new Subscriber<Wrapped<Message>>() {
-      @Override
-      public void onCompleted() {
+    vinliApp.messages()
+        .message(TestHelper.getMessageId())
+        .toBlocking()
+        .subscribe(new Subscriber<Wrapped<Message>>() {
+          @Override public void onCompleted() {
 
-      }
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Wrapped<Message> messageWrapped) {
-        Message message = messageWrapped.item();
+          @Override public void onNext(Wrapped<Message> messageWrapped) {
+            Message message = messageWrapped.item();
 
-        assertTrue(message.id() != null && message.id().length() > 0);
-        assertTrue(message.timestamp != null && message.timestamp.length() > 0);
-      }
-    });
+            assertTrue(message.id() != null && message.id().length() > 0);
+            assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+          }
+        });
   }
 }
