@@ -651,7 +651,9 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit) {
-    return Vinli.curApp().events().events(id(), type, objectId, since, until, limit);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit);
   }
 
   public Observable<TimeSeries<Location>> locations() {
@@ -660,7 +662,9 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Location>> locations(@Nullable String fields, @Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
-    return Vinli.curApp().locations().locations(id(), fields, until, since, limit, sortDir);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().locations().locations(id(), fields, untilMs, sinceMs, limit, sortDir);
   }
 
   public Observable<Location> latestlocation() {
@@ -674,7 +678,9 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Snapshot>> snapshots(@Nullable String fields, @Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
-    return Vinli.curApp().snapshots().snapshots(id(), fields, until, since, limit, sortDir);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().snapshots().snapshots(id(), fields, untilMs, sinceMs, limit, sortDir);
   }
 
   public Observable<Page<Subscription>> subscriptions() {
@@ -701,7 +707,9 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Trip>> trips(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
-    return Vinli.curApp().trips().trips(id(), since, until, limit, sortDir);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().trips().trips(id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<Message>> messages() {
@@ -710,7 +718,9 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
-    return Vinli.curApp().messages().messages(id(), since, until, limit, sortDir);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().messages().messages(id(), sinceMs, untilMs, limit, sortDir);
   }
 
   @AutoParcel

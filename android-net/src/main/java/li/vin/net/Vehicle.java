@@ -6,8 +6,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Date;
-
-import auto.parcel.AutoParcel;
 import rx.Observable;
 
 @AutoParcel
@@ -36,7 +34,9 @@ public abstract class Vehicle implements VinliItem {
       @Nullable Date until,
       @Nullable Integer limit,
       @Nullable String sortDir) {
-    return Vinli.curApp().trips().vehicleTrips(id(), since, until, limit, sortDir);
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().trips().vehicleTrips(id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<DistanceList> distances(){
