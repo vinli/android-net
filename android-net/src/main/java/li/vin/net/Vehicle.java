@@ -71,5 +71,9 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().distances().odometerTriggers(id(), since, until);
   }
 
+  public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
+    return Vinli.curApp().collisions().collisionsByVehicle(this.id(), limit, offset);
+  }
+
   /*package*/ Vehicle() { }
 }

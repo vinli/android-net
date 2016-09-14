@@ -85,6 +85,11 @@ public class TestHelper {
     return eventId.equals("DEFAULT_EVENT_ID") ? null : eventId;
   }
 
+  public static String getCollisionId(){
+    String collisionId = BuildConfig.COLLISION_ID;
+    return collisionId.equals("DEFAULT_COLLISION_ID") ? null : collisionId;
+  }
+
   public static OkHttpClient configureClient(final OkHttpClient client) {
     final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
 

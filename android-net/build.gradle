@@ -44,6 +44,7 @@ android {
             buildConfigField("String", "TRIP_ID", "\"" + integrationProperties['TRIP_ID'] + "\"")
             buildConfigField("String", "ODO_ID", "\"" + integrationProperties['ODO_ID'] + "\"")
             buildConfigField("String", "ODO_TRIGGER_ID", "\"" + integrationProperties['ODO_TRIGGER_ID'] + "\"")
+            buildConfigField("String", "COLLISION_ID", "\"" + integrationProperties['COLLISION_ID'] + "\"")
         }
         release {
             minifyEnabled false

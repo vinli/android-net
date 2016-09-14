@@ -25,6 +25,7 @@ public final class VinliApp {
   private final Trips mTrips;
   private final Distances mDistances;
   private final Messages mMessages;
+  private final Collisions mCollisions;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -58,6 +59,7 @@ public final class VinliApp {
     StreamMessage.ParametricFilter.registerGson(gsonB);
     StreamMessage.GeometryFilter.registerGson(gsonB);
     Message.registerGson(gsonB);
+    Collision.registerGson(gsonB);
 
     return gsonB;
   }
@@ -156,6 +158,16 @@ public final class VinliApp {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Distances.class);
+
+    mCollisions = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.SAFETY)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Collisions.class);
   }
 
   public String getAccessToken() {
@@ -195,6 +207,10 @@ public final class VinliApp {
 
   public Observable<Rule> rule(@NonNull String ruleId) {
     return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
+  }
+
+  public Observable<Collision> collision(@NonNull String collisionId){
+    return mCollisions.collision(collisionId).map(Wrapped.<Collision>pluckItem());
   }
 
   public Observable<Subscription> subscription(@NonNull String subscriptionId) {
@@ -251,6 +267,10 @@ public final class VinliApp {
 
   /*package*/ Diagnostics diagnostics(){
     return mDiagnostics;
+  }
+
+  /*package*/ Collisions collisions(){
+    return mCollisions;
   }
 
   /*package*/ LinkLoader linkLoader() {

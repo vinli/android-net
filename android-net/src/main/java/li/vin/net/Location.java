@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -51,6 +52,11 @@ public abstract class Location implements VinliItem {
     @Override public Location read(JsonReader in) throws IOException {
       if (gson == null) {
         gson = Vinli.curApp().gson();
+      }
+
+      if(in.peek() == JsonToken.NULL){
+        in.nextNull();
+        return null;
       }
 
       final Location.Builder b = new AutoParcel_Location.Builder();

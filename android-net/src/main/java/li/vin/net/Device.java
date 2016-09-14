@@ -723,6 +723,10 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().messages().messages(id(), sinceMs, untilMs, limit, sortDir);
   }
 
+  public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
+    return Vinli.curApp().collisions().collisionsByDevice(this.id(), limit, offset);
+  }
+
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
