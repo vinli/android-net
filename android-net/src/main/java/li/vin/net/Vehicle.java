@@ -44,7 +44,8 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<DistanceList> distances(@Nullable String since, @Nullable String until, @Nullable DistanceUnit unit){
-    return Vinli.curApp().distances().distances(id(), since, until, (unit == null) ? null : unit.getDistanceUnitStr());
+    return Vinli.curApp().distances().distances(id(), since, until,
+        (unit == null) ? null : unit.getDistanceUnitStr());
   }
 
   public Observable<DistanceList.Distance> bestDistance(){
@@ -52,7 +53,8 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<DistanceList.Distance> bestDistance(@Nullable DistanceUnit unit){
-    return Vinli.curApp().distances().bestDistance(id(), (unit == null) ? null : unit.getDistanceUnitStr()).map(Wrapped.<DistanceList.Distance>pluckItem());
+    return Vinli.curApp().distances().bestDistance(id(), (unit == null) ? null : unit.getDistanceUnitStr()).map(
+        Wrapped.<DistanceList.Distance>pluckItem());
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(){
@@ -72,7 +74,14 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
-    return Vinli.curApp().collisions().collisionsByVehicle(this.id(), limit, offset);
+    return Vinli.curApp().collisions().collisionsForVehicle(this.id(), limit, offset);
+  }
+
+  public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().reportCards().reportCardsForVehicle(this.id(), sinceMs, untilMs, limit,
+        sortDir);
   }
 
   /*package*/ Vehicle() { }

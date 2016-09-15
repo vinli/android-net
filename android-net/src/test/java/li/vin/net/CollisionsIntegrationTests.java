@@ -25,7 +25,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByVehicleId(){
-    vinliApp.collisions().collisionsByVehicle(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
+    vinliApp.collisions().collisionsForVehicle(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -53,7 +53,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByDeviceId(){
-    vinliApp.collisions().collisionsByDevice(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
+    vinliApp.collisions().collisionsForDevice(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
       @Override
       public void onCompleted() {
 

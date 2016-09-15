@@ -90,6 +90,11 @@ public class TestHelper {
     return collisionId.equals("DEFAULT_COLLISION_ID") ? null : collisionId;
   }
 
+  public static String getReportCardId(){
+    String reportCardId = BuildConfig.REPORT_CARD_ID;
+    return reportCardId.equals("DEFAULT_REPORT_CARD_ID") ? null : reportCardId;
+  }
+
   public static OkHttpClient configureClient(final OkHttpClient client) {
     final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
 

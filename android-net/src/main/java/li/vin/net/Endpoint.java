@@ -12,6 +12,7 @@ import com.squareup.okhttp.HttpUrl;
   TELEMETRY("telemetry"),
   TRIPS("trips"),
   SAFETY("safety"),
+  BEHAVIORAL("behavioral"),
   DISTANCE("distance");
 
   /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";

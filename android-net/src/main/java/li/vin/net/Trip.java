@@ -61,6 +61,10 @@ public abstract class Trip implements VinliItem {
     return Vinli.curApp().linkLoader().read(links().events(), Event.TIME_SERIES_TYPE);
   }
 
+  public Observable<ReportCard> reportCard(){
+    return Vinli.curApp().reportCards().reportCardForTrip(this.id()).map(Wrapped.<ReportCard>pluckItem());
+  }
+
   /*package*/ abstract Links links();
 
   /*package*/ Trip() { }

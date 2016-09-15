@@ -45,6 +45,7 @@ android {
             buildConfigField("String", "ODO_ID", "\"" + integrationProperties['ODO_ID'] + "\"")
             buildConfigField("String", "ODO_TRIGGER_ID", "\"" + integrationProperties['ODO_TRIGGER_ID'] + "\"")
             buildConfigField("String", "COLLISION_ID", "\"" + integrationProperties['COLLISION_ID'] + "\"")
+            buildConfigField("String", "REPORT_CARD_ID", "\"" + integrationProperties['REPORT_CARD_ID'] + "\"")
         }
         release {
             minifyEnabled false
