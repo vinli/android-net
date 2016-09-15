@@ -7,7 +7,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import li.vin.net.DistanceList.Distance;
+import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -84,7 +86,7 @@ public class DistancesIntegrationTests {
   public void getOdometerReportsByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().odometerReports(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+    vinliApp.distances().odometerReports(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
       @Override
       public void onCompleted() {
       }
@@ -143,7 +145,7 @@ public class DistancesIntegrationTests {
   public void getOdometerTriggersByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().odometerTriggers(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
+    vinliApp.distances().odometerTriggers(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
       @Override
       public void onCompleted() {
       }

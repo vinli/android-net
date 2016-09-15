@@ -31,8 +31,10 @@ public interface Distances {
   @GET("/vehicles/{vehicleId}/odometers")
   Observable<TimeSeries<Odometer>> odometerReports(
       @Path("vehicleId") String vehicleId,
-      @Query("since") String since,
-      @Query("until") String until);
+      @Query("since") Long since,
+      @Query("until") Long until,
+      @Query("limit") Integer limit,
+      @Query("sortDir") String sortDir);
 
   @GET("/odometers/{odometerId}")
   Observable<Wrapped<Odometer>> odometerReport(
@@ -58,6 +60,8 @@ public interface Distances {
   @GET("/vehicles/{vehicleId}/odometer_triggers")
   Observable<TimeSeries<OdometerTrigger>> odometerTriggers(
       @Path("vehicleId") String vehicleId,
-      @Query("since") String since,
-      @Query("until") String until);
+      @Query("since") Long since,
+      @Query("until") Long until,
+      @Query("limit") Integer limit,
+      @Query("sortDir") String sortDir);
 }

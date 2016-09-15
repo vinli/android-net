@@ -5,7 +5,11 @@ import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import rx.Observable;
 
 @AutoParcel
@@ -58,19 +62,53 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(){
-    return odometerReports(null, null);
+    return odometerReports(null, null, null, null);
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(@Nullable String since, @Nullable String until){
-    return Vinli.curApp().distances().odometerReports(id(), since, until);
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.getDefault());
+    Date sinceDate = null;
+    Date untilDate = null;
+
+    try {
+      sinceDate = (since != null) ? format.parse(since) : null;
+      untilDate = (until != null) ? format.parse(until) : null;
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+
+    return odometerReports(sinceDate, untilDate, null, null);
   }
 
-  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(){
-    return odometerTriggers(null, null);
+  public Observable<TimeSeries<Odometer>> odometerReports(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().distances().odometerReports(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<TimeSeries<OdometerTrigger>> odomterTriggers(){
+    return odometerTriggers(null, null, null, null);
   }
 
   public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable String since, @Nullable String until){
-    return Vinli.curApp().distances().odometerTriggers(id(), since, until);
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.getDefault());
+    Date sinceDate = null;
+    Date untilDate = null;
+
+    try {
+      sinceDate = (since != null) ? format.parse(since) : null;
+      untilDate = (until != null) ? format.parse(until) : null;
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+
+    return odometerTriggers(sinceDate, untilDate, null, null);
+  }
+
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().distances().odometerTriggers(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
