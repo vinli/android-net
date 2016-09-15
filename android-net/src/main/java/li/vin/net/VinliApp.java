@@ -251,6 +251,10 @@ public final class VinliApp {
     return mNotifications.notification(notificationId).map(Wrapped.<Notification>pluckItem());
   }
 
+  public Observable<Event> event(@NonNull String eventId){
+    return mEvents.event(eventId).map(Wrapped.<Event>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }

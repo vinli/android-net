@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.GsonBuilder;
@@ -22,6 +23,10 @@ public abstract class Event implements VinliItem {
     gb.registerTypeAdapter(Meta.class, AutoParcelAdapter.create(AutoParcel_Event_Meta.class));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Event.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Event.class));
+  }
+
+  public static Observable<Event> eventWithId(@NonNull String eventId){
+    return Vinli.curApp().event(eventId);
   }
 
   public abstract String eventType();
