@@ -27,6 +27,7 @@ public final class VinliApp {
   private final Messages mMessages;
   private final Collisions mCollisions;
   private final ReportCards mReportCards;
+  private final Notifications mNotifications;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -120,6 +121,7 @@ public final class VinliApp {
 
     mEvents = eventsAdapter.create(Events.class);
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
+    mNotifications = eventsAdapter.create(Notifications.class);
 
     final RestAdapter telemAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.TELEMETRY)
         .setLog(logger)
@@ -245,6 +247,10 @@ public final class VinliApp {
     return mMessages.message(messageId).map(Wrapped.<Message>pluckItem());
   }
 
+  public Observable<Notification> notification(@NonNull String notificationId){
+    return mNotifications.notification(notificationId).map(Wrapped.<Notification>pluckItem());
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }
@@ -291,6 +297,10 @@ public final class VinliApp {
 
   /*package*/ ReportCards reportCards(){
     return mReportCards;
+  }
+
+  /*package*/ Notifications notifications(){
+    return mNotifications;
   }
 
   /*package*/ LinkLoader linkLoader() {

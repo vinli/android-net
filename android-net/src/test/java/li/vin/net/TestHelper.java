@@ -95,6 +95,11 @@ public class TestHelper {
     return reportCardId.equals("DEFAULT_REPORT_CARD_ID") ? null : reportCardId;
   }
 
+  public static String getNotificationId(){
+    String notificationId = BuildConfig.NOTIFICATION_ID;
+    return notificationId.equals("DEFAULT_NOTIFICATION_ID") ? null : notificationId;
+  }
+
   public static OkHttpClient configureClient(final OkHttpClient client) {
     final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
 
