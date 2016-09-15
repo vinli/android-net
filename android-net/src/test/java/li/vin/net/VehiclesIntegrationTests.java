@@ -48,6 +48,31 @@ public class VehiclesIntegrationTests {
         });
   }
 
+  @Test public void testGetLatestVehicleByDeviceId() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.vehicles()
+        .latestVehicle(TestHelper.getDeviceId())
+        .toBlocking()
+        .subscribe(new Subscriber<Wrapped<Vehicle>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Wrapped<Vehicle> vehicleWrapped) {
+            Vehicle vehicle = vehicleWrapped.item();
+            assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+            assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+          }
+        });
+  }
+
   @Test public void testGetVehicleWithLimitOffsetByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 

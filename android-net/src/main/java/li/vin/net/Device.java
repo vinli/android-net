@@ -630,7 +630,7 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<Vehicle> latestVehicle() {
-    return vehicle("_latest");
+    return Vinli.curApp().vehicles().latestVehicle(id()).map(Wrapped.<Vehicle>pluckItem());
   }
 
   public Observable<Page<Rule>> rules() {
