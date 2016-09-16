@@ -651,9 +651,15 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit) {
+    return events(type, objectId, since, until, limit, null);
+  }
+
+  public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit);
+    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<Location>> locations() {

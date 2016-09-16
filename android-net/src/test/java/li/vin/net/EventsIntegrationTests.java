@@ -26,7 +26,7 @@ public class EventsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.events()
-        .events(TestHelper.getDeviceId(), null, null, null, null, null)
+        .events(TestHelper.getDeviceId(), null, null, null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {
 
@@ -56,7 +56,7 @@ public class EventsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.events()
-        .events(TestHelper.getDeviceId(), null, null, 0L, currentTimeMillis(), 5)
+        .events(TestHelper.getDeviceId(), null, null, 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {
 
