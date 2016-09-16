@@ -65,7 +65,7 @@ dependencies {
 
     compile 'com.squareup.duktape:duktape-android:0.9.5'
 
-    provided 'com.android.support:appcompat-v7:24.2.1'
+    provided 'com.android.support:appcompat-v7:24.+'
 
     compile 'com.squareup.okhttp:okhttp:2.4.+'
     compile 'com.squareup.okhttp:okhttp-ws:2.4.+'
