@@ -28,7 +28,6 @@ public abstract class Location implements VinliItem {
 
   public abstract Coordinate coordinate();
   public abstract String timestamp();
-  public abstract Map<String, String> data();
 
   /*package*/ Location() { }
 
@@ -37,7 +36,6 @@ public abstract class Location implements VinliItem {
     Builder id(String s);
     Builder coordinate(Coordinate c);
     Builder timestamp(String s);
-    Builder data(Map<String, String> m);
 
     Location build();
   }
@@ -90,15 +88,8 @@ public abstract class Location implements VinliItem {
                 case "timestamp": b.timestamp(in.nextString()); break;
                 case "links": in.skipValue(); break;
                 case "data":
-                  final Map<String, String> data = new HashMap<>();
-
                   in.beginObject();
-                  while (in.hasNext()) {
-                    data.put(in.nextName(), in.nextString());
-                  }
                   in.endObject();
-
-                  b.data(Collections.unmodifiableMap(data));
                   break;
                 default: throw new JsonParseException("unknown location geometry key " + propName);
               }

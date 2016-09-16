@@ -657,18 +657,27 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Location>> locations() {
-    return locations(null, null, null, null, null);
+    return locations(null, null, null, null);
   }
 
-  public Observable<TimeSeries<Location>> locations(@Nullable String fields, @Nullable Date until,
+  /**
+   * If you want to use the /api/v1/device/{deviceId}/locations?fields={list-of-fields},
+   *  please use /api/v1/device/{deviceId}/snapshots?fields=location,{list-of-fields}
+   * @param until
+   * @param since
+   * @param limit
+   * @param sortDir
+   * @return
+   */
+  public Observable<TimeSeries<Location>> locations(@Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().locations().locations(id(), fields, untilMs, sinceMs, limit, sortDir);
+    return Vinli.curApp().locations().locations(id(), untilMs, sinceMs, limit, sortDir);
   }
 
   public Observable<Location> latestlocation() {
-    return locations(null, null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
+    return locations(null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
         .firstOrDefault(null);
   }
 

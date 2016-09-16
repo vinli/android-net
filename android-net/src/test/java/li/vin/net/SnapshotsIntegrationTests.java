@@ -26,7 +26,7 @@ public class SnapshotsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.snapshots()
-        .snapshots(TestHelper.getDeviceId(), "vehicleSpeed", null, null, null, null)
+        .snapshots(TestHelper.getDeviceId(), "location,vehicleSpeed", null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
           @Override public void onCompleted() {
@@ -42,6 +42,7 @@ public class SnapshotsIntegrationTests {
             assertTrue(snapshotTimeSeries.getItems().size() > 0);
 
             for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+              assertTrue(snapshot.coord() != null);
               assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
               assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
             }
