@@ -111,8 +111,17 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().distances().odometerTriggers(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
-  public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
-    return Vinli.curApp().collisions().collisionsForVehicle(this.id(), limit, offset);
+  public Observable<TimeSeries<Collision>> collisions() {
+    return collisions(null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Collision>> collisions(@Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForVehicle(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){

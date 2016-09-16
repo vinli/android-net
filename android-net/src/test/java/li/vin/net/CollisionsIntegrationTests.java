@@ -25,7 +25,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByVehicleId(){
-    vinliApp.collisions().collisionsForVehicle(TestHelper.getVehicleId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
+    vinliApp.collisions().collisionsForVehicle(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -38,10 +38,10 @@ public class CollisionsIntegrationTests {
       }
 
       @Override
-      public void onNext(Page<Collision> collisionPage) {
-        assertTrue(collisionPage.getItems().size() > 0);
+      public void onNext(TimeSeries<Collision> collisionTimeSeries) {
+        assertTrue(collisionTimeSeries.getItems().size() > 0);
 
-        for(Collision collision : collisionPage.getItems()){
+        for(Collision collision : collisionTimeSeries.getItems()){
           assertTrue(collision.id() != null && collision.id().length() > 0);
           assertTrue(collision.deviceId().length() > 0);
           assertTrue(collision.vehicleId().length() > 0);
@@ -53,7 +53,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByDeviceId(){
-    vinliApp.collisions().collisionsForDevice(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Collision>>() {
+    vinliApp.collisions().collisionsForDevice(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -66,10 +66,10 @@ public class CollisionsIntegrationTests {
       }
 
       @Override
-      public void onNext(Page<Collision> collisionPage) {
-        assertTrue(collisionPage.getItems().size() > 0);
+      public void onNext(TimeSeries<Collision> collisionTimeSeries) {
+        assertTrue(collisionTimeSeries.getItems().size() > 0);
 
-        for(Collision collision : collisionPage.getItems()){
+        for(Collision collision : collisionTimeSeries.getItems()){
           assertTrue(collision.id() != null && collision.id().length() > 0);
           assertTrue(collision.deviceId().length() > 0);
           assertTrue(collision.vehicleId().length() > 0);

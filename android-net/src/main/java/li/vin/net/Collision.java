@@ -14,12 +14,12 @@ import rx.Observable;
 @AutoParcel
 public abstract class Collision implements VinliItem{
   /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Collision>>() { }.getType();
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Collision>>() { }.getType();
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Collision>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Collision.class, AutoParcelAdapter.create(AutoParcel_Collision.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Collision.class));
-    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Collision.class));
+    gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Collision.class));
   }
 
   @NonNull public abstract String deviceId();

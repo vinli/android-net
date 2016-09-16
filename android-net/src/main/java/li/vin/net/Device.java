@@ -732,8 +732,17 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().messages().messages(id(), sinceMs, untilMs, limit, sortDir);
   }
 
-  public Observable<Page<Collision>> collisions(@Nullable Integer limit, @Nullable Integer offset){
-    return Vinli.curApp().collisions().collisionsForDevice(this.id(), limit, offset);
+  public Observable<TimeSeries<Collision>> collisions() {
+    return collisions(null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Collision>> collisions(@Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
