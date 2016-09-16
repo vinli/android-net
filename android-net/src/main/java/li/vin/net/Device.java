@@ -679,7 +679,7 @@ public abstract class Device implements VinliItem {
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().locations().locations(id(), untilMs, sinceMs, limit, sortDir);
+    return Vinli.curApp().locations().locations(id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<Location> latestlocation() {

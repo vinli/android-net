@@ -83,7 +83,7 @@ public class LocationsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.locations()
-        .locations(TestHelper.getDeviceId(), currentTimeMillis(), 0L, 5, null)
+        .locations(TestHelper.getDeviceId(), 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {
