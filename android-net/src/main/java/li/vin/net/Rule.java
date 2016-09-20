@@ -48,6 +48,19 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(AutoParcel_Rule_Seed.class, new Seed.Adapter());
   }
 
+  public static Observable<Rule> ruleWithId(@NonNull String ruleId) {
+    return Vinli.curApp().rule(ruleId);
+  }
+
+  public static Observable<Page<Rule>> rulesWithDeviceId(@NonNull String deviceId) {
+    return rulesWithDeviceId(deviceId, null, null);
+  }
+
+  public static Observable<Page<Rule>> rulesWithDeviceId(@NonNull String deviceId,
+      @Nullable Integer limit, @Nullable Integer offset) {
+    return Vinli.curApp().rules().rules(deviceId, limit, offset);
+  }
+
   public static final Seed.Saver create() {
     return new AutoParcel_Rule_Seed.Builder();
   }

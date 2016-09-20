@@ -1,5 +1,7 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,9 +15,11 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import rx.Observable;
 
 @AutoParcel
 public abstract class Location implements VinliItem {
@@ -24,6 +28,18 @@ public abstract class Location implements VinliItem {
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Location.class, new LocationAdapter());
     gb.registerTypeAdapter(TIME_SERIES_TYPE, new LocationTimeSeriesAdapter());
+  }
+
+  public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId) {
+    return locationsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().locations().locations(deviceId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract Coordinate coordinate();

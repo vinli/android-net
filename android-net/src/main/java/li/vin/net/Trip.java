@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import auto.parcel.AutoParcel;
@@ -15,6 +16,7 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel
@@ -40,6 +42,34 @@ public abstract class Trip implements VinliItem {
   @Nullable public abstract Point stopPoint();
   @Nullable public abstract String preview();
   public abstract Stats stats();
+
+  public static Observable<Trip> tripWithId(@NonNull String tripId) {
+    return Vinli.curApp().trip(tripId);
+  }
+
+  public static Observable<TimeSeries<Trip>> tripsWithDeviceId(@NonNull String deviceId) {
+    return tripsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Trip>> tripsWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().trips().trips(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<Trip>> tripsWithVehicleId(@NonNull String vehicleId) {
+    return tripsWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Trip>> tripsWithVehicleId(@NonNull String vehicleId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().trips().vehicleTrips(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
 
   public Observable<Device> device() {
     return Vinli.curApp().device(deviceId());

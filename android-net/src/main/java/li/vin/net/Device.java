@@ -87,6 +87,10 @@ public abstract class Device implements VinliItem {
         icon);
   }
 
+  public static Observable<Device> deviceWithId(@NonNull String deviceId){
+    return Vinli.curApp().device(deviceId);
+  }
+
   /*package*/
   abstract Links links();
 
@@ -687,11 +691,7 @@ public abstract class Device implements VinliItem {
         .firstOrDefault(null);
   }
 
-  public Observable<TimeSeries<Snapshot>> snapshots() {
-    return snapshots(null, null, null, null, null);
-  }
-
-  public Observable<TimeSeries<Snapshot>> snapshots(@Nullable String fields, @Nullable Date until,
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields, @Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();

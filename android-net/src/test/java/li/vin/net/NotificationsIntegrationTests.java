@@ -26,8 +26,7 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotificationsFromEvent() {
     assertTrue(TestHelper.getEventId() != null);
 
-    vinliApp.notifications()
-        .notificationsForEvent(TestHelper.getEventId(), null, null, null, null)
+    Notification.notificationsWithEventId(TestHelper.getEventId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {
           @Override public void onCompleted() {
@@ -58,8 +57,7 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotificationsForSubscription() {
     assertTrue(TestHelper.getSubscriptionId() != null);
 
-    vinliApp.notifications()
-        .notificationsForSubscription(TestHelper.getSubscriptionId(), null, null, null, null)
+    Notification.notificationsWithSubscriptionId(TestHelper.getSubscriptionId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {
           @Override public void onCompleted() {
@@ -90,10 +88,9 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotification() {
     assertTrue(TestHelper.getNotificationId() != null);
 
-    vinliApp.notifications()
-        .notification(TestHelper.getNotificationId())
+    Notification.notificationWithId(TestHelper.getNotificationId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Notification>>() {
+        .subscribe(new Subscriber<Notification>() {
           @Override public void onCompleted() {
 
           }
@@ -103,9 +100,7 @@ public class NotificationsIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Notification> notificationWrapped) {
-            Notification notification = notificationWrapped.item();
-
+          @Override public void onNext(Notification notification) {
             assertTrue(notification.id() != null && notification.id().length() > 0);
             assertTrue(notification.eventTimestamp() != null
                 && notification.eventTimestamp().length() > 0);

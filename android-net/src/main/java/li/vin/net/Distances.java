@@ -14,8 +14,8 @@ public interface Distances {
   @GET("/vehicles/{vehicleId}/distances")
   Observable<DistanceList> distances(
       @Path("vehicleId") String vehicleId,
-      @Query("since") String since,
-      @Query("until") String until,
+      @Query("since") Long since,
+      @Query("until") Long until,
       @Header("x-vinli-unit") String unit);
 
   @GET("/vehicles/{vehicleId}/distances/_best")

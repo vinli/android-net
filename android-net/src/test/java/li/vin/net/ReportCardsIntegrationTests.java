@@ -23,10 +23,9 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardById() {
     assertTrue(TestHelper.getReportCardId() != null);
 
-    vinliApp.reportCards()
-        .reportCard(TestHelper.getReportCardId())
+    ReportCard.reportCardWithId(TestHelper.getReportCardId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<ReportCard>>() {
+        .subscribe(new Subscriber<ReportCard>() {
           @Override public void onCompleted() {
 
           }
@@ -36,9 +35,7 @@ public class ReportCardsIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<ReportCard> reportCardWrapped) {
-            ReportCard reportCard = reportCardWrapped.item();
-
+          @Override public void onNext(ReportCard reportCard) {
             assertTrue(reportCard.id() != null && reportCard.id().length() > 0);
             assertTrue(reportCard.deviceId() != null && reportCard.deviceId().length() > 0);
             assertTrue(reportCard.vehicleId() != null && reportCard.vehicleId().length() > 0);
@@ -51,8 +48,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardsForVehicle() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.reportCards()
-        .reportCardsForVehicle(TestHelper.getVehicleId(), null, null, null, null)
+    ReportCard.reportCardWithVehicleId(TestHelper.getVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
           @Override public void onCompleted() {
@@ -81,8 +77,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardsForDevice() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.reportCards()
-        .reportCardsForDevice(TestHelper.getDeviceId(), null, null, null, null)
+    ReportCard.reportCardsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
           @Override public void onCompleted() {
@@ -111,10 +106,9 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardForTrip() {
     assertTrue(TestHelper.getTripId() != null);
 
-    vinliApp.reportCards()
-        .reportCardForTrip(TestHelper.getTripId())
+    ReportCard.reportCardWithTripId(TestHelper.getTripId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<ReportCard>>() {
+        .subscribe(new Subscriber<ReportCard>() {
           @Override public void onCompleted() {
 
           }
@@ -124,9 +118,7 @@ public class ReportCardsIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<ReportCard> reportCardWrapped) {
-            ReportCard reportCard = reportCardWrapped.item();
-
+          @Override public void onNext(ReportCard reportCard) {
             assertTrue(reportCard.id() != null && reportCard.id().length() > 0);
             assertTrue(reportCard.deviceId() != null && reportCard.deviceId().length() > 0);
             assertTrue(reportCard.vehicleId() != null && reportCard.vehicleId().length() > 0);
@@ -139,8 +131,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testOverallReportCard() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.reportCards()
-        .overallReportCardForDevice(TestHelper.getDeviceId())
+    ReportCard.OverallReportCard.overallReportCardForDevice(TestHelper.getDeviceId())
         .toBlocking()
         .subscribe(new Subscriber<ReportCard.OverallReportCard>() {
           @Override public void onCompleted() {

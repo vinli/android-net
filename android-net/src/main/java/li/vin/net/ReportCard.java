@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel public abstract class ReportCard implements VinliItem {
@@ -42,6 +43,43 @@ import rx.Observable;
     return Vinli.curApp().reportCard(reportCardId);
   }
 
+  public static Observable<TimeSeries<ReportCard>> reportCardsWithDeviceId(
+      @NonNull String deviceId) {
+    return reportCardsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<ReportCard>> reportCardsWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForDevice(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<ReportCard>> reportCardsWithVehicleId(
+      @NonNull String vehicleId) {
+    return reportCardWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<ReportCard>> reportCardWithVehicleId(
+      @NonNull String vehicleId, @Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForVehicle(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<ReportCard> reportCardWithTripId(@NonNull String tripId) {
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardForTrip(tripId)
+        .map(Wrapped.<ReportCard>pluckItem());
+  }
+
   @AutoParcel public static abstract class OverallReportCard {
 
     @NonNull public abstract Integer tripSampleSize();
@@ -60,6 +98,11 @@ import rx.Observable;
 
       /*package*/ InnerReportCard() {
       }
+    }
+
+    public static Observable<OverallReportCard> overallReportCardForDevice(
+        @NonNull String deviceId) {
+      return Vinli.curApp().reportCards().overallReportCardForDevice(deviceId);
     }
   }
 }

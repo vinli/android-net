@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel
@@ -27,6 +28,20 @@ public abstract class Event implements VinliItem {
 
   public static Observable<Event> eventWithId(@NonNull String eventId){
     return Vinli.curApp().event(eventId);
+  }
+
+  public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId){
+    return eventsWithDeviceId(deviceId, null, null, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId,
+      @Nullable String type, @Nullable String objectId, @Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .events()
+        .events(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String eventType();

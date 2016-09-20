@@ -2,6 +2,7 @@ package li.vin.net;
 
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,6 +13,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel
@@ -56,6 +58,24 @@ public abstract class OdometerTrigger implements VinliItem{
 
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(OdometerTrigger.class, "odometerTrigger"));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, OdometerTrigger.class, "odometerTriggers"));
+  }
+
+  public static Observable<OdometerTrigger> odometerTriggerWithId(
+      @NonNull String odometerTriggerId) {
+    return Vinli.curApp().odometerTrigger(odometerTriggerId);
+  }
+
+  public static Observable<TimeSeries<OdometerTrigger>> odometerTriggersWithVehicleId(
+      @NonNull String vehicleId) {
+    return odometerTriggersWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<OdometerTrigger>> odometerTriggersWithVehicleId(
+      @NonNull String vehicleId, @Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().distances().odometerTriggers(vehicleId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String vehicleId();

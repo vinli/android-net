@@ -27,7 +27,7 @@ public class RulesIntegrationTests {
   public void testGetRulesByDeviceId(){
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.rules().rules(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+    Rule.rulesWithDeviceId(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Rule>>() {
       @Override
       public void onCompleted() {
 
@@ -56,23 +56,18 @@ public class RulesIntegrationTests {
   public void getRuleById(){
     assertTrue(TestHelper.getRuleId() != null);
 
-    vinliApp.rules().rule(TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Wrapped<Rule>>() {
-      @Override
-      public void onCompleted() {
+    Rule.ruleWithId(TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Rule>() {
+      @Override public void onCompleted() {
 
       }
 
-      @Override
-      public void onError(Throwable e) {
+      @Override public void onError(Throwable e) {
         System.out.println("Error: " + e.getMessage());
         e.printStackTrace();
         assertTrue(false);
       }
 
-      @Override
-      public void onNext(Wrapped<Rule> ruleWrapped) {
-        Rule rule = ruleWrapped.item();
-
+      @Override public void onNext(Rule rule) {
         assertTrue(rule.id() != null && rule.id().length() > 0);
         assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
       }

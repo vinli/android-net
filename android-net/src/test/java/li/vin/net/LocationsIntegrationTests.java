@@ -27,8 +27,7 @@ public class LocationsIntegrationTests {
   @Test public void testGetLocationsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.locations()
-        .locations(TestHelper.getDeviceId(), null, null, null, null)
+    Location.locationsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {
@@ -56,7 +55,7 @@ public class LocationsIntegrationTests {
   @Test public void testGetLatestLocation(){
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.device(TestHelper.getDeviceId()).flatMap(new Func1<Device, Observable<Location>>() {
+    Device.deviceWithId(TestHelper.getDeviceId()).flatMap(new Func1<Device, Observable<Location>>() {
       @Override public Observable<Location> call(Device device) {
         return device.latestlocation();
       }

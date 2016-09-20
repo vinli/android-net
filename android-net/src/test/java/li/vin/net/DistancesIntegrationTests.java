@@ -30,7 +30,7 @@ public class DistancesIntegrationTests {
   public void testGetDistancesByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().distances(TestHelper.getVehicleId(), null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
+    DistanceList.distancesWithVehicleId(TestHelper.getVehicleId(), null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
       @Override
       public void onCompleted() {
       }
@@ -59,7 +59,7 @@ public class DistancesIntegrationTests {
   public void getBestDistanceByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().bestDistance(TestHelper.getVehicleId(), null).toBlocking().subscribe(new Subscriber<Wrapped<Distance>>() {
+    Distance.bestDistanceWithVehicleId(TestHelper.getVehicleId(), null).toBlocking().subscribe(new Subscriber<Distance>() {
       @Override
       public void onCompleted() {
       }
@@ -72,9 +72,7 @@ public class DistancesIntegrationTests {
       }
 
       @Override
-      public void onNext(Wrapped<Distance> distanceWrapped) {
-        Distance distance = distanceWrapped.item();
-
+      public void onNext(Distance distance) {
         assertTrue(distance.confidenceMin() != null);
         assertTrue(distance.confidenceMax() != null);
         assertTrue(distance.value() != null);
@@ -86,7 +84,7 @@ public class DistancesIntegrationTests {
   public void getOdometerReportsByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().odometerReports(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
       @Override
       public void onCompleted() {
       }
@@ -116,36 +114,31 @@ public class DistancesIntegrationTests {
   public void getOdometerById(){
     assertTrue(TestHelper.getOdometerId() != null);
 
-    vinliApp.distances().odometerReport(TestHelper.getOdometerId()).toBlocking().subscribe(new Subscriber<Wrapped<Odometer>>() {
-      @Override
-      public void onCompleted() {
-      }
+    Odometer.odometerWithId(TestHelper.getOdometerId()).toBlocking().subscribe(
+        new Subscriber<Odometer>() {
+          @Override public void onCompleted() {
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Wrapped<Odometer> odometerWrapped) {
-        Odometer odometer = odometerWrapped.item();
-
-        assertTrue(odometer.id() != null && odometer.id().length() > 0);
-        assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
-        assertTrue(odometer.date() != null && odometer.date().length() > 0);
-        assertTrue(odometer.reading() != null);
-
-      }
-    });
+          @Override public void onNext(Odometer odometer) {
+            assertTrue(odometer.id() != null && odometer.id().length() > 0);
+            assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+            assertTrue(odometer.date() != null && odometer.date().length() > 0);
+            assertTrue(odometer.reading() != null);
+          }
+        });
   }
 
   @Test
   public void getOdometerTriggersByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.distances().odometerTriggers(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
+    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
       @Override
       public void onCompleted() {
       }
@@ -175,27 +168,24 @@ public class DistancesIntegrationTests {
   public void getOdometerTriggerById(){
     assertTrue(TestHelper.getOdometerTriggerId() != null);
 
-    vinliApp.distances().odometerTrigger(TestHelper.getOdometerTriggerId()).toBlocking().subscribe(new Subscriber<Wrapped<OdometerTrigger>>() {
-      @Override
-      public void onCompleted() {
-      }
+    OdometerTrigger.odometerTriggerWithId(TestHelper.getOdometerTriggerId()).toBlocking().subscribe(
+        new Subscriber<OdometerTrigger>() {
+          @Override public void onCompleted() {
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Wrapped<OdometerTrigger> odometerTriggerWrapped) {
-        OdometerTrigger odometerTrigger = odometerTriggerWrapped.item();
-
-        assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
-        assertTrue(odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
-        assertTrue(odometerTrigger.type() != null);
-        assertTrue(odometerTrigger.threshold() != null);
-      }
-    });
+          @Override public void onNext(OdometerTrigger odometerTrigger) {
+            assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
+            assertTrue(
+                odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
+            assertTrue(odometerTrigger.type() != null);
+            assertTrue(odometerTrigger.threshold() != null);
+          }
+        });
   }
 }

@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import auto.parcel.AutoParcel;
+import rx.Observable;
 
 @AutoParcel
 public class Snapshot implements VinliItem {
@@ -37,6 +39,19 @@ public class Snapshot implements VinliItem {
     gb.registerTypeAdapter(TIME_SERIES_TYPE,
         TimeSeries.Adapter.create(TIME_SERIES_TYPE, Snapshot.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Snapshot.class));
+  }
+
+  public static Observable<TimeSeries<Snapshot>> snapshotsWithDeviceId(@NonNull String deviceId,
+      @NonNull String fields) {
+    return snapshotsWithDeviceId(deviceId, fields, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Snapshot>> snapshotsWithDeviceId(@NonNull String deviceId,
+      @NonNull String fields, @Nullable Date until, @Nullable Date since, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().snapshots().snapshots(deviceId, fields, untilMs, sinceMs, limit, sortDir);
   }
 
   private String id;

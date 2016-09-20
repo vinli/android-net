@@ -25,7 +25,8 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByVehicleId(){
-    vinliApp.collisions().collisionsForVehicle(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+    Collision.collisionsWithVehicleId(TestHelper.getVehicleId(), null, null, null,
+        null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -53,7 +54,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByDeviceId(){
-    vinliApp.collisions().collisionsForDevice(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+    Collision.collisionsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -81,28 +82,23 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void getCollisionById(){
-    vinliApp.collisions().collision(TestHelper.getCollisionId()).toBlocking().subscribe(new Subscriber<Wrapped<Collision>>() {
-      @Override
-      public void onCompleted() {
+    Collision.collisionWithId(TestHelper.getCollisionId()).toBlocking().subscribe(
+        new Subscriber<Collision>() {
+          @Override public void onCompleted() {
 
-      }
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Wrapped<Collision> collisionWrapped) {
-        Collision collision = collisionWrapped.item();
-
-        assertTrue(collision.id() != null && collision.id().length() > 0);
-        assertTrue(collision.deviceId().length() > 0);
-        assertTrue(collision.vehicleId().length() > 0);
-        assertTrue(collision.timestamp().length() > 0);
-
-      }
-    });
+          @Override public void onNext(Collision collision) {
+            assertTrue(collision.id() != null && collision.id().length() > 0);
+            assertTrue(collision.deviceId().length() > 0);
+            assertTrue(collision.vehicleId().length() > 0);
+            assertTrue(collision.timestamp().length() > 0);
+          }
+        });
   }
 
 }

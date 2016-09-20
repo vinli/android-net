@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel
@@ -27,7 +28,36 @@ public abstract class Collision implements VinliItem{
   @NonNull public abstract String timestamp();
   @Nullable public abstract Location location();
 
-  public static Observable<Collision> collisionWithId(@NonNull String collisionId){
+  public static Observable<Collision> collisionWithId(@NonNull String collisionId) {
     return Vinli.curApp().collision(collisionId);
+  }
+
+  public static Observable<TimeSeries<Collision>> collisionsWithDeviceId(@NonNull String deviceId) {
+    return collisionsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Collision>> collisionsWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForDevice(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<Collision>> collisionsWithVehicleId(
+      @NonNull String vehicleId) {
+    return collisionsWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Collision>> collisionsWithVehicleId(@NonNull String vehicleId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForVehicle(vehicleId, sinceMs, untilMs, limit, sortDir);
   }
 }

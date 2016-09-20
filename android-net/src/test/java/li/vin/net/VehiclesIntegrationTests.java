@@ -24,8 +24,7 @@ public class VehiclesIntegrationTests {
   @Test public void testGetVehicleByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.vehicles()
-        .vehicles(TestHelper.getDeviceId(), null, null)
+    Vehicle.vehiclesWithDeviceId(TestHelper.getDeviceId(), null, null)
         .toBlocking()
         .subscribe(new Subscriber<Page<Vehicle>>() {
           @Override public void onCompleted() {
@@ -51,10 +50,9 @@ public class VehiclesIntegrationTests {
   @Test public void testGetLatestVehicleByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.vehicles()
-        .latestVehicle(TestHelper.getDeviceId())
+    Vehicle.latestVehicleWithDeviceId(TestHelper.getDeviceId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Vehicle>>() {
+        .subscribe(new Subscriber<Vehicle>() {
           @Override public void onCompleted() {
 
           }
@@ -65,8 +63,7 @@ public class VehiclesIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Vehicle> vehicleWrapped) {
-            Vehicle vehicle = vehicleWrapped.item();
+          @Override public void onNext(Vehicle vehicle) {
             assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
             assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
           }
@@ -103,10 +100,9 @@ public class VehiclesIntegrationTests {
   @Test public void testGetVehicleById() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.vehicles()
-        .vehicle(TestHelper.getVehicleId())
+    Vehicle.vehicleWithId(TestHelper.getVehicleId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Vehicle>>() {
+        .subscribe(new Subscriber<Vehicle>() {
           @Override public void onCompleted() {
 
           }
@@ -117,8 +113,7 @@ public class VehiclesIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Vehicle> vehicleWrapped) {
-            Vehicle vehicle = vehicleWrapped.item();
+          @Override public void onNext(Vehicle vehicle) {
             assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
             assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
           }

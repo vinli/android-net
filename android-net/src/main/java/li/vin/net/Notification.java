@@ -1,12 +1,14 @@
 package li.vin.net;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 
 import auto.parcel.AutoParcel;
+import java.util.Date;
 import rx.Observable;
 
 @AutoParcel public abstract class Notification implements VinliItem {
@@ -32,6 +34,36 @@ import rx.Observable;
 
   public static Observable<Notification> notificationWithId(@NonNull String notificationId) {
     return Vinli.curApp().notification(notificationId);
+  }
+
+  public static Observable<TimeSeries<Notification>> notificationsWithSubscriptionId(
+      @NonNull String subscriptionId) {
+    return notificationsWithSubscriptionId(subscriptionId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Notification>> notificationsWithSubscriptionId(
+      @NonNull String subscriptionId, @Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForSubscription(subscriptionId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<Notification>> notificationsWithEventId(
+      @NonNull String eventId) {
+    return notificationsWithEventId(eventId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Notification>> notificationsWithEventId(
+      @NonNull String eventId, @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForEvent(eventId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String createdAt();
