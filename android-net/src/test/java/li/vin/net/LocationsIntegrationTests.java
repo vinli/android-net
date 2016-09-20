@@ -6,7 +6,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 import static java.lang.System.currentTimeMillis;
 import static junit.framework.Assert.assertTrue;
@@ -25,8 +27,7 @@ public class LocationsIntegrationTests {
   @Test public void testGetLocationsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.locations()
-        .locations(TestHelper.getDeviceId(), null, null, null, null, null)
+    Location.locationsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {
@@ -51,11 +52,37 @@ public class LocationsIntegrationTests {
         });
   }
 
+  @Test public void testGetLatestLocation(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Device.deviceWithId(TestHelper.getDeviceId()).flatMap(new Func1<Device, Observable<Location>>() {
+      @Override public Observable<Location> call(Device device) {
+        return device.latestlocation();
+      }
+    }).toBlocking().subscribe(new Subscriber<Location>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(Location location) {
+        assertTrue(location.coordinate() != null);
+        assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+        assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+        assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+      }
+    });
+  }
+
   @Test public void testGetLocationsWithSinceUntilLimitByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.locations()
-        .locations(TestHelper.getDeviceId(), null, currentTimeMillis(), 0L, 5, null)
+        .locations(TestHelper.getDeviceId(), 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {

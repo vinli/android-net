@@ -87,6 +87,10 @@ public abstract class Device implements VinliItem {
         icon);
   }
 
+  public static Observable<Device> deviceWithId(@NonNull String deviceId){
+    return Vinli.curApp().device(deviceId);
+  }
+
   /*package*/
   abstract Links links();
 
@@ -651,32 +655,43 @@ public abstract class Device implements VinliItem {
 
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit) {
+    return events(type, objectId, since, until, limit, null);
+  }
+
+  public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit);
+    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<Location>> locations() {
-    return locations(null, null, null, null, null);
+    return locations(null, null, null, null);
   }
 
-  public Observable<TimeSeries<Location>> locations(@Nullable String fields, @Nullable Date until,
+  /**
+   * If you want to use the /api/v1/device/{deviceId}/locations?fields={list-of-fields},
+   *  please use /api/v1/device/{deviceId}/snapshots?fields=location,{list-of-fields}
+   * @param until
+   * @param since
+   * @param limit
+   * @param sortDir
+   * @return
+   */
+  public Observable<TimeSeries<Location>> locations(@Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().locations().locations(id(), fields, untilMs, sinceMs, limit, sortDir);
+    return Vinli.curApp().locations().locations(id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<Location> latestlocation() {
-    return locations(null, null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
+    return locations(null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
         .firstOrDefault(null);
   }
 
-  public Observable<TimeSeries<Snapshot>> snapshots() {
-    return snapshots(null, null, null, null, null);
-  }
-
-  public Observable<TimeSeries<Snapshot>> snapshots(@Nullable String fields, @Nullable Date until,
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields, @Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
@@ -721,6 +736,29 @@ public abstract class Device implements VinliItem {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
     return Vinli.curApp().messages().messages(id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<TimeSeries<Collision>> collisions() {
+    return collisions(null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Collision>> collisions(@Nullable Date since, @Nullable Date until,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().reportCards().reportCardsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<ReportCard.OverallReportCard> overallReportCard(){
+    return Vinli.curApp().reportCards().overallReportCardForDevice(this.id());
   }
 
   @AutoParcel

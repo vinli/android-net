@@ -1,5 +1,7 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,14 +9,17 @@ import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import rx.Observable;
 
 @AutoParcel
 public abstract class Location implements VinliItem {
@@ -25,9 +30,20 @@ public abstract class Location implements VinliItem {
     gb.registerTypeAdapter(TIME_SERIES_TYPE, new LocationTimeSeriesAdapter());
   }
 
+  public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId) {
+    return locationsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().locations().locations(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
   public abstract Coordinate coordinate();
   public abstract String timestamp();
-  public abstract Map<String, String> data();
 
   /*package*/ Location() { }
 
@@ -36,7 +52,6 @@ public abstract class Location implements VinliItem {
     Builder id(String s);
     Builder coordinate(Coordinate c);
     Builder timestamp(String s);
-    Builder data(Map<String, String> m);
 
     Location build();
   }
@@ -51,6 +66,11 @@ public abstract class Location implements VinliItem {
     @Override public Location read(JsonReader in) throws IOException {
       if (gson == null) {
         gson = Vinli.curApp().gson();
+      }
+
+      if(in.peek() == JsonToken.NULL){
+        in.nextNull();
+        return null;
       }
 
       final Location.Builder b = new AutoParcel_Location.Builder();
@@ -84,15 +104,8 @@ public abstract class Location implements VinliItem {
                 case "timestamp": b.timestamp(in.nextString()); break;
                 case "links": in.skipValue(); break;
                 case "data":
-                  final Map<String, String> data = new HashMap<>();
-
                   in.beginObject();
-                  while (in.hasNext()) {
-                    data.put(in.nextName(), in.nextString());
-                  }
                   in.endObject();
-
-                  b.data(Collections.unmodifiableMap(data));
                   break;
                 default: throw new JsonParseException("unknown location geometry key " + propName);
               }

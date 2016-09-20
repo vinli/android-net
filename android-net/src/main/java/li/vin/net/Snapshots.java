@@ -12,7 +12,7 @@ import rx.Observable;
   @GET("/devices/{deviceId}/snapshots")
   Observable<TimeSeries<Snapshot>> snapshots(
       @NonNull @Path("deviceId") String deviceId,
-      @Nullable @Query("fields") String fields,
+      @NonNull @Query("fields") String fields,
       @Nullable @Query("since") Long since,
       @Nullable @Query("until") Long until,
       @Nullable @Query("limit") Integer limit,

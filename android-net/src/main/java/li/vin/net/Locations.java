@@ -12,9 +12,8 @@ import rx.Observable;
   @GET("/devices/{deviceId}/locations")
   Observable<TimeSeries<Location>> locations(
       @NonNull @Path("deviceId") String deviceId,
-      @Nullable @Query("fields") String fields,
-      @Nullable @Query("until") Long until,
       @Nullable @Query("since") Long since,
+      @Nullable @Query("until") Long until,
       @Nullable @Query("limit") Integer limit,
       @Nullable @Query("sortDir") String sortDir);
 

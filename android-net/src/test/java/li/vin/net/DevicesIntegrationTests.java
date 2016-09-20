@@ -53,7 +53,7 @@ public class DevicesIntegrationTests {
   public void testGetDeviceById(){
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.device(TestHelper.getDeviceId()).toBlocking().subscribe(new Subscriber<Device>() {
+    Device.deviceWithId(TestHelper.getDeviceId()).toBlocking().subscribe(new Subscriber<Device>() {
       @Override
       public void onCompleted() {
 

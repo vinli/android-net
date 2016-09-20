@@ -24,8 +24,7 @@ public class TripsIntegrationTests {
 
   @Test public void getTripsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
-    vinliApp.trips()
-        .trips(TestHelper.getDeviceId(), null, null, null, null)
+    Trip.tripsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
           @Override public void onCompleted() {
@@ -86,8 +85,7 @@ public class TripsIntegrationTests {
   @Test public void getTripsByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.trips()
-        .vehicleTrips(TestHelper.getVehicleId(), null, null, null, null)
+    Trip.tripsWithVehicleId(TestHelper.getVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
           @Override public void onCompleted() {
@@ -149,23 +147,19 @@ public class TripsIntegrationTests {
   @Test public void getTripById() {
     assertTrue(TestHelper.getTripId() != null);
 
-    vinliApp.trips()
-        .trip(TestHelper.getTripId())
+    Trip.tripWithId(TestHelper.getTripId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Trip>>() {
+        .subscribe(new Subscriber<Trip>() {
           @Override public void onCompleted() {
 
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Trip> tripWrapped) {
-            Trip trip = tripWrapped.item();
-
+          @Override public void onNext(Trip trip) {
             assertTrue(trip.id() != null && trip.id().length() > 0);
             assertTrue(trip.deviceId() != null && trip.deviceId().length() > 0);
             assertTrue(trip.vehicleId() != null && trip.vehicleId().length() > 0);

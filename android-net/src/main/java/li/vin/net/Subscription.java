@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -35,6 +36,22 @@ public abstract class Subscription implements VinliItem {
     return new AutoParcel_Subscription_SeedCreate.Builder();
   }
 
+  public static Observable<Subscription> subscriptionWithId(@NonNull String subscriptionId) {
+    return Vinli.curApp().subscription(subscriptionId);
+  }
+
+  public static Observable<Page<Subscription>> subscriptionsWithDeviceId(@NonNull String deviceId) {
+    return subscriptionsWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<Page<Subscription>> subscriptionsWithDeviceId(@NonNull String deviceId,
+      @Nullable Integer limit, @Nullable Integer offset, @Nullable String objectId,
+      @Nullable String objectType) {
+    return Vinli.curApp()
+        .subscriptions()
+        .subscriptions(deviceId, limit, offset, objectId, objectType);
+  }
+
   public abstract String deviceId();
   public abstract String eventType();
   public abstract String url();
@@ -47,8 +64,8 @@ public abstract class Subscription implements VinliItem {
 
   /*package*/ Subscription() { }
 
-  public Observable<Page<Notification>> notifications() {
-    return Vinli.curApp().linkLoader().read(links().notifications(), Notification.PAGE_TYPE);
+  public Observable<TimeSeries<Notification>> notifications() {
+    return Vinli.curApp().notifications().notificationsForSubscription(this.id(), null, null, null, null);
   }
 
   public SeedEdit.Saver edit() {

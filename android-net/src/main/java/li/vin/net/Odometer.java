@@ -12,11 +12,9 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Date;
 import rx.Observable;
 
-/**
- * Created by tbrown on 3/22/16.
- */
 @AutoParcel
 public abstract class Odometer implements VinliItem{
   /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Odometer>>() { }.getType();
@@ -29,6 +27,22 @@ public abstract class Odometer implements VinliItem{
 
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Odometer.class));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Odometer.class));
+  }
+
+  public static Observable<Odometer> odometerWithId(@NonNull String odometerId) {
+    return Vinli.curApp().odometerReport(odometerId);
+  }
+
+  public static Observable<TimeSeries<Odometer>> odometersWithVehicleId(@NonNull String vehicleId) {
+    return odometersWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Odometer>> odometersWithVehicleId(@NonNull String vehicleId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().distances().odometerReports(vehicleId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String vehicleId();

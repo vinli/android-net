@@ -10,10 +10,12 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import rx.Observable;
 
 public class Message implements VinliItem {
   /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Message>>() {
@@ -26,6 +28,22 @@ public class Message implements VinliItem {
     gb.registerTypeAdapter(TIME_SERIES_TYPE,
         TimeSeries.Adapter.create(TIME_SERIES_TYPE, Message.class));
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Message.class));
+  }
+
+  public static Observable<Message> messageWithId(@NonNull String messageId) {
+    return Vinli.curApp().message(messageId);
+  }
+
+  public static Observable<TimeSeries<Message>> messagesWithDeviceId(@NonNull String deviceId) {
+    return messagesWithDeviceId(deviceId, null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Message>> messagesWithDeviceId(@NonNull String deviceId,
+      @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    Long sinceMs = since == null ? null : since.getTime();
+    Long untilMs = until == null ? null : until.getTime();
+    return Vinli.curApp().messages().messages(deviceId, sinceMs, untilMs, limit, sortDir);
   }
 
   public String id;

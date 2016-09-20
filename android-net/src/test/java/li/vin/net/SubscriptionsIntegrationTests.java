@@ -24,8 +24,7 @@ public class SubscriptionsIntegrationTests {
   @Test public void getSubscriptionByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.subscriptions()
-        .subscriptions(TestHelper.getDeviceId(), null, null, null, null)
+    Subscription.subscriptionsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
         .subscribe(new Subscriber<Page<Subscription>>() {
           @Override public void onCompleted() {
           }
@@ -78,10 +77,9 @@ public class SubscriptionsIntegrationTests {
   @Test public void getSubscriptionById() {
     assertTrue(TestHelper.getSubscriptionId() != null);
 
-    vinliApp.subscriptions()
-        .subscription(TestHelper.getSubscriptionId())
+    Subscription.subscriptionWithId(TestHelper.getSubscriptionId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Subscription>>() {
+        .subscribe(new Subscriber<Subscription>() {
           @Override public void onCompleted() {
           }
 
@@ -89,9 +87,7 @@ public class SubscriptionsIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Subscription> subscriptionWrapped) {
-            Subscription subscription = subscriptionWrapped.item();
-
+          @Override public void onNext(Subscription subscription) {
             assertTrue(subscription.id() != null && subscription.id().length() > 0);
             assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
             assertTrue(subscription.url() != null && subscription.url().length() > 0);

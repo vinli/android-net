@@ -25,8 +25,7 @@ public class EventsIntegrationTests {
   @Test public void testGetEventsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    vinliApp.events()
-        .events(TestHelper.getDeviceId(), null, null, null, null, null)
+    Event.eventsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {
 
@@ -34,7 +33,6 @@ public class EventsIntegrationTests {
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
@@ -56,7 +54,7 @@ public class EventsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.events()
-        .events(TestHelper.getDeviceId(), null, null, 0L, currentTimeMillis(), 5)
+        .events(TestHelper.getDeviceId(), null, null, 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {
 
@@ -64,7 +62,6 @@ public class EventsIntegrationTests {
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
@@ -86,9 +83,7 @@ public class EventsIntegrationTests {
   @Test public void testGetEventById() {
     assertTrue(TestHelper.getEventId() != null);
 
-    vinliApp.events()
-        .event(TestHelper.getEventId())
-        .map(Wrapped.<Event>pluckItem())
+    Event.eventWithId(TestHelper.getEventId())
         .toBlocking()
         .subscribe(new Subscriber<Event>() {
           @Override public void onCompleted() {
@@ -96,7 +91,6 @@ public class EventsIntegrationTests {
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }

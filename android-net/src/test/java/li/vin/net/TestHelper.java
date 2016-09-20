@@ -85,6 +85,21 @@ public class TestHelper {
     return eventId.equals("DEFAULT_EVENT_ID") ? null : eventId;
   }
 
+  public static String getCollisionId(){
+    String collisionId = BuildConfig.COLLISION_ID;
+    return collisionId.equals("DEFAULT_COLLISION_ID") ? null : collisionId;
+  }
+
+  public static String getReportCardId(){
+    String reportCardId = BuildConfig.REPORT_CARD_ID;
+    return reportCardId.equals("DEFAULT_REPORT_CARD_ID") ? null : reportCardId;
+  }
+
+  public static String getNotificationId(){
+    String notificationId = BuildConfig.NOTIFICATION_ID;
+    return notificationId.equals("DEFAULT_NOTIFICATION_ID") ? null : notificationId;
+  }
+
   public static OkHttpClient configureClient(final OkHttpClient client) {
     final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
 

@@ -25,8 +25,7 @@ public class MessagesIntegrationTests {
   @Test public void getMessagesByDeviceId() {
     assertTrue(getDeviceId() != null);
 
-    vinliApp.messages()
-        .messages(getDeviceId(), null, null, null, null)
+    Message.messagesWithDeviceId(getDeviceId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
           @Override public void onCompleted() {
@@ -34,7 +33,6 @@ public class MessagesIntegrationTests {
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
@@ -62,7 +60,6 @@ public class MessagesIntegrationTests {
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
@@ -82,23 +79,19 @@ public class MessagesIntegrationTests {
   @Test public void getMessageById() {
     assertTrue(TestHelper.getMessageId() != null);
 
-    vinliApp.messages()
-        .message(TestHelper.getMessageId())
+    Message.messageWithId(TestHelper.getMessageId())
         .toBlocking()
-        .subscribe(new Subscriber<Wrapped<Message>>() {
+        .subscribe(new Subscriber<Message>() {
           @Override public void onCompleted() {
 
           }
 
           @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
             assertTrue(false);
           }
 
-          @Override public void onNext(Wrapped<Message> messageWrapped) {
-            Message message = messageWrapped.item();
-
+          @Override public void onNext(Message message) {
             assertTrue(message.id() != null && message.id().length() > 0);
             assertTrue(message.timestamp != null && message.timestamp.length() > 0);
           }

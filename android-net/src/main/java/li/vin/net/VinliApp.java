@@ -25,6 +25,9 @@ public final class VinliApp {
   private final Trips mTrips;
   private final Distances mDistances;
   private final Messages mMessages;
+  private final Collisions mCollisions;
+  private final ReportCards mReportCards;
+  private final Notifications mNotifications;
 
   private final Gson mGson;
   private final LinkLoader mLinkLoader;
@@ -58,6 +61,8 @@ public final class VinliApp {
     StreamMessage.ParametricFilter.registerGson(gsonB);
     StreamMessage.GeometryFilter.registerGson(gsonB);
     Message.registerGson(gsonB);
+    Collision.registerGson(gsonB);
+    ReportCard.registerGson(gsonB);
 
     return gsonB;
   }
@@ -116,6 +121,7 @@ public final class VinliApp {
 
     mEvents = eventsAdapter.create(Events.class);
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
+    mNotifications = eventsAdapter.create(Notifications.class);
 
     final RestAdapter telemAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.TELEMETRY)
         .setLog(logger)
@@ -156,6 +162,26 @@ public final class VinliApp {
         .setRequestInterceptor(oauthInterceptor)
         .build()
         .create(Distances.class);
+
+    mCollisions = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.SAFETY)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(Collisions.class);
+
+    mReportCards = new RestAdapter.Builder()
+        .setEndpoint(Endpoint.BEHAVIORAL)
+        .setLog(logger)
+        .setLogLevel(logLevel)
+        .setClient(client)
+        .setConverter(gson)
+        .setRequestInterceptor(oauthInterceptor)
+        .build()
+        .create(ReportCards.class);
   }
 
   public String getAccessToken() {
@@ -197,6 +223,10 @@ public final class VinliApp {
     return mRules.rule(ruleId).map(Wrapped.<Rule>pluckItem());
   }
 
+  public Observable<Collision> collision(@NonNull String collisionId){
+    return mCollisions.collision(collisionId).map(Wrapped.<Collision>pluckItem());
+  }
+
   public Observable<Subscription> subscription(@NonNull String subscriptionId) {
     return mSubscriptions.subscription(subscriptionId).map(Wrapped.<Subscription>pluckItem());
   }
@@ -209,8 +239,20 @@ public final class VinliApp {
     return mDistances.odometerTrigger(odometerTriggerId).map(Wrapped.<OdometerTrigger>pluckItem());
   }
 
+  public Observable<ReportCard> reportCard(@NonNull String reportCardId){
+    return mReportCards.reportCard(reportCardId).map(Wrapped.<ReportCard>pluckItem());
+  }
+
   public Observable<Message> message(@NonNull String messageId){
     return mMessages.message(messageId).map(Wrapped.<Message>pluckItem());
+  }
+
+  public Observable<Notification> notification(@NonNull String notificationId){
+    return mNotifications.notification(notificationId).map(Wrapped.<Notification>pluckItem());
+  }
+
+  public Observable<Event> event(@NonNull String eventId){
+    return mEvents.event(eventId).map(Wrapped.<Event>pluckItem());
   }
 
   /*package*/ Vehicles vehicles() {
@@ -251,6 +293,18 @@ public final class VinliApp {
 
   /*package*/ Diagnostics diagnostics(){
     return mDiagnostics;
+  }
+
+  /*package*/ Collisions collisions(){
+    return mCollisions;
+  }
+
+  /*package*/ ReportCards reportCards(){
+    return mReportCards;
+  }
+
+  /*package*/ Notifications notifications(){
+    return mNotifications;
   }
 
   /*package*/ LinkLoader linkLoader() {

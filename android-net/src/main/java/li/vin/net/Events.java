@@ -16,7 +16,8 @@ import rx.Observable;
       @Nullable @Query("objectId") String objectId,
       @Nullable @Query("since") Long since,
       @Nullable @Query("until") Long until,
-      @Nullable @Query("limit") Integer limit);
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("sortDir") String sortDir);
 
   @GET("/events/{eventId}")
   Observable<Wrapped<Event>> event(@NonNull @Path("eventId") String eventId);
