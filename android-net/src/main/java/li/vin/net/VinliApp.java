@@ -2,15 +2,21 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.android.AndroidLog;
-import retrofit.client.Client;
-import retrofit.client.OkClient;
-import retrofit.converter.GsonConverter;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 public final class VinliApp {
   private final Devices mDevices;
@@ -30,11 +36,10 @@ public final class VinliApp {
   private final Notifications mNotifications;
 
   private final Gson mGson;
-  private final LinkLoader mLinkLoader;
 
   private final String mAccessToken;
 
-  /*package*/ static Client client = new OkClient();
+  private OkHttpClient client;
 
   public GsonBuilder gsonBuilder() {
     final GsonBuilder gsonB = new GsonBuilder();
@@ -67,119 +72,125 @@ public final class VinliApp {
     return gsonB;
   }
 
+  /*package*/ Observable<? extends Page<? extends VinliItem>> pagingPageObservable(
+      Class itemClz, String link) {
+    // TODO - add every Retrofit interface and class to this
+    if (Device.class.equals(itemClz)) {
+      // return mDevices.devicesFromLink(link);
+    }
+    throw new RuntimeException(String.format("no paging observable for %s", link));
+  }
+
+  /*package*/ Observable<? extends TimeSeries<? extends VinliItem>> pagingTsObservable(
+      Class itemClz, String link) {
+    // TODO - add every Retrofit interface and class to this
+    if (Device.class.equals(itemClz)) {
+      // return mDevices.devicesFromLink(link);
+    }
+    throw new RuntimeException(String.format("no paging observable for %s", link));
+  }
+
+  /*package*/ static OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+
   /*protected*/ VinliApp(@NonNull String accessToken) {
     mAccessToken = accessToken;
 
-    final RestAdapter.Log logger = new AndroidLog("VinliNet");
+    HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+      @Override public void log(String message) {
+        Log.d("VinliNet", message);
+      }
+    });
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
+
+    client = clientBuilder.build().newBuilder()
+        .addInterceptor(new OauthInterceptor(accessToken))
+        .addInterceptor(loggingInterceptor)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .build();
 
     mGson = gsonBuilder().create();
+    final GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(mGson);
+    RxJavaCallAdapterFactory rxJavaCallAdapterFactory =
+        RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
 
-    final GsonConverter gson = new GsonConverter(mGson);
-
-    mLinkLoader = new LinkLoader(client, accessToken, gson);
-
-    final RestAdapter.LogLevel logLevel = RestAdapter.LogLevel.FULL;
-
-    final RequestInterceptor oauthInterceptor = new OauthInterceptor(accessToken);
-
-    final RestAdapter platformAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.PLATFORM)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    final Retrofit platformAdapter = new Retrofit.Builder().baseUrl(Endpoint.PLATFORM.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build();
 
     mDevices = platformAdapter.create(Devices.class);
     mVehicles = platformAdapter.create(Vehicles.class);
 
-    mDiagnostics = new RestAdapter.Builder().setEndpoint(Endpoint.DIAGNOSTICS)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mDiagnostics = new Retrofit.Builder().baseUrl(Endpoint.DIAGNOSTICS.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Diagnostics.class);
 
-    mRules = new RestAdapter.Builder().setEndpoint(Endpoint.RULES)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mRules = new Retrofit.Builder().baseUrl(Endpoint.RULES.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Rules.class);
 
-    final RestAdapter eventsAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.EVENTS)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    final Retrofit eventsAdapter = new Retrofit.Builder().baseUrl(Endpoint.EVENTS.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build();
 
     mEvents = eventsAdapter.create(Events.class);
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
     mNotifications = eventsAdapter.create(Notifications.class);
 
-    final RestAdapter telemAdapter = new RestAdapter.Builder().setEndpoint(Endpoint.TELEMETRY)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    final Retrofit telemAdapter = new Retrofit.Builder().baseUrl(Endpoint.TELEMETRY.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build();
 
     mLocations = telemAdapter.create(Locations.class);
     mSnapshots = telemAdapter.create(Snapshots.class);
     mMessages = telemAdapter.create(Messages.class);
 
-    mUsers = new RestAdapter.Builder().setEndpoint(Endpoint.AUTH)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mUsers = new Retrofit.Builder().baseUrl(Endpoint.AUTH.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Users.class);
 
-    mTrips = new RestAdapter.Builder().setEndpoint(Endpoint.TRIPS)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mTrips = new Retrofit.Builder().baseUrl(Endpoint.TRIPS.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Trips.class);
 
-    mDistances = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.DISTANCE)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mDistances = new Retrofit.Builder().baseUrl(Endpoint.DISTANCE.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Distances.class);
 
-    mCollisions = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.SAFETY)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mCollisions = new Retrofit.Builder()
+        .baseUrl(Endpoint.SAFETY.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Collisions.class);
 
-    mReportCards = new RestAdapter.Builder()
-        .setEndpoint(Endpoint.BEHAVIORAL)
-        .setLog(logger)
-        .setLogLevel(logLevel)
-        .setClient(client)
-        .setConverter(gson)
-        .setRequestInterceptor(oauthInterceptor)
+    mReportCards = new Retrofit.Builder()
+        .baseUrl(Endpoint.BEHAVIORAL.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(ReportCards.class);
   }
@@ -307,15 +318,11 @@ public final class VinliApp {
     return mNotifications;
   }
 
-  /*package*/ LinkLoader linkLoader() {
-    return mLinkLoader;
-  }
-
   /*package*/ Gson gson() {
     return mGson;
   }
 
-  private static final class OauthInterceptor implements RequestInterceptor {
+  private static final class OauthInterceptor implements Interceptor {
     private static final String AUTH = "Authorization";
     private final String mBearer;
 
@@ -323,9 +330,12 @@ public final class VinliApp {
       mBearer = "Bearer " + accessToken;
     }
 
-    @Override
-    public void intercept(RequestFacade request) {
-      request.addHeader(AUTH, mBearer);
+    @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+      Request original = chain.request();
+
+      Request request = original.newBuilder().header(AUTH, mBearer).build();
+
+      return chain.proceed(request);
     }
   }
 }

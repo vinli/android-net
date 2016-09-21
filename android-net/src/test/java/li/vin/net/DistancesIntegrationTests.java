@@ -134,34 +134,63 @@ public class DistancesIntegrationTests {
         });
   }
 
+  @Test public void getOdometersByUrl() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    vinliApp.distances()
+        .odometerReportsForUrl(String.format("%svehicles/%s/odometers", Endpoint.DISTANCE.getUrl(),
+            TestHelper.getVehicleId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Odometer>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
+            assertTrue(odometerTimeSeries.getItems().size() > 0);
+
+            for (Odometer odometer : odometerTimeSeries.getItems()) {
+              assertTrue(odometer.id() != null && odometer.id().length() > 0);
+              assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+              assertTrue(odometer.date() != null && odometer.date().length() > 0);
+              assertTrue(odometer.reading() != null);
+            }
+          }
+        });
+  }
+
   @Test
   public void getOdometerTriggersByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
-      @Override
-      public void onCompleted() {
-      }
+    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(
+        new Subscriber<TimeSeries<OdometerTrigger>>() {
+          @Override public void onCompleted() {
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(TimeSeries<OdometerTrigger> odometerTriggerTimeSeries) {
-        assertTrue(odometerTriggerTimeSeries.getItems().size() > 0);
+          @Override public void onNext(TimeSeries<OdometerTrigger> odometerTriggerTimeSeries) {
+            assertTrue(odometerTriggerTimeSeries.getItems().size() > 0);
 
-        for(OdometerTrigger odometerTrigger : odometerTriggerTimeSeries.getItems()){
-          assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
-          assertTrue(odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
-          assertTrue(odometerTrigger.type() != null);
-          assertTrue(odometerTrigger.threshold() != null);
-        }
-      }
-    });
+            for (OdometerTrigger odometerTrigger : odometerTriggerTimeSeries.getItems()) {
+              assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
+              assertTrue(
+                  odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
+              assertTrue(odometerTrigger.type() != null);
+              assertTrue(odometerTrigger.threshold() != null);
+            }
+          }
+        });
   }
 
   @Test
@@ -187,5 +216,37 @@ public class DistancesIntegrationTests {
             assertTrue(odometerTrigger.threshold() != null);
           }
         });
+  }
+
+  @Test public void getOdometerTriggersByUrl() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    vinliApp.distances()
+        .odometerTriggersForUrl(
+            String.format("%svehicles/%s/odometer_triggers", Endpoint.DISTANCE.getUrl(),
+                TestHelper.getVehicleId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<OdometerTrigger> odometerTriggerTimeSeries) {
+                assertTrue(odometerTriggerTimeSeries.getItems().size() > 0);
+
+                for (OdometerTrigger odometerTrigger : odometerTriggerTimeSeries.getItems()) {
+                  assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
+                  assertTrue(
+                      odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
+                  assertTrue(odometerTrigger.type() != null);
+                  assertTrue(odometerTrigger.threshold() != null);
+                }
+              }
+            });
   }
 }

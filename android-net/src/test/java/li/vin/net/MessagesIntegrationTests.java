@@ -97,4 +97,32 @@ public class MessagesIntegrationTests {
           }
         });
   }
+
+  @Test public void getMessagesByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.messages()
+        .messagesForUrl(String.format("%sdevices/%s/messages", Endpoint.TELEMETRY.getUrl(),
+            TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+                assertTrue(messageTimeSeries.getItems().size() > 0);
+
+                for (Message message : messageTimeSeries.getItems()) {
+                  assertTrue(message.id() != null && message.id().length() > 0);
+                  assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+                }
+              }
+            });
+  }
 }

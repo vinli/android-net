@@ -77,7 +77,7 @@ public abstract class Subscription implements VinliItem {
   }
 
   public Observable<Void> delete() {
-    return Vinli.curApp().linkLoader().delete(links().self());
+    return Vinli.curApp().subscriptions().delete(this.id());
   }
 
   @AutoParcel

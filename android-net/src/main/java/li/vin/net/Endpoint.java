@@ -3,7 +3,7 @@ package li.vin.net;
 import android.support.annotation.NonNull;
 import com.squareup.okhttp.HttpUrl;
 
-/*package*/ enum Endpoint implements retrofit.Endpoint {
+/*package*/ enum Endpoint {
   AUTH("auth"),
   DIAGNOSTICS("diagnostic"),
   EVENTS("events"),
@@ -40,14 +40,15 @@ import com.squareup.okhttp.HttpUrl;
         .host(subDomain + domain())
         .addPathSegment("api")
         .addPathSegment("v1")
+        .addPathSegment("")
         .build();
   }
 
-  @Override public String getName() {
+  public String getName() {
     return this.name();
   }
 
-  @Override public String getUrl() {
+  public String getUrl() {
     return mUrl.newBuilder().host(subDomain + domain()).toString();
   }
 

@@ -76,4 +76,33 @@ public class SnapshotsIntegrationTests {
           }
         });
   }
+
+  @Test public void getSnapshotsByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.snapshots()
+        .snapshotsForUrl(
+            String.format("%sdevices/%s/snapshots?fields=vehicleSpeed", Endpoint.TELEMETRY.getUrl(),
+                TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<Snapshot> snapshotTimeSeries) {
+                assertTrue(snapshotTimeSeries.getItems().size() > 0);
+
+                for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+                  assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
+                  assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
+                }
+              }
+            });
+  }
 }

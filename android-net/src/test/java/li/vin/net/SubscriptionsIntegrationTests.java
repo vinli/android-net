@@ -94,4 +94,33 @@ public class SubscriptionsIntegrationTests {
           }
         });
   }
+
+  @Test public void getSubscriptionsByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.subscriptions()
+        .subscriptionsForUrl(String.format("%sdevices/%s/subscriptions", Endpoint.EVENTS.getUrl(),
+            TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Subscription>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Page<Subscription> subscriptionPage) {
+                assertTrue(subscriptionPage.getItems().size() > 0);
+
+                for (Subscription subscription : subscriptionPage.getItems()) {
+                  assertTrue(subscription.id() != null && subscription.id().length() > 0);
+                  assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+                  assertTrue(subscription.url() != null && subscription.url().length() > 0);
+                }
+              }
+            });
+  }
 }
