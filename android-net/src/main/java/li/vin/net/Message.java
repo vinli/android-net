@@ -35,9 +35,16 @@ public class Message implements VinliItem {
   }
 
   public static Observable<TimeSeries<Message>> messagesWithDeviceId(@NonNull String deviceId) {
-    return messagesWithDeviceId(deviceId, null, null, null, null);
+    return messagesWithDeviceId(deviceId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Message>> messagesWithDeviceId(@NonNull String deviceId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().messages().messages(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Message>> messagesWithDeviceId(@NonNull String deviceId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {

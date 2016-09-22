@@ -26,7 +26,7 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotificationsFromEvent() {
     assertTrue(TestHelper.getEventId() != null);
 
-    Notification.notificationsWithEventId(TestHelper.getEventId(), null, null, null, null)
+    Notification.notificationsWithEventId(TestHelper.getEventId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {
           @Override public void onCompleted() {
@@ -57,7 +57,7 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotificationsForSubscription() {
     assertTrue(TestHelper.getSubscriptionId() != null);
 
-    Notification.notificationsWithSubscriptionId(TestHelper.getSubscriptionId(), null, null, null,
+    Notification.notificationsWithSubscriptionId(TestHelper.getSubscriptionId(), (Long) null, null, null,
         null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {

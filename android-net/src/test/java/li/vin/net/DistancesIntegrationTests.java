@@ -30,7 +30,7 @@ public class DistancesIntegrationTests {
   public void testGetDistancesByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    DistanceList.distancesWithVehicleId(TestHelper.getVehicleId(), null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
+    DistanceList.distancesWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
       @Override
       public void onCompleted() {
       }
@@ -84,7 +84,7 @@ public class DistancesIntegrationTests {
   public void getOdometerReportsByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
       @Override
       public void onCompleted() {
       }
@@ -168,7 +168,7 @@ public class DistancesIntegrationTests {
   public void getOdometerTriggersByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(
+    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(
         new Subscriber<TimeSeries<OdometerTrigger>>() {
           @Override public void onCompleted() {
           }

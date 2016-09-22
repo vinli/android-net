@@ -31,9 +31,18 @@ public abstract class Event implements VinliItem {
   }
 
   public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId){
-    return eventsWithDeviceId(deviceId, null, null, null, null, null, null);
+    return eventsWithDeviceId(deviceId, null, null, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId,
+      @Nullable String type, @Nullable String objectId, @Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .events()
+        .events(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId,
       @Nullable String type, @Nullable String objectId, @Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
@@ -51,7 +60,14 @@ public abstract class Event implements VinliItem {
   @Nullable public abstract ObjectRef object();
 
   public Observable<TimeSeries<Notification>> notifications() {
-    return Vinli.curApp().notifications().notificationsForEvent(this.id(), null, null, null, null);
+    return notifications(null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Notification>> notifications(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForEvent(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
   /*package*/ abstract Links links();

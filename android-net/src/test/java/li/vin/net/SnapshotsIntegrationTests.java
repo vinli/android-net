@@ -25,7 +25,7 @@ public class SnapshotsIntegrationTests {
   @Test public void getSnapshotsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Snapshot.snapshotsWithDeviceId(TestHelper.getDeviceId(), "location,vehicleSpeed", null, null, null, null)
+    Snapshot.snapshotsWithDeviceId(TestHelper.getDeviceId(), "location,vehicleSpeed", (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
           @Override public void onCompleted() {

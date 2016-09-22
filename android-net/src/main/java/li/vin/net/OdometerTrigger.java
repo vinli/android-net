@@ -67,9 +67,14 @@ public abstract class OdometerTrigger implements VinliItem{
 
   public static Observable<TimeSeries<OdometerTrigger>> odometerTriggersWithVehicleId(
       @NonNull String vehicleId) {
-    return odometerTriggersWithVehicleId(vehicleId, null, null, null, null);
+    return odometerTriggersWithVehicleId(vehicleId, (Long) null, null, null, null);
   }
 
+  public static  Observable<TimeSeries<OdometerTrigger>> odometerTriggersWithVehicleId(@NonNull String vehicleId, @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir){
+    return Vinli.curApp().distances().odometerTriggers(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<OdometerTrigger>> odometerTriggersWithVehicleId(
       @NonNull String vehicleId, @Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {

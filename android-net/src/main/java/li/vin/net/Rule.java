@@ -79,7 +79,7 @@ public abstract class Rule implements VinliItem {
   /*package*/ Rule() { }
 
   public Observable<TimeSeries<Event>> events() {
-    return Event.eventsWithDeviceId(this.deviceId(), "rule-*", this.id(), null, null, null, null);
+    return Event.eventsWithDeviceId(this.deviceId(), "rule-*", this.id(), (Long) null, null, null, null);
   }
 
   public Observable<Page<Subscription>> subscriptions() {

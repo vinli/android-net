@@ -25,7 +25,7 @@ public class EventsIntegrationTests {
   @Test public void testGetEventsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Event.eventsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null, null, null)
+    Event.eventsWithDeviceId(TestHelper.getDeviceId(), null, null, (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {
 

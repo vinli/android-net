@@ -43,9 +43,16 @@ public class Snapshot implements VinliItem {
 
   public static Observable<TimeSeries<Snapshot>> snapshotsWithDeviceId(@NonNull String deviceId,
       @NonNull String fields) {
-    return snapshotsWithDeviceId(deviceId, fields, null, null, null, null);
+    return snapshotsWithDeviceId(deviceId, fields, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Snapshot>> snapshotsWithDeviceId(@NonNull String deviceId,
+      @NonNull String fields, @Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().snapshots().snapshots(deviceId, fields, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Snapshot>> snapshotsWithDeviceId(@NonNull String deviceId,
       @NonNull String fields, @Nullable Date until, @Nullable Date since, @Nullable Integer limit,
       @Nullable String sortDir) {
