@@ -1,28 +1,27 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-
-import auto.parcel.AutoParcel;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.internal.operators.OnSubscribeFromIterable;
 
 @AutoParcel
 public abstract class Page<T extends VinliItem> implements Parcelable {
+
   /*package*/ static final Func1 EXTRACT_ITEMS = new Func1<Page<?>, Observable<?>>() {
     @Override public Observable<?> call(Page<?> tPage) {
       return tPage.observeItems();
@@ -68,6 +67,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
   /*package*/ abstract List<T> items();
   /*package*/ abstract Meta meta();
   /*package*/ abstract Type type();
+  /*package*/ abstract String className();
 
   public int size() {
     return items().size();
@@ -75,6 +75,19 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
 
   public int total() {
     return meta().pagination().total();
+  }
+
+  private Observable<Page<T>> loadLink(@NonNull String link){
+    final Class<T> clz;
+    try {
+      //noinspection unchecked
+      clz = (Class<T>) Class.forName(className());
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
+    //noinspection unchecked
+    return (Observable<Page<T>>) Vinli.curApp().pagingPageObservable(clz, link);
   }
 
   public List<T> getItems() {
@@ -101,7 +114,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no prev link"));
     }
 
-    return Vinli.curApp().linkLoader().read(link, type());
+    return loadLink(link);
   }
 
   public Observable<Page<T>> loadNextPage() {
@@ -115,7 +128,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no next link"));
     }
 
-    return Vinli.curApp().linkLoader().read(link, type());
+    return loadLink(link);
   }
 
   public Observable<Page<T>> loadFirstPage() {
@@ -124,7 +137,12 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().read(links.first(), type());
+    final String link = links.first();
+    if(link == null){
+      return Observable.error(new IOException("no first link"));
+    }
+
+    return loadLink(link);
   }
 
   public Observable<Page<T>> loadLastPage() {
@@ -133,7 +151,12 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no links"));
     }
 
-    return Vinli.curApp().linkLoader().read(links.last(), type());
+    final String link = links.last();
+    if(link == null){
+      return Observable.error(new IOException("no last link"));
+    }
+
+    return loadLink(link);
   }
 
   /*package*/ Page() { }
@@ -164,6 +187,7 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
     Builder<T> items(List<T> l);
     Builder<T> meta(Meta m);
     Builder<T> type(Type t);
+    Builder<T> className(String c);
 
     Page<T> build();
   }
@@ -199,7 +223,8 @@ public abstract class Page<T extends VinliItem> implements Parcelable {
       }
 
       final Page.Builder<T> b = new AutoParcel_Page.Builder<T>()
-          .type(pageType);
+          .type(pageType)
+          .className(itemCls.getName());
 
       in.beginObject();
       while (in.hasNext()) {

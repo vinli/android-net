@@ -79,31 +79,19 @@ public abstract class Rule implements VinliItem {
   /*package*/ Rule() { }
 
   public Observable<TimeSeries<Event>> events() {
-    final String events = links().events();
-    if (events == null) {
-      return Observable.error(new IOException("no events link"));
-    }
-
-    return Vinli.curApp().linkLoader().read(events, Event.TIME_SERIES_TYPE);
+    return Event.eventsWithDeviceId(this.deviceId(), "rule-*", this.id(), null, null, null, null);
   }
 
   public Observable<Page<Subscription>> subscriptions() {
-    final String subscriptions = links().subscriptions();
-    if (subscriptions == null) {
-      return Observable.error(new IOException("no subscriptions link"));
-    }
-
-    return Vinli.curApp().linkLoader().read(subscriptions, Subscription.PAGE_TYPE);
+    return Subscription.subscriptionsWithDeviceId(this.deviceId(), null, null, this.id(), "rule");
   }
 
   public Observable<Rule> fill() {
-    return Vinli.curApp().linkLoader()
-        .<Wrapped<Rule>>read(links().self(), Rule.WRAPPED_TYPE)
-        .map(Wrapped.<Rule>pluckItem());
+    return Rule.ruleWithId(this.id());
   }
 
   public Observable<Void> delete() {
-    return Vinli.curApp().linkLoader().delete(links().self());
+    return Vinli.curApp().rules().delete(this.id());
   }
 
   @AutoParcel

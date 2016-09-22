@@ -1,13 +1,11 @@
 package li.vin.net;
 
 
-import com.squareup.okhttp.OkHttpClient;
-
+import javax.net.ssl.SSLSocketFactory;
+import okhttp3.OkHttpClient;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -15,7 +13,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import retrofit.client.OkClient;
 
 public class TestHelper {
 
@@ -23,7 +20,7 @@ public class TestHelper {
 
   public static VinliApp getVinliApp(){
     if(vinliApp == null){
-      VinliApp.client = new OkClient(configureClient(new OkHttpClient()));
+      VinliApp.clientBuilder = generateUnsafeBuilder();
 
       Endpoint.setDomain(Endpoint.DOMAIN_DEV);
       FakeHttp.getFakeHttpLayer().interceptHttpRequests(false);
@@ -100,45 +97,92 @@ public class TestHelper {
     return notificationId.equals("DEFAULT_NOTIFICATION_ID") ? null : notificationId;
   }
 
-  public static OkHttpClient configureClient(final OkHttpClient client) {
-    final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
+  //public static OkHttpClient.Builder configureClient(OkHttpClient.Builder clientBuilder) {
+  //  final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
+  //
+  //    @Override
+  //    public X509Certificate[] getAcceptedIssuers() {
+  //      return null;
+  //    }
+  //
+  //    @Override
+  //    public void checkServerTrusted(final X509Certificate[] chain,
+  //                                   final String authType) throws CertificateException {
+  //    }
+  //
+  //    @Override
+  //    public void checkClientTrusted(final X509Certificate[] chain,
+  //                                   final String authType) throws CertificateException {
+  //    }
+  //  }};
+  //
+  //  SSLContext ctx = null;
+  //  try {
+  //    ctx = SSLContext.getInstance("TLS");
+  //    ctx.init(null, certs, new SecureRandom());
+  //  } catch (final java.security.GeneralSecurityException ex) {
+  //  }
+  //
+  //  try {
+  //    final HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+  //      @Override
+  //      public boolean verify(final String hostname,
+  //                            final SSLSession session) {
+  //        return true;
+  //      }
+  //    };
+  //
+  //    client.setHostnameVerifier(hostnameVerifier);
+  //    client.setSslSocketFactory(ctx.getSocketFactory());
+  //  } catch (final Exception e) {
+  //  }
+  //
+  //  return client;
+  //}
 
-      @Override
-      public X509Certificate[] getAcceptedIssuers() {
-        return null;
-      }
-
-      @Override
-      public void checkServerTrusted(final X509Certificate[] chain,
-                                     final String authType) throws CertificateException {
-      }
-
-      @Override
-      public void checkClientTrusted(final X509Certificate[] chain,
-                                     final String authType) throws CertificateException {
-      }
-    }};
-
-    SSLContext ctx = null;
+  public static OkHttpClient.Builder generateUnsafeBuilder(){
     try {
-      ctx = SSLContext.getInstance("TLS");
-      ctx.init(null, certs, new SecureRandom());
-    } catch (final java.security.GeneralSecurityException ex) {
-    }
+      // Create a trust manager that does not validate certificate chains
 
-    try {
+      final X509TrustManager x509TrustManager = new X509TrustManager() {
+        @Override
+        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+            throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+            throws CertificateException {
+        }
+
+        @Override public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+          return new java.security.cert.X509Certificate[] {};
+        }
+      };
+
+      final TrustManager[] trustAllCerts = new TrustManager[] {
+          x509TrustManager
+      };
+
+      // Install the all-trusting trust manager
+      final SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+      // Create an ssl socket factory with our all-trusting manager
+      final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
       final HostnameVerifier hostnameVerifier = new HostnameVerifier() {
         @Override
         public boolean verify(final String hostname,
-                              final SSLSession session) {
+            final SSLSession session) {
           return true;
         }
       };
-      client.setHostnameVerifier(hostnameVerifier);
-      client.setSslSocketFactory(ctx.getSocketFactory());
-    } catch (final Exception e) {
-    }
 
-    return client;
+      return new OkHttpClient.Builder()
+          .sslSocketFactory(sslSocketFactory, x509TrustManager)
+          .hostnameVerifier(hostnameVerifier);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

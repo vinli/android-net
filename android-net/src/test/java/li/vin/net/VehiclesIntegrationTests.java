@@ -119,4 +119,32 @@ public class VehiclesIntegrationTests {
           }
         });
   }
+
+  @Test public void getVehiclesByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.vehicles()
+        .vehiclesForUrl(String.format("%sdevices/%s/vehicles", Endpoint.PLATFORM.getUrl(),
+            TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Vehicle>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Page<Vehicle> vehiclePage) {
+                assertTrue(vehiclePage.getItems().size() > 0);
+
+                for (Vehicle vehicle : vehiclePage.getItems()) {
+                  assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+                  assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+                }
+              }
+            });
+  }
 }

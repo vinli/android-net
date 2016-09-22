@@ -2,14 +2,15 @@ package li.vin.net;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.Url;
 import rx.Observable;
 
 public interface Messages {
 
-  @GET("/devices/{deviceId}/messages")
+  @GET("devices/{deviceId}/messages")
   Observable<TimeSeries<Message>> messages(
     @NonNull @Path("deviceId") String deviceId,
     @Nullable @Query("since") Long since,
@@ -17,7 +18,9 @@ public interface Messages {
     @Nullable @Query("limit") Integer limit,
     @Nullable @Query("sortDir") String sortDir);
 
-  @GET("/messages/{messageId}")
+  @GET("messages/{messageId}")
   Observable<Wrapped<Message>> message(
     @NonNull @Path("messageId") String messageId);
+
+  @GET Observable<TimeSeries<Message>> messagesForUrl(@NonNull @Url String url);
 }

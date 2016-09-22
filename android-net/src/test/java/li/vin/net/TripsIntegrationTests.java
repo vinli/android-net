@@ -168,4 +168,35 @@ public class TripsIntegrationTests {
           }
         });
   }
+
+  @Test public void getTripsByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.trips()
+        .tripsForUrl(
+            String.format("%sdevices/%s/trips", Endpoint.TRIPS.getUrl(), TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Trip>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<Trip> tripTimeSeries) {
+                assertTrue(tripTimeSeries.getItems().size() > 0);
+
+                for (Trip trip : tripTimeSeries.getItems()) {
+                  assertTrue(trip.id() != null && trip.id().length() > 0);
+                  assertTrue(trip.deviceId() != null && trip.deviceId().length() > 0);
+                  assertTrue(trip.vehicleId() != null && trip.vehicleId().length() > 0);
+                  assertTrue(trip.start() != null && trip.start().length() > 0);
+                  assertTrue(trip.stop() != null && trip.stop().length() > 0);
+                }
+              }
+            });
+  }
 }

@@ -55,11 +55,12 @@ public class LocationsIntegrationTests {
   @Test public void testGetLatestLocation(){
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Device.deviceWithId(TestHelper.getDeviceId()).flatMap(new Func1<Device, Observable<Location>>() {
-      @Override public Observable<Location> call(Device device) {
-        return device.latestlocation();
-      }
-    }).toBlocking().subscribe(new Subscriber<Location>() {
+    Device.deviceWithId(TestHelper.getDeviceId()).flatMap(
+        new Func1<Device, Observable<Location>>() {
+          @Override public Observable<Location> call(Device device) {
+            return device.latestlocation();
+          }
+        }).toBlocking().subscribe(new Subscriber<Location>() {
       @Override public void onCompleted() {
 
       }
@@ -106,5 +107,35 @@ public class LocationsIntegrationTests {
             }
           }
         });
+  }
+
+  @Test public void getLocationsByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.locations()
+        .locationsForUrl(String.format("%sdevices/%s/locations", Endpoint.TELEMETRY.getUrl(),
+            TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Location>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<Location> locationTimeSeries) {
+                assertTrue(locationTimeSeries.getItems().size() > 0);
+
+                for (Location location : locationTimeSeries.getItems()) {
+                  assertTrue(location.coordinate() != null);
+                  assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+                  assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+                  assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+                }
+              }
+            });
   }
 }

@@ -135,7 +135,8 @@ public abstract class Location implements VinliItem {
       }
 
       final TimeSeries.Builder<Location> b = new AutoParcel_TimeSeries.Builder<Location>()
-          .type(TIME_SERIES_TYPE);
+          .type(TIME_SERIES_TYPE)
+          .className(this.getClass().getName());
 
       in.beginObject();
       while (in.hasNext()) {

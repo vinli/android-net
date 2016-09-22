@@ -151,4 +151,35 @@ public class ReportCardsIntegrationTests {
           }
         });
   }
+
+  @Test public void getReportCardsWithUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.reportCards()
+        .reportCardsForUrl(String.format("%sdevices/%s/report_cards", Endpoint.BEHAVIORAL.getUrl(),
+            TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(TimeSeries<ReportCard> reportCardTimeSeries) {
+                assertTrue(reportCardTimeSeries.getItems().size() > 0);
+
+                for (ReportCard reportCard : reportCardTimeSeries.getItems()) {
+                  assertTrue(reportCard.id() != null && reportCard.id().length() > 0);
+                  assertTrue(reportCard.deviceId() != null && reportCard.deviceId().length() > 0);
+                  assertTrue(reportCard.vehicleId() != null && reportCard.vehicleId().length() > 0);
+                  assertTrue(reportCard.tripId() != null && reportCard.tripId().length() > 0);
+                  assertTrue(reportCard.grade() != null && reportCard.grade().length() > 0);
+                }
+              }
+            });
+  }
 }

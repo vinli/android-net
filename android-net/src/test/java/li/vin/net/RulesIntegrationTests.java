@@ -73,4 +73,32 @@ public class RulesIntegrationTests {
       }
     });
   }
+
+  @Test public void getRulesByUrl() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    vinliApp.rules()
+        .rulesForUrl(
+            String.format("%sdevices/%s/rules", Endpoint.RULES.getUrl(), TestHelper.getDeviceId()))
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Rule>>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Page<Rule> rulePage) {
+                assertTrue(rulePage.getItems().size() > 0);
+
+                for(Rule rule : rulePage.getItems()){
+                  assertTrue(rule.id() != null && rule.id().length() > 0);
+                  assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+                }
+              }
+            });
+  }
 }

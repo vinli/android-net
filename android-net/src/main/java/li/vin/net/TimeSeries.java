@@ -1,6 +1,7 @@
 package li.vin.net;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
@@ -70,6 +71,20 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
   /*package*/ abstract List<T> items();
   /*package*/ abstract Meta meta();
   /*package*/ abstract Type type();
+  /*package*/ abstract String className();
+
+  private Observable<TimeSeries<T>> loadLink(@NonNull String link){
+    final Class<T> clz;
+    try {
+      //noinspection unchecked
+      clz = (Class<T>) Class.forName(className());
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
+    //noinspection unchecked
+    return (Observable<TimeSeries<T>>) Vinli.curApp().pagingTsObservable(clz, link);
+  }
 
   public int size() {
     return items().size();
@@ -98,7 +113,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no prior link"));
     }
 
-    return Vinli.curApp().linkLoader().read(link, type());
+    return loadLink(link);
   }
 
   public Observable<TimeSeries<T>> loadNext(){
@@ -112,7 +127,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
       return Observable.error(new IOException("no next link"));
     }
 
-    return Vinli.curApp().linkLoader().read(link, type());
+    return loadLink(link);
   }
 
   public boolean hasPrior() {
@@ -151,6 +166,7 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
     Builder<T> items(List<T> l);
     Builder<T> meta(Meta m);
     Builder<T> type(Type t);
+    Builder<T> className(String c);
 
     TimeSeries<T> build();
   }
@@ -186,7 +202,8 @@ public abstract class TimeSeries<T extends VinliItem> implements Parcelable {
       }
 
       final TimeSeries.Builder<T> b = new AutoParcel_TimeSeries.Builder<T>()
-          .type(pageType);
+          .type(pageType)
+          .className(itemCls.getName());
 
       in.beginObject();
       while (in.hasNext()) {

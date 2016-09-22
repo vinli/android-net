@@ -16,7 +16,11 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import rx.Observable;
 
 @AutoParcel
@@ -80,7 +84,7 @@ public abstract class Trip implements VinliItem {
   }
 
   public Observable<TimeSeries<Location>> locations() {
-    return Vinli.curApp().linkLoader().read(links().locations(), Location.TIME_SERIES_TYPE);
+    return Vinli.curApp().locations().locationsForUrl(links().locations());
   }
 
   //public Observable<TimeSeries<Message>> messages() {
@@ -88,7 +92,7 @@ public abstract class Trip implements VinliItem {
   //}
 
   public Observable<TimeSeries<Event>> events() {
-    return Vinli.curApp().linkLoader().read(links().events(), Event.TIME_SERIES_TYPE);
+    return Vinli.curApp().events().eventsForUrl(links().events());
   }
 
   public Observable<ReportCard> reportCard(){
