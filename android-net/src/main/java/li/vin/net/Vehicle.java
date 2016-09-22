@@ -169,5 +169,9 @@ public abstract class Vehicle implements VinliItem {
         sortDir);
   }
 
+  public Observable<BatteryStatus> currentBatteryStatus(){
+    return BatteryStatus.currentBatteryStatusForVehicle(this.id());
+  }
+
   /*package*/ Vehicle() { }
 }

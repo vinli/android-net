@@ -68,6 +68,7 @@ public final class VinliApp {
     Message.registerGson(gsonB);
     Collision.registerGson(gsonB);
     ReportCard.registerGson(gsonB);
+    BatteryStatus.registerGson(gsonB);
 
     return gsonB;
   }
