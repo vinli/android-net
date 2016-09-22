@@ -14,4 +14,7 @@ import rx.Observable;
   @GET("codes")
   Observable<Page<Dtc.Code>> diagnose(@NonNull @Query("number") String number);
 
+  @GET("vehicles/{vehicleId}/battery_statuses/_current")
+  Observable<Wrapped<BatteryStatus>> currentBatteryStatus(@NonNull @Path("vehicleId") String vehicleId);
+
 }

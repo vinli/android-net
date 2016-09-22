@@ -79,4 +79,28 @@ public class DiagnosticsIntegrationTests {
     });
   }
 
+  @Test public void getCurrentBatteryStatus() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    BatteryStatus.currentBatteryStatusForVehicle(TestHelper.getVehicleId())
+        .toBlocking()
+        .subscribe(new Subscriber<BatteryStatus>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(BatteryStatus batteryStatus) {
+            if (batteryStatus != null) {
+              assertTrue(batteryStatus.status() != null);
+              assertTrue(batteryStatus.timestamp().length() > 0);
+            }
+          }
+        });
+  }
+
 }
