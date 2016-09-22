@@ -24,9 +24,17 @@ public abstract class DistanceList implements VinliItem{
   public abstract List<Distance> distances();
 
   public static Observable<DistanceList> distancesWithVehicleId(@NonNull String vehicleId) {
-    return distancesWithVehicleId(vehicleId, null, null, null);
+    return distancesWithVehicleId(vehicleId, (Long) null, null, null);
   }
 
+  public static Observable<DistanceList> distancesWithVehicleId(@NonNull String vehicleId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable DistanceUnit unit) {
+    return Vinli.curApp()
+        .distances()
+        .distances(vehicleId, sinceMs, untilMs, (unit == null) ? null : unit.getDistanceUnitStr());
+  }
+
+  @Deprecated
   public static Observable<DistanceList> distancesWithVehicleId(@NonNull String vehicleId,
       @Nullable Date since, @Nullable Date until, @Nullable DistanceUnit unit) {
     Long sinceMs = since == null ? null : since.getTime();

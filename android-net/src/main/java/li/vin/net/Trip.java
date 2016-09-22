@@ -52,9 +52,16 @@ public abstract class Trip implements VinliItem {
   }
 
   public static Observable<TimeSeries<Trip>> tripsWithDeviceId(@NonNull String deviceId) {
-    return tripsWithDeviceId(deviceId, null, null, null, null);
+    return tripsWithDeviceId(deviceId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Trip>> tripsWithDeviceId(@NonNull String deviceId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().trips().trips(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Trip>> tripsWithDeviceId(@NonNull String deviceId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {
@@ -64,9 +71,16 @@ public abstract class Trip implements VinliItem {
   }
 
   public static Observable<TimeSeries<Trip>> tripsWithVehicleId(@NonNull String vehicleId) {
-    return tripsWithVehicleId(vehicleId, null, null, null, null);
+    return tripsWithVehicleId(vehicleId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Trip>> tripsWithVehicleId(@NonNull String vehicleId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().trips().vehicleTrips(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Trip>> tripsWithVehicleId(@NonNull String vehicleId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {

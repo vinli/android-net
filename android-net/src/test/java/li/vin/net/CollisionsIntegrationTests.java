@@ -25,7 +25,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByVehicleId(){
-    Collision.collisionsWithVehicleId(TestHelper.getVehicleId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+    Collision.collisionsWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 
@@ -53,7 +53,7 @@ public class CollisionsIntegrationTests {
 
   @Test
   public void testGetCollisionsByDeviceId(){
-    Collision.collisionsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+    Collision.collisionsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
       public void onCompleted() {
 

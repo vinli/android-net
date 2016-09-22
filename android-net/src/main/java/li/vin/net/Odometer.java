@@ -34,9 +34,16 @@ public abstract class Odometer implements VinliItem{
   }
 
   public static Observable<TimeSeries<Odometer>> odometersWithVehicleId(@NonNull String vehicleId) {
-    return odometersWithVehicleId(vehicleId, null, null, null, null);
+    return odometersWithVehicleId(vehicleId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Odometer>> odometersWithVehicleId(@NonNull String vehicleId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().distances().odometerReports(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Odometer>> odometersWithVehicleId(@NonNull String vehicleId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {

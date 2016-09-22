@@ -31,9 +31,16 @@ public abstract class Location implements VinliItem {
   }
 
   public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId) {
-    return locationsWithDeviceId(deviceId, null, null, null, null);
+    return locationsWithDeviceId(deviceId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().locations().locations(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Location>> locationsWithDeviceId(@NonNull String deviceId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {

@@ -48,9 +48,15 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<Trip>> trips() {
-    return Vinli.curApp().trips().vehicleTrips(id(), null, null, null, null);
+    return trips((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Trip>> trips(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().trips().vehicleTrips(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Trip>> trips(
       @Nullable Date since,
       @Nullable Date until,
@@ -62,9 +68,17 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<DistanceList> distances() {
-    return Vinli.curApp().distances().distances(this.id(), null, null, null);
+    return distances((Long) null, null, null);
   }
 
+  public Observable<DistanceList> distances(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable DistanceUnit unit) {
+    return Vinli.curApp()
+        .distances()
+        .distances(this.id(), sinceMs, untilMs, (unit == null) ? null : unit.getDistanceUnitStr());
+  }
+
+  @Deprecated
   public Observable<DistanceList> distances(@Nullable String since, @Nullable String until,
       @Nullable DistanceUnit unit) {
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.getDefault());
@@ -81,6 +95,7 @@ public abstract class Vehicle implements VinliItem {
     return distances(sinceDate, untilDate, unit);
   }
 
+  @Deprecated
   public Observable<DistanceList> distances(@Nullable Date since, @Nullable Date until,
       @Nullable DistanceUnit unit) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -100,9 +115,15 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<Odometer>> odometerReports(){
-    return odometerReports(null, null, null, null);
+    return odometerReports((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Odometer>> odometerReports(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().distances().odometerReports(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Odometer>> odometerReports(@Nullable String since, @Nullable String until){
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.getDefault());
     Date sinceDate = null;
@@ -118,6 +139,7 @@ public abstract class Vehicle implements VinliItem {
     return odometerReports(sinceDate, untilDate, null, null);
   }
 
+  @Deprecated
   public Observable<TimeSeries<Odometer>> odometerReports(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
@@ -125,9 +147,15 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<OdometerTrigger>> odomterTriggers(){
-    return odometerTriggers(null, null, null, null);
+    return odometerTriggers((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().distances().odometerTriggers(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable String since, @Nullable String until){
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'", Locale.getDefault());
     Date sinceDate = null;
@@ -143,6 +171,7 @@ public abstract class Vehicle implements VinliItem {
     return odometerTriggers(sinceDate, untilDate, null, null);
   }
 
+  @Deprecated
   public Observable<TimeSeries<OdometerTrigger>> odometerTriggers(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
@@ -150,9 +179,17 @@ public abstract class Vehicle implements VinliItem {
   }
 
   public Observable<TimeSeries<Collision>> collisions() {
-    return collisions(null, null, null, null);
+    return collisions((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Collision>> collisions(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForVehicle(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Collision>> collisions(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -162,6 +199,18 @@ public abstract class Vehicle implements VinliItem {
         .collisionsForVehicle(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
+  public Observable<TimeSeries<ReportCard>> reportCards(){
+    return reportCards((Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForVehicle(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();

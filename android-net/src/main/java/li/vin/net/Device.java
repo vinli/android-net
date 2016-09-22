@@ -650,24 +650,43 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Event>> events() {
-    return events(null, null, null, null, null);
+    return events(null, null, (Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().events().events(this.id(), type, objectId, sinceMs, untilMs, limit,
+        sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit) {
     return events(type, objectId, since, until, limit, null);
   }
 
+  @Deprecated
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
-    return Vinli.curApp().events().events(id(), type, objectId, sinceMs, untilMs, limit, sortDir);
+    return events(type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public Observable<TimeSeries<Location>> locations() {
-    return locations(null, null, null, null);
+    return locations((Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Location>> locations(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().locations().locations(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<Location> latestlocation() {
+    return locations((Long) null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
+        .firstOrDefault(null);
   }
 
   /**
@@ -679,6 +698,7 @@ public abstract class Device implements VinliItem {
    * @param sortDir
    * @return
    */
+  @Deprecated
   public Observable<TimeSeries<Location>> locations(@Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -686,11 +706,16 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().locations().locations(id(), sinceMs, untilMs, limit, sortDir);
   }
 
-  public Observable<Location> latestlocation() {
-    return locations(null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
-        .firstOrDefault(null);
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields){
+    return snapshots(fields, (Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields, @Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().snapshots().snapshots(this.id(), fields, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields, @Nullable Date until,
       @Nullable Date since, @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -720,6 +745,12 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().trips().trips(id(), null, null, null, null);
   }
 
+  public Observable<TimeSeries<Trip>> trips(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().trips().trips(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Trip>> trips(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -728,9 +759,15 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Message>> messages() {
-    return Vinli.curApp().messages().messages(id(), null, null, null, null);
+    return messages((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Message>> messages(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().messages().messages(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Message>> messages(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -739,9 +776,17 @@ public abstract class Device implements VinliItem {
   }
 
   public Observable<TimeSeries<Collision>> collisions() {
-    return collisions(null, null, null, null);
+    return collisions((Long) null, null, null, null);
   }
 
+  public Observable<TimeSeries<Collision>> collisions(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .collisions()
+        .collisionsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<Collision>> collisions(@Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
     Long sinceMs = since == null ? null : since.getTime();
@@ -751,6 +796,18 @@ public abstract class Device implements VinliItem {
         .collisionsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
+  public Observable<TimeSeries<ReportCard>> reportCards(){
+    return reportCards((Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForDevice(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public Observable<TimeSeries<ReportCard>> reportCards(@Nullable Date since, @Nullable Date until, @Nullable Integer limit, @Nullable String sortDir){
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();

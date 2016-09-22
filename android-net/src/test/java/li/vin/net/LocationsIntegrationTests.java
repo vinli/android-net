@@ -27,7 +27,7 @@ public class LocationsIntegrationTests {
   @Test public void testGetLocationsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Location.locationsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
+    Location.locationsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {

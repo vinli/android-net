@@ -24,7 +24,7 @@ public class TripsIntegrationTests {
 
   @Test public void getTripsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
-    Trip.tripsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
+    Trip.tripsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
           @Override public void onCompleted() {
@@ -85,7 +85,7 @@ public class TripsIntegrationTests {
   @Test public void getTripsByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    Trip.tripsWithVehicleId(TestHelper.getVehicleId(), null, null, null, null)
+    Trip.tripsWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
           @Override public void onCompleted() {

@@ -25,7 +25,7 @@ public class MessagesIntegrationTests {
   @Test public void getMessagesByDeviceId() {
     assertTrue(getDeviceId() != null);
 
-    Message.messagesWithDeviceId(getDeviceId(), null, null, null, null)
+    Message.messagesWithDeviceId(getDeviceId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
           @Override public void onCompleted() {

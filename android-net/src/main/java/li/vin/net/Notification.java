@@ -38,9 +38,18 @@ import rx.Observable;
 
   public static Observable<TimeSeries<Notification>> notificationsWithSubscriptionId(
       @NonNull String subscriptionId) {
-    return notificationsWithSubscriptionId(subscriptionId, null, null, null, null);
+    return notificationsWithSubscriptionId(subscriptionId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Notification>> notificationsWithSubscriptionId(
+      @NonNull String subscriptionId, @Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForSubscription(subscriptionId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Notification>> notificationsWithSubscriptionId(
       @NonNull String subscriptionId, @Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {
@@ -53,9 +62,18 @@ import rx.Observable;
 
   public static Observable<TimeSeries<Notification>> notificationsWithEventId(
       @NonNull String eventId) {
-    return notificationsWithEventId(eventId, null, null, null, null);
+    return notificationsWithEventId(eventId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<Notification>> notificationsWithEventId(
+      @NonNull String eventId, @Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForEvent(eventId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<Notification>> notificationsWithEventId(
       @NonNull String eventId, @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {

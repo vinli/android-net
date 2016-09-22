@@ -48,7 +48,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardsForVehicle() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    ReportCard.reportCardWithVehicleId(TestHelper.getVehicleId(), null, null, null, null)
+    ReportCard.reportCardsWithVehicleId(TestHelper.getVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
           @Override public void onCompleted() {
@@ -77,7 +77,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardsForDevice() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    ReportCard.reportCardsWithDeviceId(TestHelper.getDeviceId(), null, null, null, null)
+    ReportCard.reportCardsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
           @Override public void onCompleted() {

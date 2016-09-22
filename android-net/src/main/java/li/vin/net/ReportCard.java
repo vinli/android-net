@@ -45,9 +45,18 @@ import rx.Observable;
 
   public static Observable<TimeSeries<ReportCard>> reportCardsWithDeviceId(
       @NonNull String deviceId) {
-    return reportCardsWithDeviceId(deviceId, null, null, null, null);
+    return reportCardsWithDeviceId(deviceId, (Long) null, null, null, null);
   }
 
+  public static Observable<TimeSeries<ReportCard>> reportCardsWithDeviceId(@NonNull String deviceId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForDevice(deviceId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<ReportCard>> reportCardsWithDeviceId(@NonNull String deviceId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit,
       @Nullable String sortDir) {
@@ -60,9 +69,18 @@ import rx.Observable;
 
   public static Observable<TimeSeries<ReportCard>> reportCardsWithVehicleId(
       @NonNull String vehicleId) {
-    return reportCardWithVehicleId(vehicleId, null, null, null, null);
+    return reportCardsWithVehicleId(vehicleId, null, null, null, null);
   }
 
+  public static Observable<TimeSeries<ReportCard>> reportCardsWithVehicleId(
+      @NonNull String vehicleId, @Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .reportCards()
+        .reportCardsForVehicle(vehicleId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  @Deprecated
   public static Observable<TimeSeries<ReportCard>> reportCardWithVehicleId(
       @NonNull String vehicleId, @Nullable Date since, @Nullable Date until,
       @Nullable Integer limit, @Nullable String sortDir) {

@@ -65,7 +65,14 @@ public abstract class Subscription implements VinliItem {
   /*package*/ Subscription() { }
 
   public Observable<TimeSeries<Notification>> notifications() {
-    return Vinli.curApp().notifications().notificationsForSubscription(this.id(), null, null, null, null);
+    return notifications(null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Notification>> notifications(@Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .notifications()
+        .notificationsForSubscription(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
   public SeedEdit.Saver edit() {
