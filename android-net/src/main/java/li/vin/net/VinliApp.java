@@ -106,8 +106,9 @@ public final class VinliApp {
     client = clientBuilder.build().newBuilder()
         .addInterceptor(new OauthInterceptor(accessToken))
         .addInterceptor(loggingInterceptor)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
         .build();
 
     mGson = gsonBuilder().create();
