@@ -73,6 +73,7 @@ public abstract class Rule implements VinliItem {
   @Nullable public abstract PolygonBoundary polygonBoundary();
   @Nullable public abstract RadiusBoundary radiusBoundary();
   @NonNull public abstract List<ParametricBoundary> parametricBoundaries();
+  @NonNull public abstract ObjectRef object();
 
   /*package*/ abstract Links links();
 
@@ -115,6 +116,7 @@ public abstract class Rule implements VinliItem {
     public abstract Builder radiusBoundary(@Nullable RadiusBoundary rb);
     public abstract Builder parametricBoundaries(List<ParametricBoundary> l);
     public abstract Builder links(Links l);
+    public abstract Builder object(ObjectRef objectRef);
 
     public abstract Rule build();
   }
@@ -398,6 +400,19 @@ public abstract class Rule implements VinliItem {
             b.parametricBoundaries(parametricBoundaries);
             break;
           case "links": b.links(gson.<Rule.Links>fromJson(in, Links.class)); break;
+          case "object":
+            ObjectRef.Builder bld = new AutoParcel_ObjectRef.Builder();
+            in.beginObject();
+            while (in.hasNext()) {
+              switch (in.nextName()) {
+                case "id": bld = bld.id(in.nextString()); break;
+                case "type": bld = bld.type(in.nextString()); break;
+                default: break;
+              }
+            }
+            in.endObject();
+            b.object(bld.build());
+            break;
           default: throw new JsonParseException("unknown rule key " + name);
         }
       }

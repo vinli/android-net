@@ -47,6 +47,8 @@ public class RulesIntegrationTests {
         for(Rule rule : rulePage.getItems()){
           assertTrue(rule.id() != null && rule.id().length() > 0);
           assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+          assertTrue(rule.object().type().length() > 0);
+          assertTrue(rule.object().id().length() > 0);
         }
       }
     });
@@ -70,6 +72,8 @@ public class RulesIntegrationTests {
       @Override public void onNext(Rule rule) {
         assertTrue(rule.id() != null && rule.id().length() > 0);
         assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+        assertTrue(rule.object().type().length() > 0);
+        assertTrue(rule.object().id().length() > 0);
       }
     });
   }
@@ -97,6 +101,8 @@ public class RulesIntegrationTests {
                 for(Rule rule : rulePage.getItems()){
                   assertTrue(rule.id() != null && rule.id().length() > 0);
                   assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+                  assertTrue(rule.object().type().length() > 0);
+                  assertTrue(rule.object().id().length() > 0);
                 }
               }
             });
