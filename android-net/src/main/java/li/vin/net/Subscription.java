@@ -28,8 +28,8 @@ public abstract class Subscription implements VinliItem {
 
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Subscription_Links.class));
 
-    gb.registerTypeAdapter(AutoParcel_Subscription_SeedCreate.class, new SeedCreate.Adapter());
-    gb.registerTypeAdapter(AutoParcel_Subscription_SeedEdit.class, new SeedEdit.Adapter());
+    gb.registerTypeAdapter(Subscription.SeedCreate.class, new SeedCreate.Adapter());
+    gb.registerTypeAdapter(Subscription.SeedEdit.class, new SeedEdit.Adapter());
   }
 
   public static final SeedCreate.Saver create() {

@@ -34,18 +34,18 @@ public abstract class Rule implements VinliItem {
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Rule_Links.class));
 
     gb.registerTypeAdapter(ParametricBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
-    gb.registerTypeAdapter(AutoParcel_Rule_ParametricBoundary.Seed.class,
+    gb.registerTypeAdapter(ParametricBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary_Seed.class));
 
     gb.registerTypeAdapter(RadiusBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
-    gb.registerTypeAdapter(AutoParcel_Rule_RadiusBoundary.Seed.class,
+    gb.registerTypeAdapter(RadiusBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary_Seed.class));
 
     gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
-    gb.registerTypeAdapter(AutoParcel_Rule_PolygonBoundary.Seed.class,
+    gb.registerTypeAdapter(PolygonBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary_Seed.class));
 
-    gb.registerTypeAdapter(AutoParcel_Rule_Seed.class, new Seed.Adapter());
+    gb.registerTypeAdapter(Rule.Seed.class, new Seed.Adapter());
   }
 
   public static Observable<Rule> ruleWithId(@NonNull String ruleId) {
