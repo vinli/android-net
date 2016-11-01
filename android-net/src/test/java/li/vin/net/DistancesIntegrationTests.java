@@ -196,7 +196,8 @@ public class DistancesIntegrationTests {
   public void getOdometerReportsByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, 1, null)
+        .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
       @Override
       public void onCompleted() {
       }
@@ -217,6 +218,32 @@ public class DistancesIntegrationTests {
           assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
           assertTrue(odometer.date() != null && odometer.date().length() > 0);
           assertTrue(odometer.reading() != null);
+        }
+
+        if (odometerTimeSeries.hasPrior()) {
+          odometerTimeSeries.loadPrior()
+              .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+            @Override public void onCompleted() {
+
+            }
+
+            @Override public void onError(Throwable e) {
+              System.out.println("Error: " + e.getMessage());
+              e.printStackTrace();
+              assertTrue(false);
+            }
+
+            @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
+              assertTrue(odometerTimeSeries.getItems().size() > 0);
+
+              for(Odometer odometer : odometerTimeSeries.getItems()){
+                assertTrue(odometer.id() != null && odometer.id().length() > 0);
+                assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+                assertTrue(odometer.date() != null && odometer.date().length() > 0);
+                assertTrue(odometer.reading() != null);
+              }
+            }
+          });
         }
       }
     });
