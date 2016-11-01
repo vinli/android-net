@@ -54,7 +54,7 @@ public abstract class OdometerTrigger implements VinliItem{
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(OdometerTrigger.class, new OdometerTriggerAdapter());
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_OdometerTrigger_Links.class));
-    gb.registerTypeAdapter(AutoParcel_OdometerTrigger_Seed.class, new Seed.Adapter());
+    gb.registerTypeAdapter(OdometerTrigger.Seed.class, new Seed.Adapter());
 
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(OdometerTrigger.class, "odometerTrigger"));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, OdometerTrigger.class, "odometerTriggers"));

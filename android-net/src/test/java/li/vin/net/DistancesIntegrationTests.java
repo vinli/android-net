@@ -25,7 +25,7 @@ public class DistancesIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeleteOdometer(){
+  public void testCreateAndDeleteOdometer() {
     assertTrue(TestHelper.getVehicleId() != null);
 
     Odometer.create()
@@ -50,6 +50,52 @@ public class DistancesIntegrationTests {
         assertTrue(odometer.reading() != null);
 
         odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Void aVoid) {
+
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testCreateAndDeleteOdometerTrigger() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    OdometerTrigger.create()
+        .unit(DistanceUnit.METERS)
+        .vehicleId(TestHelper.getVehicleId())
+        .threshold(300000d)
+        .type(OdometerTrigger.TriggerType.SPECIFIC)
+        .save().toBlocking().subscribe(new Subscriber<OdometerTrigger>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(OdometerTrigger odometerTrigger) {
+        assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
+        assertTrue(
+            odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
+        assertTrue(odometerTrigger.type() != null);
+        assertTrue(odometerTrigger.threshold() != null);
+
+        odometerTrigger.delete().toBlocking().subscribe(new Observer<Void>() {
           @Override public void onCompleted() {
 
           }
