@@ -79,7 +79,8 @@ public final class VinliApp {
     if (Device.class.equals(itemClz)) {
        return mDevices.devicesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
     }
-    throw new RuntimeException(String.format("no paging observable for %s", link));
+    throw new RuntimeException(String.format(
+        "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }
 
   /*package*/ Observable<? extends TimeSeries<? extends VinliItem>> pagingTsObservable(
@@ -88,7 +89,14 @@ public final class VinliApp {
     if (Message.class.equals(itemClz)) {
       return mMessages.messagesForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
     }
-    throw new RuntimeException(String.format("no paging observable for %s", link));
+    if (Snapshot.class.equals(itemClz)) {
+      return mSnapshots.snapshotsForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
+    }
+    if (Location.LocationTimeSeriesAdapter.class.equals(itemClz)) {
+      return mLocations.locationsForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
+    }
+    throw new RuntimeException(String.format(
+        "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }
 
   /*package*/ static OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();

@@ -24,6 +24,60 @@ public class LocationsIntegrationTests {
     vinliApp = TestHelper.getVinliApp();
   }
 
+  @Test public void testGetPagedLocations() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Location.locationsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, 1, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Location>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Location> locationTimeSeries) {
+            assertTrue(locationTimeSeries.getItems().size() > 0);
+
+            for (Location location : locationTimeSeries.getItems()) {
+              assertTrue(location.coordinate() != null);
+              assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+              assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+              assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+            }
+
+            if (locationTimeSeries.hasPrior()) {
+              locationTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<Location>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<Location> locationTimeSeries) {
+                  assertTrue(locationTimeSeries.getItems().size() > 0);
+
+                  for (Location location : locationTimeSeries.getItems()) {
+                    assertTrue(location.coordinate() != null);
+                    assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+                    assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+                    assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+                  }
+                }
+              });
+            }
+          }
+        });
+  }
+
   @Test public void testGetLocationsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 

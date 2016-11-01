@@ -22,6 +22,58 @@ public class SnapshotsIntegrationTests {
     vinliApp = TestHelper.getVinliApp();
   }
 
+  @Test public void getPagedSnapshots() {
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Snapshot.snapshotsWithDeviceId(TestHelper.getDeviceId(), "location,vehicleSpeed", (Long) null, null, 1, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Snapshot> snapshotTimeSeries) {
+            assertTrue(snapshotTimeSeries.getItems().size() > 0);
+
+            for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+              assertTrue(snapshot.coord() != null);
+              assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
+              assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
+            }
+
+            if (snapshotTimeSeries.hasPrior()) {
+              snapshotTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<Snapshot>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<Snapshot> snapshotTimeSeries) {
+                  assertTrue(snapshotTimeSeries.getItems().size() > 0);
+
+                  for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+                    assertTrue(snapshot.coord() != null);
+                    assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
+                    assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
+                  }
+                }
+              });
+            }
+          }
+        });
+  }
+
   @Test public void getSnapshotsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 

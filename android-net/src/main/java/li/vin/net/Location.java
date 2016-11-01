@@ -14,11 +14,8 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import rx.Observable;
 
 @AutoParcel
@@ -128,7 +125,7 @@ public abstract class Location implements VinliItem {
     }
   }
 
-  private static final class LocationTimeSeriesAdapter extends TypeAdapter<TimeSeries<Location>> {
+  /*package*/ static final class LocationTimeSeriesAdapter extends TypeAdapter<TimeSeries<Location>> {
 
     private Gson gson;
 
