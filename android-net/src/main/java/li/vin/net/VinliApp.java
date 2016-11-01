@@ -79,7 +79,7 @@ public final class VinliApp {
     if (Device.class.equals(itemClz)) {
        return mDevices.devicesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
     }
-    if (Dtc.class.equals(itemClz)) {
+    if (Dtc.Code.class.equals(itemClz)) {
        return mDiagnostics.rawCodesForUrl(link.replaceFirst(Endpoint.DIAGNOSTICS.getUrl(), ""));
     }
     throw new RuntimeException(String.format(
