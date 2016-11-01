@@ -113,6 +113,9 @@ public final class VinliApp {
     if (Event.class.equals(itemClz)) {
       return mEvents.eventsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
     }
+    if (Notification.class.equals(itemClz)) {
+      return mNotifications.notificationsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
+    }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }

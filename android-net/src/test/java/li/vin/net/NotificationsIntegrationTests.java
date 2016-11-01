@@ -5,10 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -57,8 +54,8 @@ public class NotificationsIntegrationTests {
   @Test public void testGetNotificationsForSubscription() {
     assertTrue(TestHelper.getSubscriptionId() != null);
 
-    Notification.notificationsWithSubscriptionId(TestHelper.getSubscriptionId(), (Long) null, null, null,
-        null)
+    Notification
+        .notificationsWithSubscriptionId(TestHelper.getSubscriptionId(), (Long) null, null, 1, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {
           @Override public void onCompleted() {
@@ -81,6 +78,34 @@ public class NotificationsIntegrationTests {
               assertTrue(notification.eventId() != null && notification.eventId().length() > 0);
               assertTrue(notification.subscriptionId() != null
                   && notification.subscriptionId().length() > 0);
+            }
+
+            if (notificationTimeSeries.hasPrior()) {
+              notificationTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<Notification>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<Notification> notificationTimeSeries) {
+                  assertTrue(notificationTimeSeries.getItems().size() > 0);
+
+                  for (Notification notification : notificationTimeSeries.getItems()) {
+                    assertTrue(notification.id() != null && notification.id().length() > 0);
+                    assertTrue(notification.eventTimestamp() != null
+                        && notification.eventTimestamp().length() > 0);
+                    assertTrue(notification.eventType() != null && notification.eventType().length() > 0);
+                    assertTrue(notification.eventId() != null && notification.eventId().length() > 0);
+                    assertTrue(notification.subscriptionId() != null
+                        && notification.subscriptionId().length() > 0);
+                  }
+                }
+              });
             }
           }
         });
