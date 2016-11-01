@@ -21,6 +21,51 @@ public class SubscriptionsIntegrationTests {
     vinliApp = TestHelper.getVinliApp();
   }
 
+  @Test
+  public void testCreateAndDeleteSubscription(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Subscription.create().deviceId(TestHelper.getDeviceId())
+        .eventType("rule-enter")
+        .appData("{\"data]\":\"stuff\"}")
+        .object(ObjectRef.builder().id(TestHelper.getRuleId()).type("rule").build())
+        .url("https://someurl/notifications")
+        .save().toBlocking().subscribe(new Subscriber<Subscription>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(final Subscription subscription) {
+        assertTrue(subscription.id() != null && subscription.id().length() > 0);
+        assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+        assertTrue(subscription.url() != null && subscription.url().length() > 0);
+
+        subscription.delete().toBlocking().subscribe(new Subscriber<Void>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Void aVoid) {
+
+          }
+        });
+
+      }
+    });
+  }
+
   @Test public void getSubscriptionByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
