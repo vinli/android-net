@@ -307,7 +307,9 @@ public class DistancesIntegrationTests {
   public void getOdometerTriggersByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    OdometerTrigger.odometerTriggersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(
+    OdometerTrigger
+        .odometerTriggersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, 1, null)
+        .toBlocking().subscribe(
         new Subscriber<TimeSeries<OdometerTrigger>>() {
           @Override public void onCompleted() {
           }
@@ -327,6 +329,34 @@ public class DistancesIntegrationTests {
                   odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
               assertTrue(odometerTrigger.type() != null);
               assertTrue(odometerTrigger.threshold() != null);
+            }
+
+            if (odometerTriggerTimeSeries.hasPrior()) {
+              odometerTriggerTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override
+                public void onNext(TimeSeries<OdometerTrigger> odometerTriggerTimeSeries) {
+                  assertTrue(odometerTriggerTimeSeries.getItems().size() > 0);
+
+                  for (OdometerTrigger odometerTrigger : odometerTriggerTimeSeries.getItems()) {
+                    assertTrue(odometerTrigger.id() != null && odometerTrigger.id().length() > 0);
+                    assertTrue(
+                        odometerTrigger.vehicleId() != null && odometerTrigger.vehicleId().length() > 0);
+                    assertTrue(odometerTrigger.type() != null);
+                    assertTrue(odometerTrigger.threshold() != null);
+                  }
+                }
+              });
             }
           }
         });
