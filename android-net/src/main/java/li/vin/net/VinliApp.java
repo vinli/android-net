@@ -95,6 +95,9 @@ public final class VinliApp {
     if (Location.LocationTimeSeriesAdapter.class.equals(itemClz)) {
       return mLocations.locationsForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
     }
+    if (Collision.class.equals(itemClz)) {
+      return mCollisions.collisionsForUrl(link.replaceFirst(Endpoint.SAFETY.getUrl(), ""));
+    }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }

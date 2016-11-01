@@ -24,6 +24,60 @@ public class CollisionsIntegrationTests {
   }
 
   @Test
+  public void testGetPagedCollisions(){
+    Collision.collisionsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, 1, null)
+        .toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+      @Override
+      public void onCompleted() {
+
+      }
+
+      @Override
+      public void onError(Throwable e) {
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override
+      public void onNext(TimeSeries<Collision> collisionTimeSeries) {
+        assertTrue(collisionTimeSeries.getItems().size() > 0);
+
+        for(Collision collision : collisionTimeSeries.getItems()){
+          assertTrue(collision.id() != null && collision.id().length() > 0);
+          assertTrue(collision.deviceId().length() > 0);
+          assertTrue(collision.vehicleId().length() > 0);
+          assertTrue(collision.timestamp().length() > 0);
+        }
+
+        if (collisionTimeSeries.hasPrior()) {
+          collisionTimeSeries.loadPrior()
+              .toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
+            @Override public void onCompleted() {
+
+            }
+
+            @Override public void onError(Throwable e) {
+              e.printStackTrace();
+              assertTrue(false);
+            }
+
+            @Override public void onNext(TimeSeries<Collision> collisionTimeSeries) {
+              assertTrue(collisionTimeSeries.getItems().size() > 0);
+
+              for(Collision collision : collisionTimeSeries.getItems()){
+                assertTrue(collision.id() != null && collision.id().length() > 0);
+                assertTrue(collision.deviceId().length() > 0);
+                assertTrue(collision.vehicleId().length() > 0);
+                assertTrue(collision.timestamp().length() > 0);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  @Test
   public void testGetCollisionsByVehicleId(){
     Collision.collisionsWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null).toBlocking().subscribe(new Subscriber<TimeSeries<Collision>>() {
       @Override
