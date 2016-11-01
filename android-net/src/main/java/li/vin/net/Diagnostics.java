@@ -25,4 +25,6 @@ import rx.Observable;
 
   @GET Observable<TimeSeries<Dtc>> codesForUrl(@NonNull @Url String url);
 
+  @GET Observable<Page<Dtc.Code>> rawCodesForUrl(@NonNull @Url String url);
+
 }

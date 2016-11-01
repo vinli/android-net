@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +44,6 @@ public class DiagnosticsIntegrationTests {
       @Override
       public void onNext(TimeSeries<Dtc> dtcTimeSeries) {
         assertTrue(dtcTimeSeries.getItems().size() > 0);
-        System.out.println("p1");
 
         for(Dtc dtc : dtcTimeSeries.getItems()){
           assertTrue(dtc.start() != null && dtc.start().length() > 0);
@@ -65,8 +65,8 @@ public class DiagnosticsIntegrationTests {
             }
 
             @Override public void onNext(TimeSeries<Dtc> dtcTimeSeries) {
+              // TODO - uncomment this when platform bug is resolved or explained
               //assertTrue(dtcTimeSeries.getItems().size() > 0);
-              System.out.println("p2");
 
               for(Dtc dtc : dtcTimeSeries.getItems()){
                 assertTrue(dtc.start() != null && dtc.start().length() > 0);
@@ -114,8 +114,10 @@ public class DiagnosticsIntegrationTests {
 
   @Test
   public void testDiagnoseCode(){
+    final AtomicBoolean codeFound = new AtomicBoolean(false);
     vinliApp.diagnostics().diagnose("P0301")
-        .toBlocking().subscribe(new Subscriber<Page<Dtc.Code>>() {
+        .flatMap(Page.<Dtc.Code>allItems())
+        .toBlocking().subscribe(new Subscriber<Dtc.Code>() {
       @Override
       public void onCompleted() {
 
@@ -129,14 +131,12 @@ public class DiagnosticsIntegrationTests {
       }
 
       @Override
-      public void onNext(Page<Dtc.Code> codePage) {
-        assertTrue(codePage.getItems().size() > 0);
-
-        for(Dtc.Code code : codePage.getItems()){
-          assertTrue(code.make() != null && code.make().length() > 0);
-        }
+      public void onNext(Dtc.Code code) {
+        codeFound.set(true);
+        assertTrue(code.make() != null && code.make().length() > 0);
       }
     });
+    assertTrue(codeFound.get());
   }
 
   @Test public void getCurrentBatteryStatus() {
