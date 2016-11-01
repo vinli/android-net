@@ -23,6 +23,53 @@ public class DevicesIntegrationTests {
     vinliApp = TestHelper.getVinliApp();
   }
 
+  @Test public void getPagedDevices() {
+    vinliApp.devices(1, 0)
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Device>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Page<Device> devicePage) {
+            assertTrue(devicePage.getItems().size() > 0);
+
+            for(Device device : devicePage.getItems()){
+              assertTrue(device.id() != null && device.id().length() > 0);
+              assertTrue(device.name() != null && device.name().length() > 0);
+            }
+
+            if (devicePage.hasNextPage()) {
+              devicePage.loadNextPage().toBlocking()
+                  .subscribe(new Subscriber<Page<Device>>() {
+                    @Override public void onCompleted() {
+
+                    }
+
+                    @Override public void onError(Throwable e) {
+                      e.printStackTrace();
+                      assertTrue(false);
+                    }
+
+                    @Override public void onNext(Page<Device> devicePage) {
+                      assertTrue(devicePage.getItems().size() > 0);
+
+                      for(Device device : devicePage.getItems()){
+                        assertTrue(device.id() != null && device.id().length() > 0);
+                        assertTrue(device.name() != null && device.name().length() > 0);
+                      }
+                    }
+                  });
+            }
+          }
+        });
+  }
+
   @Test
   public void testGetDevices(){
     vinliApp.devices().toBlocking().subscribe(new Subscriber<Page<Device>>() {
