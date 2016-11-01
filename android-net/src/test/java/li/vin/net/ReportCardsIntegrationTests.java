@@ -77,7 +77,7 @@ public class ReportCardsIntegrationTests {
   @Test public void testGetReportCardsForDevice() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    ReportCard.reportCardsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null)
+    ReportCard.reportCardsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, 1, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {
           @Override public void onCompleted() {
@@ -98,6 +98,32 @@ public class ReportCardsIntegrationTests {
               assertTrue(reportCard.vehicleId() != null && reportCard.vehicleId().length() > 0);
               assertTrue(reportCard.tripId() != null && reportCard.tripId().length() > 0);
               assertTrue(reportCard.grade() != null && reportCard.grade().length() > 0);
+            }
+
+            if (reportCardTimeSeries.hasPrior()) {
+              reportCardTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<ReportCard>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<ReportCard> reportCardTimeSeries) {
+                  assertTrue(reportCardTimeSeries.getItems().size() > 0);
+
+                  for (ReportCard reportCard : reportCardTimeSeries.getItems()) {
+                    assertTrue(reportCard.id() != null && reportCard.id().length() > 0);
+                    assertTrue(reportCard.deviceId() != null && reportCard.deviceId().length() > 0);
+                    assertTrue(reportCard.vehicleId() != null && reportCard.vehicleId().length() > 0);
+                    assertTrue(reportCard.tripId() != null && reportCard.tripId().length() > 0);
+                    assertTrue(reportCard.grade() != null && reportCard.grade().length() > 0);
+                  }
+                }
+              });
             }
           }
         });
