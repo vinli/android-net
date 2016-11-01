@@ -27,7 +27,7 @@ public class SubscriptionsIntegrationTests {
 
     Subscription.create().deviceId(TestHelper.getDeviceId())
         .eventType("rule-enter")
-        .appData("{\"data]\":\"stuff\"}")
+        .appData("{\"data\":\"stuff\"}")
         .object(ObjectRef.builder().id(TestHelper.getRuleId()).type("rule").build())
         .url("https://someurl/notifications")
         .save().toBlocking().subscribe(new Subscriber<Subscription>() {
