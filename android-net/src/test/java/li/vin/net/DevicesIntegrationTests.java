@@ -50,6 +50,33 @@ public class DevicesIntegrationTests {
   }
 
   @Test
+  public void testGetDevicesByUrl(){
+    vinliApp.devicesSvc().devicesForUrl(String.format("%sdevices", Endpoint.PLATFORM.getUrl()))
+        .toBlocking().subscribe(new Subscriber<Page<Device>>() {
+      @Override
+      public void onCompleted() {
+
+      }
+
+      @Override
+      public void onError(Throwable e) {
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override
+      public void onNext(Page<Device> devicePage) {
+        assertTrue(devicePage.getItems().size() > 0);
+
+        for(Device device : devicePage.getItems()){
+          assertTrue(device.id() != null && device.id().length() > 0);
+          assertTrue(device.name() != null && device.name().length() > 0);
+        }
+      }
+    });
+  }
+
+  @Test
   public void testGetDeviceById(){
     assertTrue(TestHelper.getDeviceId() != null);
 

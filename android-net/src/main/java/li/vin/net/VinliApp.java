@@ -268,6 +268,10 @@ public final class VinliApp {
     return mEvents.event(eventId).map(Wrapped.<Event>pluckItem());
   }
 
+  /*package*/ Devices devicesSvc() {
+    return mDevices;
+  }
+
   /*package*/ Vehicles vehicles() {
     return mVehicles;
   }
