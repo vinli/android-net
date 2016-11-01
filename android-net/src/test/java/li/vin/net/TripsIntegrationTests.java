@@ -24,7 +24,7 @@ public class TripsIntegrationTests {
 
   @Test public void getTripsByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
-    Trip.tripsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, null, null)
+    Trip.tripsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, 1, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
           @Override public void onCompleted() {
@@ -46,6 +46,33 @@ public class TripsIntegrationTests {
               assertTrue(trip.vehicleId() != null && trip.vehicleId().length() > 0);
               assertTrue(trip.start() != null && trip.start().length() > 0);
               assertTrue(trip.stop() != null && trip.stop().length() > 0);
+            }
+
+            if (tripTimeSeries.hasPrior()) {
+              tripTimeSeries.loadPrior()
+                  .toBlocking().subscribe(new Subscriber<TimeSeries<Trip>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<Trip> tripTimeSeries) {
+                  assertTrue(tripTimeSeries.getItems().size() > 0);
+
+                  for (Trip trip : tripTimeSeries.getItems()) {
+                    assertTrue(trip.id() != null && trip.id().length() > 0);
+                    assertTrue(trip.deviceId() != null && trip.deviceId().length() > 0);
+                    assertTrue(trip.vehicleId() != null && trip.vehicleId().length() > 0);
+                    assertTrue(trip.start() != null && trip.start().length() > 0);
+                    assertTrue(trip.stop() != null && trip.stop().length() > 0);
+                  }
+                }
+              });
             }
           }
         });
