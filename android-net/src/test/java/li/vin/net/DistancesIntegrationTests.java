@@ -1,15 +1,13 @@
 package li.vin.net;
 
+import li.vin.net.DistanceList.Distance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import li.vin.net.DistanceList.Distance;
-import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -24,6 +22,74 @@ public class DistancesIntegrationTests {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
+  }
+
+  @Test
+  public void testCreateAndDeleteOdometer(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Odometer.create()
+        .reading(200000d)
+        .unit(DistanceUnit.MILES)
+        .vehicleId(TestHelper.getVehicleId())
+        .save().toBlocking().subscribe(new Subscriber<Odometer>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(Odometer odometer) {
+        assertTrue(odometer.id() != null && odometer.id().length() > 0);
+        assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+        assertTrue(odometer.date() != null && odometer.date().length() > 0);
+        assertTrue(odometer.reading() != null);
+
+        odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Void aVoid) {
+
+          }
+        });
+      }
+    });
+
+    DistanceList.distancesWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null).toBlocking().subscribe(new Subscriber<DistanceList>() {
+      @Override
+      public void onCompleted() {
+      }
+
+      @Override
+      public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override
+      public void onNext(DistanceList distanceList) {
+        assertTrue(distanceList.distances().size() > 0);
+
+        for(Distance distance : distanceList.distances()){
+          assertTrue(distance.confidenceMin() != null);
+          assertTrue(distance.confidenceMax() != null);
+          assertTrue(distance.value() != null);
+        }
+      }
+    });
   }
 
   @Test

@@ -23,7 +23,7 @@ public abstract class Odometer implements VinliItem{
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Odometer.class, AutoParcelAdapter.create(AutoParcel_Odometer.class));
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Odometer_Links.class));
-    gb.registerTypeAdapter(AutoParcel_Odometer_Seed.class, new Seed.Adapter());
+    gb.registerTypeAdapter(Odometer.Seed.class, new Seed.Adapter());
 
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Odometer.class));
     gb.registerTypeAdapter(TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Odometer.class));
