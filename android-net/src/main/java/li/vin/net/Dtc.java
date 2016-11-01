@@ -9,7 +9,7 @@ import rx.Observable;
 
 @AutoParcel
 public abstract class Dtc implements VinliItem {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Dtc>>() { }.getType();
+  /*package*/ static final Type TIME_SERIES_TYPE = new TypeToken<TimeSeries<Dtc>>() { }.getType();
 
   /*package*/ static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Dtc.class, AutoParcelAdapter.create(AutoParcel_Dtc.class));
@@ -18,8 +18,9 @@ public abstract class Dtc implements VinliItem {
     gb.registerTypeAdapter(Code.TwoByte.class, AutoParcelAdapter.create(AutoParcel_Dtc_Code_TwoByte.class));
     gb.registerTypeAdapter(Code.ThreeByte.class, AutoParcelAdapter.create(AutoParcel_Dtc_Code_ThreeByte.class));
     gb.registerTypeAdapter(Code.WRAPPED_TYPE, Wrapped.Adapter.create(Code.class, "code"));
-    gb.registerTypeAdapter(Code.PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Code.class, "codes"));
-    gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Dtc.class, "codes"));
+    gb.registerTypeAdapter(Code.PAGE_TYPE, Page.Adapter.create(Code.PAGE_TYPE, Code.class, "codes"));
+    gb.registerTypeAdapter(
+        TIME_SERIES_TYPE, TimeSeries.Adapter.create(TIME_SERIES_TYPE, Dtc.class, "codes"));
   }
 
   public abstract String start();

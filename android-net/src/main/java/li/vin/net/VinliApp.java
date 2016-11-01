@@ -98,6 +98,9 @@ public final class VinliApp {
     if (Collision.class.equals(itemClz)) {
       return mCollisions.collisionsForUrl(link.replaceFirst(Endpoint.SAFETY.getUrl(), ""));
     }
+    if (Dtc.class.equals(itemClz)) {
+      return mDiagnostics.codesForUrl(link.replaceFirst(Endpoint.DIAGNOSTICS.getUrl(), ""));
+    }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }

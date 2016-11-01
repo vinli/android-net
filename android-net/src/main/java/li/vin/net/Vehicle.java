@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import retrofit2.http.Query;
 import rx.Observable;
 
 @AutoParcel
@@ -220,6 +221,13 @@ public abstract class Vehicle implements VinliItem {
 
   public Observable<BatteryStatus> currentBatteryStatus(){
     return BatteryStatus.currentBatteryStatusForVehicle(this.id());
+  }
+
+  public Observable<TimeSeries<Dtc>> dtcs(@Nullable @Query("since") Long since,
+      @Nullable @Query("until") Long until,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("sortDir") String sortDir) {
+    return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir);
   }
 
   /*package*/ Vehicle() { }

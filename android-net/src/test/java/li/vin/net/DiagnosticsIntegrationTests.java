@@ -24,10 +24,11 @@ public class DiagnosticsIntegrationTests {
   }
 
   @Test
-  public void testGetCodesByVehicleId(){
+  public void testGetPagedCodes(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.diagnostics().codes(TestHelper.getVehicleId()).toBlocking().subscribe(new Subscriber<Page<Dtc>>() {
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, 1, null)
+        .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
       @Override
       public void onCompleted() {
       }
@@ -40,7 +41,65 @@ public class DiagnosticsIntegrationTests {
       }
 
       @Override
-      public void onNext(Page<Dtc> dtcPage) {
+      public void onNext(TimeSeries<Dtc> dtcTimeSeries) {
+        assertTrue(dtcTimeSeries.getItems().size() > 0);
+        System.out.println("p1");
+
+        for(Dtc dtc : dtcTimeSeries.getItems()){
+          assertTrue(dtc.start() != null && dtc.start().length() > 0);
+          assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
+          assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
+          assertTrue(dtc.number() != null && dtc.number().length() > 0);
+        }
+
+        if (dtcTimeSeries.hasPrior()) {
+          dtcTimeSeries.loadPrior().toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
+            @Override public void onCompleted() {
+
+            }
+
+            @Override public void onError(Throwable e) {
+              System.out.println("Error: " + e.getMessage());
+              e.printStackTrace();
+              assertTrue(false);
+            }
+
+            @Override public void onNext(TimeSeries<Dtc> dtcTimeSeries) {
+              //assertTrue(dtcTimeSeries.getItems().size() > 0);
+              System.out.println("p2");
+
+              for(Dtc dtc : dtcTimeSeries.getItems()){
+                assertTrue(dtc.start() != null && dtc.start().length() > 0);
+                assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
+                assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
+                assertTrue(dtc.number() != null && dtc.number().length() > 0);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  @Test
+  public void testGetCodesByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, null, null)
+        .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
+      @Override
+      public void onCompleted() {
+      }
+
+      @Override
+      public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override
+      public void onNext(TimeSeries<Dtc> dtcPage) {
         assertTrue(dtcPage.getItems().size() > 0);
 
         for(Dtc dtc : dtcPage.getItems()){
@@ -55,7 +114,8 @@ public class DiagnosticsIntegrationTests {
 
   @Test
   public void testDiagnoseCode(){
-    vinliApp.diagnostics().diagnose("P0301").toBlocking().subscribe(new Subscriber<Page<Dtc.Code>>() {
+    vinliApp.diagnostics().diagnose("P0301")
+        .toBlocking().subscribe(new Subscriber<Page<Dtc.Code>>() {
       @Override
       public void onCompleted() {
 
