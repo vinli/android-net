@@ -77,7 +77,7 @@ public final class VinliApp {
       Class itemClz, String link) {
     // TODO - add every Retrofit interface and class to this
     if (Device.class.equals(itemClz)) {
-      // return mDevices.devicesFromLink(link);
+       return mDevices.devicesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
     }
     throw new RuntimeException(String.format("no paging observable for %s", link));
   }
@@ -85,8 +85,8 @@ public final class VinliApp {
   /*package*/ Observable<? extends TimeSeries<? extends VinliItem>> pagingTsObservable(
       Class itemClz, String link) {
     // TODO - add every Retrofit interface and class to this
-    if (Device.class.equals(itemClz)) {
-      // return mDevices.devicesFromLink(link);
+    if (Message.class.equals(itemClz)) {
+      return mMessages.messagesForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
     }
     throw new RuntimeException(String.format("no paging observable for %s", link));
   }

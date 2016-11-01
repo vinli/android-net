@@ -22,6 +22,51 @@ public class MessagesIntegrationTests {
     vinliApp = TestHelper.getVinliApp();
   }
 
+  @Test public void getPagedMessagesByDeviceId() {
+    assertTrue(getDeviceId() != null);
+
+    Message.messagesWithDeviceId(getDeviceId(), (Long) null, null, 1, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+
+            if (messageTimeSeries.hasPrior()) {
+              messageTimeSeries.loadPrior().toBlocking()
+                  .subscribe(new Subscriber<TimeSeries<Message>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+                  for (Message message : messageTimeSeries.getItems()) {
+                    assertTrue(message.id() != null && message.id().length() > 0);
+                    assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+                  }
+                }
+              });
+            }
+          }
+        });
+  }
+
   @Test public void getMessagesByDeviceId() {
     assertTrue(getDeviceId() != null);
 
