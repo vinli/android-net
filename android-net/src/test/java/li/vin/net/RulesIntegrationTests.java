@@ -176,7 +176,8 @@ public class RulesIntegrationTests {
   public void testGetRulesByDeviceId(){
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Rule.rulesWithDeviceId(TestHelper.getDeviceId(), null, null).toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+    Rule.rulesWithDeviceId(TestHelper.getDeviceId(), 1, null)
+        .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
       @Override
       public void onCompleted() {
 
@@ -198,6 +199,32 @@ public class RulesIntegrationTests {
           assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
           assertTrue(rule.object().type().length() > 0);
           assertTrue(rule.object().id().length() > 0);
+        }
+
+        if (rulePage.hasNextPage()) {
+          rulePage.loadNextPage()
+              .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+            @Override public void onCompleted() {
+
+            }
+
+            @Override public void onError(Throwable e) {
+              System.out.println("Error: " + e.getMessage());
+              e.printStackTrace();
+              assertTrue(false);
+            }
+
+            @Override public void onNext(Page<Rule> rulePage) {
+              assertTrue(rulePage.getItems().size() > 0);
+
+              for(Rule rule : rulePage.getItems()){
+                assertTrue(rule.id() != null && rule.id().length() > 0);
+                assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+                assertTrue(rule.object().type().length() > 0);
+                assertTrue(rule.object().id().length() > 0);
+              }
+            }
+          });
         }
       }
     });
