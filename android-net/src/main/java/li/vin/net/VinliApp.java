@@ -110,6 +110,9 @@ public final class VinliApp {
     if (OdometerTrigger.class.equals(itemClz)) {
       return mDistances.odometerTriggersForUrl(link.replaceFirst(Endpoint.DISTANCE.getUrl(), ""));
     }
+    if (Event.class.equals(itemClz)) {
+      return mEvents.eventsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
+    }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }
