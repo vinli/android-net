@@ -1,11 +1,12 @@
 package li.vin.net;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
 import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
@@ -21,6 +22,99 @@ public class RulesIntegrationTests {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
+  }
+
+  @Test
+  public void testCreateAndDeleteRadiusBoundaryRule(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Rule.create().deviceId(TestHelper.getDeviceId()).name("testrule").radiusBoundary(
+        Rule.RadiusBoundary.create().lat(32.897480f).lon(-97.040443f).radius(100).build()).save()
+        .toBlocking().subscribe(new Subscriber<Rule>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Rule rule) {
+            assertTrue(rule.id() != null && rule.id().length() > 0);
+            assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+            assertTrue(rule.object().type().length() > 0);
+            assertTrue(rule.object().id().length() > 0);
+
+            rule.delete().toBlocking().subscribe(new Subscriber<Void>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Void aVoid) {
+
+              }
+            });
+          }
+        });
+  }
+
+  @Test
+  public void testCreateAndDeletePolygonBoundaryRule(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    List<double[]> l = new ArrayList<>();
+    l.add(new double[]{32.792492f, -96.823495f});
+    l.add(new double[]{32.817846f, -96.670862f});
+    l.add(new double[]{32.67926f, -96.771103f});
+    l.add(new double[]{32.792492f, -96.823495f});
+    List<List<double[]>> ll = new ArrayList<>();
+    ll.add(l);
+
+    Rule.create().deviceId(TestHelper.getDeviceId()).name("testrule")
+        .polygonBoundary(Rule.PolygonBoundary.create().coordinates(ll).build())
+        .save()
+        .toBlocking().subscribe(new Subscriber<Rule>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Rule rule) {
+            assertTrue(rule.id() != null && rule.id().length() > 0);
+            assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+            assertTrue(rule.object().type().length() > 0);
+            assertTrue(rule.object().id().length() > 0);
+
+            rule.delete().toBlocking().subscribe(new Subscriber<Void>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Void aVoid) {
+
+              }
+            });
+          }
+        });
   }
 
   @Test

@@ -233,12 +233,12 @@ public abstract class Rule implements VinliItem {
       return new AutoParcel_Rule_PolygonBoundary_Seed.Builder();
     }
 
-    public abstract List<List<Coordinate>> coordinates();
+    public abstract List<List<double[]>> coordinates();
 
     @AutoParcel.Builder
     /*package*/ interface Builder {
       Builder id(String s);
-      Builder coordinates(List<List<Coordinate>> l);
+      Builder coordinates(List<List<double[]>> l);
 
       PolygonBoundary build();
     }
@@ -247,11 +247,11 @@ public abstract class Rule implements VinliItem {
     public static abstract class Seed {
       private final String type = PolygonBoundary.TYPE; // needed for GSON serialization
 
-      public abstract List<List<Coordinate>> coordinates();
+      public abstract List<List<double[]>> coordinates();
 
       @AutoParcel.Builder
       public static abstract class Builder {
-        public abstract Builder coordinates(List<List<Coordinate>> l);
+        public abstract Builder coordinates(List<List<double[]>> l);
 
         public abstract Seed build();
 
