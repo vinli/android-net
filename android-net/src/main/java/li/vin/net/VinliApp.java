@@ -75,7 +75,6 @@ public final class VinliApp {
 
   /*package*/ Observable<? extends Page<? extends VinliItem>> pagingPageObservable(
       Class itemClz, String link) {
-    // TODO - add every Retrofit interface and class to this
     if (Device.class.equals(itemClz)) {
        return mDevices.devicesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
     }
@@ -88,13 +87,15 @@ public final class VinliApp {
     if (Subscription.class.equals(itemClz)) {
        return mSubscriptions.subscriptionsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
     }
+    if (Vehicle.class.equals(itemClz)) {
+       return mVehicles.vehiclesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
+    }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
   }
 
   /*package*/ Observable<? extends TimeSeries<? extends VinliItem>> pagingTsObservable(
       Class itemClz, String link) {
-    // TODO - add every Retrofit interface and class to this
     if (Message.class.equals(itemClz)) {
       return mMessages.messagesForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
     }

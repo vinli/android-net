@@ -24,7 +24,7 @@ public class VehiclesIntegrationTests {
   @Test public void testGetVehicleByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Vehicle.vehiclesWithDeviceId(TestHelper.getDeviceId(), null, null)
+    Vehicle.vehiclesWithDeviceId(TestHelper.getDeviceId(), 1, null)
         .toBlocking()
         .subscribe(new Subscriber<Page<Vehicle>>() {
           @Override public void onCompleted() {
@@ -42,6 +42,30 @@ public class VehiclesIntegrationTests {
             for (Vehicle vehicle : vehiclePage.getItems()) {
               assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
               assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+            }
+
+            if (vehiclePage.hasNextPage()) {
+              vehiclePage.loadNextPage()
+                  .toBlocking().subscribe(new Subscriber<Page<Vehicle>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(Page<Vehicle> vehiclePage) {
+                  assertTrue(vehiclePage.getItems().size() > 0);
+
+                  for (Vehicle vehicle : vehiclePage.getItems()) {
+                    assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
+                    assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
+                  }
+                }
+              });
             }
           }
         });
