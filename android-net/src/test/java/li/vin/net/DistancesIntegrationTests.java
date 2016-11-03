@@ -25,7 +25,7 @@ public class DistancesIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeleteOdometer() {
+  public void testCreateGetAndDeleteOdometer() {
     assertTrue(TestHelper.getVehicleId() != null);
 
     Odometer.create()
@@ -49,7 +49,8 @@ public class DistancesIntegrationTests {
         assertTrue(odometer.date() != null && odometer.date().length() > 0);
         assertTrue(odometer.reading() != null);
 
-        odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+        Odometer.odometerWithId(odometer.id())
+            .toBlocking().subscribe(new Subscriber<Odometer>() {
           @Override public void onCompleted() {
 
           }
@@ -60,8 +61,156 @@ public class DistancesIntegrationTests {
             assertTrue(false);
           }
 
-          @Override public void onNext(Void aVoid) {
+          @Override public void onNext(final Odometer odometer) {
+            assertTrue(odometer.id() != null && odometer.id().length() > 0);
+            assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+            assertTrue(odometer.date() != null && odometer.date().length() > 0);
+            assertTrue(odometer.reading() != null);
 
+            odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Void aVoid) {
+
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testCreateGetByVehicleIdAndDeleteOdometer() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Odometer.create()
+        .reading(200000d)
+        .unit(DistanceUnit.MILES)
+        .vehicleId(TestHelper.getVehicleId())
+        .save().toBlocking().subscribe(new Subscriber<Odometer>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(final Odometer odometer) {
+        assertTrue(odometer.id() != null && odometer.id().length() > 0);
+        assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+        assertTrue(odometer.date() != null && odometer.date().length() > 0);
+        assertTrue(odometer.reading() != null);
+
+        Odometer.odometersWithVehicleId(TestHelper.getVehicleId())
+            .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
+            assertTrue(odometer.id() != null && odometer.id().length() > 0);
+            assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+            assertTrue(odometer.date() != null && odometer.date().length() > 0);
+            assertTrue(odometer.reading() != null);
+
+            odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Void aVoid) {
+
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @Test
+  public void testCreateGetByUrlAndDeleteOdometer() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Odometer.create()
+        .reading(200000d)
+        .unit(DistanceUnit.MILES)
+        .vehicleId(TestHelper.getVehicleId())
+        .save().toBlocking().subscribe(new Subscriber<Odometer>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(final Odometer odometer) {
+        assertTrue(odometer.id() != null && odometer.id().length() > 0);
+        assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+        assertTrue(odometer.date() != null && odometer.date().length() > 0);
+        assertTrue(odometer.reading() != null);
+
+        vinliApp.distances().odometerReportsForUrl(String.format(
+            "%svehicles/%s/odometers", Endpoint.DISTANCE.getUrl(), TestHelper.getVehicleId()))
+            .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
+            assertTrue(odometer.id() != null && odometer.id().length() > 0);
+            assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
+            assertTrue(odometer.date() != null && odometer.date().length() > 0);
+            assertTrue(odometer.reading() != null);
+
+            odometer.delete().toBlocking().subscribe(new Observer<Void>() {
+              @Override public void onCompleted() {
+
+              }
+
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
+
+              @Override public void onNext(Void aVoid) {
+
+              }
+            });
           }
         });
       }
@@ -190,117 +339,6 @@ public class DistancesIntegrationTests {
         assertTrue(distance.value() != null);
       }
     });
-  }
-
-  @Test
-  public void getOdometerReportsByVehicleId(){
-    assertTrue(TestHelper.getVehicleId() != null);
-
-    Odometer.odometersWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, 1, null)
-        .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
-      @Override
-      public void onCompleted() {
-      }
-
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
-
-      @Override
-      public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
-        assertTrue(odometerTimeSeries.getItems().size() > 0);
-
-        for(Odometer odometer : odometerTimeSeries.getItems()){
-          assertTrue(odometer.id() != null && odometer.id().length() > 0);
-          assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
-          assertTrue(odometer.date() != null && odometer.date().length() > 0);
-          assertTrue(odometer.reading() != null);
-        }
-
-        if (odometerTimeSeries.hasPrior()) {
-          odometerTimeSeries.loadPrior()
-              .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
-            @Override public void onCompleted() {
-
-            }
-
-            @Override public void onError(Throwable e) {
-              System.out.println("Error: " + e.getMessage());
-              e.printStackTrace();
-              assertTrue(false);
-            }
-
-            @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
-              assertTrue(odometerTimeSeries.getItems().size() > 0);
-
-              for(Odometer odometer : odometerTimeSeries.getItems()){
-                assertTrue(odometer.id() != null && odometer.id().length() > 0);
-                assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
-                assertTrue(odometer.date() != null && odometer.date().length() > 0);
-                assertTrue(odometer.reading() != null);
-              }
-            }
-          });
-        }
-      }
-    });
-  }
-
-  @Test
-  public void getOdometerById(){
-    assertTrue(TestHelper.getOdometerId() != null);
-
-    Odometer.odometerWithId(TestHelper.getOdometerId()).toBlocking().subscribe(
-        new Subscriber<Odometer>() {
-          @Override public void onCompleted() {
-          }
-
-          @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            assertTrue(false);
-          }
-
-          @Override public void onNext(Odometer odometer) {
-            assertTrue(odometer.id() != null && odometer.id().length() > 0);
-            assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
-            assertTrue(odometer.date() != null && odometer.date().length() > 0);
-            assertTrue(odometer.reading() != null);
-          }
-        });
-  }
-
-  @Test public void getOdometersByUrl() {
-    assertTrue(TestHelper.getVehicleId() != null);
-
-    vinliApp.distances()
-        .odometerReportsForUrl(String.format("%svehicles/%s/odometers", Endpoint.DISTANCE.getUrl(),
-            TestHelper.getVehicleId()))
-        .toBlocking()
-        .subscribe(new Subscriber<TimeSeries<Odometer>>() {
-          @Override public void onCompleted() {
-
-          }
-
-          @Override public void onError(Throwable e) {
-            e.printStackTrace();
-            assertTrue(false);
-          }
-
-          @Override public void onNext(TimeSeries<Odometer> odometerTimeSeries) {
-            assertTrue(odometerTimeSeries.getItems().size() > 0);
-
-            for (Odometer odometer : odometerTimeSeries.getItems()) {
-              assertTrue(odometer.id() != null && odometer.id().length() > 0);
-              assertTrue(odometer.vehicleId() != null && odometer.vehicleId().length() > 0);
-              assertTrue(odometer.date() != null && odometer.date().length() > 0);
-              assertTrue(odometer.reading() != null);
-            }
-          }
-        });
   }
 
   @Test
