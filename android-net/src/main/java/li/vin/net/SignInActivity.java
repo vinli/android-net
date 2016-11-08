@@ -1,4 +1,3 @@
-
 package li.vin.net;
 
 import android.app.Activity;
@@ -13,7 +12,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.squareup.okhttp.HttpUrl;
 
-
 public class SignInActivity extends Activity {
   private static final String TAG = SignInActivity.class.getSimpleName();
 
@@ -24,8 +22,7 @@ public class SignInActivity extends Activity {
   private static final String ACTION_ERROR = "li.vin.net.signIn.ERROR";
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
 
-  private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder()
-      .scheme("https")
+  private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder().scheme("https")
       .host("auth" + Endpoint.domain())
       .addPathSegment("oauth")
       .addPathSegment("authorization")
@@ -33,7 +30,8 @@ public class SignInActivity extends Activity {
       .addQueryParameter("response_type", "token")
       .build();
 
-  /*protected*/ static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
+  /*protected*/
+  static final Intent newIntent(@NonNull Context context, @NonNull String clientId,
       @NonNull String redirectUri, @NonNull PendingIntent pendingIntent) {
     final Intent signInIntent = new Intent(context, SignInActivity.class);
 
@@ -127,12 +125,12 @@ public class SignInActivity extends Activity {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
           } catch (Exception e) {
             Log.d(TAG, "failed to launch sign up url", e);
-          } return true;
+          }
+          return true;
         }
         return false;
       }
     });
-
 
     final String url = OAUTH_ENPOINT.newBuilder()
         .host("auth" + Endpoint.domain())
@@ -143,5 +141,4 @@ public class SignInActivity extends Activity {
     Log.d("SignInActivity", "loading url: " + url);
     wv.loadUrl(url);
   }
-
 }
