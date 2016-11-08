@@ -1,5 +1,6 @@
 package li.vin.net;
 
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
@@ -30,6 +31,7 @@ public abstract class Vehicle implements VinliItem {
   @Nullable public abstract String year();
   @Nullable public abstract String trim();
   @Nullable public abstract String vin();
+  @Nullable public abstract String lastStartup();
 
   public static Observable<Vehicle> vehicleWithId(@NonNull String vehicleId) {
     return Vinli.curApp().vehicle(vehicleId);
@@ -231,4 +233,18 @@ public abstract class Vehicle implements VinliItem {
   }
 
   /*package*/ Vehicle() { }
+
+  @AutoParcel
+  /*package*/ static abstract class Data implements Parcelable {
+    @Nullable public abstract String engine();
+    @Nullable public abstract String engineDisplacement();
+    @Nullable public abstract String transmission();
+    @Nullable public abstract String manufacturer();
+    @Nullable public abstract String epaMpg();
+    @Nullable public abstract String drive();
+    @Nullable public abstract String numDoors();
+
+    /*package*/ Data() {
+    }
+  }
 }
