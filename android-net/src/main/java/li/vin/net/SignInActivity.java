@@ -1,3 +1,4 @@
+
 package li.vin.net;
 
 import android.app.Activity;
@@ -114,10 +115,10 @@ public class SignInActivity extends Activity {
 
           try {
             pendingIntent.send(SignInActivity.this, 0, resultIntent);
+            finish();
           } catch (Exception e) {
             Log.d(TAG, "pending intent send error: " + e);
           }
-
           return true;
         }
 
@@ -128,10 +129,10 @@ public class SignInActivity extends Activity {
             Log.d(TAG, "failed to launch sign up url", e);
           } return true;
         }
-
         return false;
       }
     });
+
 
     final String url = OAUTH_ENPOINT.newBuilder()
         .host("auth" + Endpoint.domain())
@@ -140,7 +141,6 @@ public class SignInActivity extends Activity {
         .toString();
 
     Log.d("SignInActivity", "loading url: " + url);
-
     wv.loadUrl(url);
   }
 
