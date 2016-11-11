@@ -235,43 +235,35 @@ public abstract class Vehicle implements VinliItem {
   }
 
   @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> engine(){
-    System.out.println(data().get("engine"));
     return (LinkedTreeMap<String, Object>) data().get("engine");
   }
 
   @SuppressWarnings("unchecked") Double engineDisplacement(){
-    System.out.println(data().get("engineDisplacement"));
     return (Double) data().get("engineDisplacement");
   }
 
   @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> transmission(){
-    System.out.println(data().get("transmission"));
     return (LinkedTreeMap<String, Object>) data().get("transmission");
   }
 
   @SuppressWarnings("unchecked") String manufacturer() {
-    System.out.println(data().get("manufacturer"));
       return data().get("manufacturer").toString();
 
   }
 
   @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> categories(){
-    System.out.println(data().get("categories"));
     return (LinkedTreeMap<String, Object>) data().get("categories");
   }
 
   @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> epaMpg(){
-    System.out.println(data().get("epaMpg"));
     return (LinkedTreeMap<String, Object>) data().get("epaMpg");
   }
 
   @SuppressWarnings("unchecked") String drive(){
-    System.out.println(data().get("drive"));
     return data().get("drive").toString();
   }
 
   @SuppressWarnings("unchecked") String numDoors(){
-    System.out.println(data().get("numDoors"));
     return data().get("numDoors").toString();
   }
 
