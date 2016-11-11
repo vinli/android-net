@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -87,6 +86,7 @@ public abstract class OdometerTrigger implements VinliItem{
   public abstract TriggerType type();
   public abstract Double threshold();
   public abstract Double events();
+  @Nullable public abstract DistanceUnit unit();
 
   /*package*/ abstract Links links();
 
@@ -112,6 +112,7 @@ public abstract class OdometerTrigger implements VinliItem{
     public abstract Builder type(TriggerType type);
     public abstract Builder threshold(Double threshold);
     public abstract Builder events(Double events);
+    public abstract Builder unit(@Nullable DistanceUnit unit);
     public abstract Builder links(Links links);
 
     public abstract OdometerTrigger build();
@@ -192,8 +193,9 @@ public abstract class OdometerTrigger implements VinliItem{
           case "type": b.type(TriggerType.getEnumFromString(in.nextString())); break;
           case "threshold": b.threshold(in.nextDouble()); break;
           case "events": b.events(in.nextDouble()); break;
+          case "unit": b.unit(DistanceUnit.parse(in.nextString())); break;
           case "links": b.links(gson.<OdometerTrigger.Links>fromJson(in, Links.class)); break;
-          default: throw new JsonParseException("unknown rule key " + name);
+          default: in.skipValue(); break;
         }
       }
       in.endObject();

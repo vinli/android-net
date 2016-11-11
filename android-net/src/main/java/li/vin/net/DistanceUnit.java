@@ -15,4 +15,11 @@ public enum DistanceUnit {
     return this.unitStr;
   }
 
+  /*package*/ static DistanceUnit parse(String str) {
+    if ("km".equals(str)) return KILOMETERS;
+    if ("m".equals(str)) return METERS;
+    if ("mi".equals(str)) return MILES;
+    return null;
+  }
+
 }
