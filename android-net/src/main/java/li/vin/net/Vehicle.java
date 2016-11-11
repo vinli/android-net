@@ -1,10 +1,10 @@
 package li.vin.net;
 
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -32,6 +32,8 @@ public abstract class Vehicle implements VinliItem {
   @Nullable public abstract String trim();
   @Nullable public abstract String vin();
   @Nullable public abstract String lastStartup();
+  @NonNull public abstract LinkedTreeMap<String, Object> data();
+
 
   public static Observable<Vehicle> vehicleWithId(@NonNull String vehicleId) {
     return Vinli.curApp().vehicle(vehicleId);
@@ -232,19 +234,50 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir);
   }
 
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> engine(){
+    System.out.println(data().get("engine"));
+    return (LinkedTreeMap<String, Object>) data().get("engine");
+  }
+
+  @SuppressWarnings("unchecked") Double engineDisplacement(){
+    System.out.println(data().get("engineDisplacement"));
+    return (Double) data().get("engineDisplacement");
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> transmission(){
+    System.out.println(data().get("transmission"));
+    return (LinkedTreeMap<String, Object>) data().get("transmission");
+  }
+
+  @SuppressWarnings("unchecked") String manufacturer() {
+    System.out.println(data().get("manufacturer"));
+      return data().get("manufacturer").toString();
+
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> categories(){
+    System.out.println(data().get("categories"));
+    return (LinkedTreeMap<String, Object>) data().get("categories");
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> epaMpg(){
+    System.out.println(data().get("epaMpg"));
+    return (LinkedTreeMap<String, Object>) data().get("epaMpg");
+  }
+
+  @SuppressWarnings("unchecked") String drive(){
+    System.out.println(data().get("drive"));
+    return data().get("drive").toString();
+  }
+
+  @SuppressWarnings("unchecked") String numDoors(){
+    System.out.println(data().get("numDoors"));
+    return data().get("numDoors").toString();
+  }
+
+
+
+
   /*package*/ Vehicle() { }
 
-  @AutoParcel
-  /*package*/ static abstract class Data implements Parcelable {
-    @Nullable public abstract String engine();
-    @Nullable public abstract String engineDisplacement();
-    @Nullable public abstract String transmission();
-    @Nullable public abstract String manufacturer();
-    @Nullable public abstract String epaMpg();
-    @Nullable public abstract String drive();
-    @Nullable public abstract String numDoors();
-
-    /*package*/ Data() {
-    }
-  }
 }
