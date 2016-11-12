@@ -7,7 +7,6 @@ import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
@@ -390,8 +389,7 @@ public abstract class Rule implements VinliItem {
                 case RadiusBoundary.TYPE:
                   b.radiusBoundary(gson.fromJson(boundary, RadiusBoundary.class));
                   break;
-                default:
-                  throw new JsonParseException("unknown boundary type " + type);
+                default: in.skipValue(); break;
               }
             }
 
@@ -413,7 +411,7 @@ public abstract class Rule implements VinliItem {
             in.endObject();
             b.object(bld.build());
             break;
-          default: throw new JsonParseException("unknown rule key " + name);
+          default: in.skipValue(); break;
         }
       }
       in.endObject();
