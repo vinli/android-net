@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -93,7 +92,7 @@ public abstract class Location implements VinliItem {
               switch (geoName) {
                 case "type": in.skipValue(); break;
                 case "coordinates": b.coordinate(gson.<Coordinate>fromJson(in, Coordinate.class)); break;
-                default: throw new JsonParseException("unknown location geometry key " + geoName);
+                default: in.skipValue(); break;
               }
             }
             in.endObject();
@@ -111,12 +110,12 @@ public abstract class Location implements VinliItem {
                   in.beginObject();
                   in.endObject();
                   break;
-                default: throw new JsonParseException("unknown location geometry key " + propName);
+                default: in.skipValue(); break;
               }
             }
             in.endObject();
             break;
-          default: throw new JsonParseException("unknown location key " + locationName);
+          default: in.skipValue(); break;
         }
       }
       in.endObject();
@@ -166,12 +165,12 @@ public abstract class Location implements VinliItem {
 
                   b.items(locations);
                   break;
-                default: throw new JsonParseException("unrecognized key '" + locName + "' while parsing locations");
+                default: in.skipValue(); break;
               }
             }
             in.endObject();
             break;
-          default: throw new JsonParseException("unrecognized key '" + name + "' while parsing locations");
+          default: in.skipValue(); break;
         }
       }
       in.endObject();
