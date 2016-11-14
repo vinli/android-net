@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import auto.parcel.AutoParcel;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
@@ -30,6 +31,9 @@ public abstract class Vehicle implements VinliItem {
   @Nullable public abstract String year();
   @Nullable public abstract String trim();
   @Nullable public abstract String vin();
+  @Nullable public abstract String lastStartup();
+  @NonNull public abstract LinkedTreeMap<String, Object> data();
+
 
   public static Observable<Vehicle> vehicleWithId(@NonNull String vehicleId) {
     return Vinli.curApp().vehicle(vehicleId);
@@ -230,5 +234,42 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir);
   }
 
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> engine(){
+    return (LinkedTreeMap<String, Object>) data().get("engine");
+  }
+
+  @SuppressWarnings("unchecked") Double engineDisplacement(){
+    return (Double) data().get("engineDisplacement");
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> transmission(){
+    return (LinkedTreeMap<String, Object>) data().get("transmission");
+  }
+
+  @SuppressWarnings("unchecked") String manufacturer() {
+      return data().get("manufacturer").toString();
+
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> categories(){
+    return (LinkedTreeMap<String, Object>) data().get("categories");
+  }
+
+  @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> epaMpg(){
+    return (LinkedTreeMap<String, Object>) data().get("epaMpg");
+  }
+
+  @SuppressWarnings("unchecked") String drive(){
+    return data().get("drive").toString();
+  }
+
+  @SuppressWarnings("unchecked") String numDoors(){
+    return data().get("numDoors").toString();
+  }
+
+
+
+
   /*package*/ Vehicle() { }
+
 }
