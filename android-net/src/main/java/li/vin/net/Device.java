@@ -5,16 +5,11 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import auto.parcel.AutoParcel;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ws.WebSocket;
-import com.squareup.okhttp.ws.WebSocketCall;
-import com.squareup.okhttp.ws.WebSocketListener;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.lang.reflect.Type;
@@ -32,8 +27,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import auto.parcel.AutoParcel;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.ws.WebSocket;
+import okhttp3.ws.WebSocketCall;
+import okhttp3.ws.WebSocketListener;
 import okio.Buffer;
-import okio.BufferedSource;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
@@ -215,24 +218,20 @@ public abstract class Device implements VinliItem {
                   return;
                 }
 
-                Buffer buffer = new Buffer();
+                final Buffer buffer = new Buffer();
                 buffer.writeString(message, UTF8);
                 try {
-                  webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
 
+                  webSocket.sendMessage(RequestBody.create(WebSocket.TEXT, message));
                   if (geometryFilter != null) {
-                    buffer.clear();
-                    buffer.writeString(
-                        gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class), UTF8);
-                    webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+                    webSocket.sendMessage(RequestBody.create(WebSocket.TEXT,
+                            gson.toJson(geometryFilter, StreamMessage.GeometryFilter.Seed.class)));
                   }
 
                   if (parametricFilters != null && parametricFilters.size() > 0) {
                     for (StreamMessage.ParametricFilter.Seed filter : parametricFilters) {
-                      buffer.clear();
-                      buffer.writeString(
-                          gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class), UTF8);
-                      webSocket.sendMessage(WebSocket.PayloadType.TEXT, buffer);
+                      webSocket.sendMessage(RequestBody.create(WebSocket.TEXT,
+                              gson.toJson(filter, StreamMessage.ParametricFilter.Seed.class)));
                     }
                   }
                 } catch (IOException ioe) {
@@ -254,7 +253,7 @@ public abstract class Device implements VinliItem {
               }
 
               @Override
-              public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
+              public void onMessage(ResponseBody responseBody)
                   throws IOException {
                 try {
                   recordActivity.run();
@@ -266,10 +265,10 @@ public abstract class Device implements VinliItem {
                     return;
                   }
 
-                  if (type == WebSocket.PayloadType.TEXT) {
+                  if (responseBody.contentType().equals(WebSocket.TEXT)) {
                     try {
-                      String payloadStr = payload.readString(UTF8);
-                      if (payloadStr != null && !payloadStr.isEmpty()) {
+                      String payloadStr = responseBody.string();
+                      if (!payloadStr.isEmpty()) {
                         StreamMessage streamMessage = gson.fromJson(payloadStr, StreamMessage.class);
 
                         if(streamMessage.coord() != null){
@@ -287,7 +286,7 @@ public abstract class Device implements VinliItem {
                     }
                   }
                 } finally {
-                  payload.close();
+                  responseBody.close();
                 }
               }
 
