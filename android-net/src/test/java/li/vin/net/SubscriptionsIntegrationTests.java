@@ -70,6 +70,7 @@ public class SubscriptionsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     Subscription.subscriptionsWithDeviceId(TestHelper.getDeviceId(), 1, null, null, null)
+        .toBlocking()
         .subscribe(new Subscriber<Page<Subscription>>() {
           @Override public void onCompleted() {
           }
@@ -83,6 +84,58 @@ public class SubscriptionsIntegrationTests {
           @Override public void onNext(Page<Subscription> subscriptionPage) {
             assertTrue(subscriptionPage.getItems().size() > 0);
 
+            for (Subscription subscription : subscriptionPage.getItems()) {
+              assertTrue(subscription.id() != null && subscription.id().length() > 0);
+              assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+              assertTrue(subscription.url() != null && subscription.url().length() > 0);
+            }
+
+            if (subscriptionPage.hasNextPage()) {
+              subscriptionPage.loadNextPage()
+                  .toBlocking().subscribe(new Subscriber<Page<Subscription>>() {
+                @Override public void onCompleted() {
+
+                }
+
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(Page<Subscription> subscriptionPage) {
+                  assertTrue(subscriptionPage.getItems().size() > 0);
+
+                  for (Subscription subscription : subscriptionPage.getItems()) {
+                    assertTrue(subscription.id() != null && subscription.id().length() > 0);
+                    assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+                    assertTrue(subscription.url() != null && subscription.url().length() > 0);
+                  }
+                }
+              });
+            }
+          }
+        });
+  }
+
+  @Test public void getSubscriptionByVehicleId() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Subscription.subscriptionsWithVehicleId(TestHelper.getVehicleId(), 1, null, null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Subscription>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Page<Subscription> subscriptionPage) {
+            assertTrue(subscriptionPage.getItems().size() > 0);
             for (Subscription subscription : subscriptionPage.getItems()) {
               assertTrue(subscription.id() != null && subscription.id().length() > 0);
               assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);

@@ -23,6 +23,19 @@ import rx.Observable;
       @Nullable @Query("objectId") String objectId,
       @Nullable @Query("objectType") String objectType);
 
+  @GET("vehicles/{vehicleId}/subscriptions")
+  Observable<Page<Subscription>> vehicleSubscriptions(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("offset") Integer offset,
+      @Nullable @Query("objectId") String objectId,
+      @Nullable @Query("objectType") String objectType);
+
+  @POST("devices/{deviceId}/subscriptions")
+  Observable<Wrapped<Subscription>> vehicleCreate(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @NonNull @Body Subscription.SeedCreate seedCreate);
+
   @GET("subscriptions/{subscriptionId}")
   Observable<Wrapped<Subscription>> subscription(
       @NonNull @Path("subscriptionId") String subscriptionId);

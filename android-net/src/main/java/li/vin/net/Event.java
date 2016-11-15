@@ -34,12 +34,28 @@ public abstract class Event implements VinliItem {
     return eventsWithDeviceId(deviceId, null, null, (Long) null, null, null, null);
   }
 
+
+  public static Observable<TimeSeries<Event>> eventsWithVehicleId(@NonNull String vehicleId) {
+    return Vinli.curApp()
+        .events()
+        .vehicleEvents(vehicleId, null, null, null, null, null, null);
+  }
+
+
   public static Observable<TimeSeries<Event>> eventsWithDeviceId(@NonNull String deviceId,
       @Nullable String type, @Nullable String objectId, @Nullable Long sinceMs,
       @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
     return Vinli.curApp()
         .events()
         .events(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<Event>> eventsWithVehicleId(@NonNull String vehicleId,
+      @Nullable String type, @Nullable String objectId, @Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp()
+        .events()
+        .events(vehicleId, type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   @Deprecated
@@ -50,7 +66,7 @@ public abstract class Event implements VinliItem {
     Long untilMs = until == null ? null : until.getTime();
     return Vinli.curApp()
         .events()
-        .events(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
+        .vehicleEvents(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String eventType();

@@ -660,6 +660,13 @@ public abstract class Device implements VinliItem {
         sortDir);
   }
 
+  public Observable<TimeSeries<Event>> vehicleEvents(@Nullable String type, @Nullable String objectId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().events().vehicleEvents(this.id(), type, objectId, sinceMs, untilMs, limit,
+        sortDir);
+  }
+
   @Deprecated
   public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
       @Nullable Date since, @Nullable Date until, @Nullable Integer limit) {

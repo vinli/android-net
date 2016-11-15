@@ -52,6 +52,18 @@ public abstract class Subscription implements VinliItem {
         .subscriptions(deviceId, limit, offset, objectId, objectType);
   }
 
+  public static Observable<Page<Subscription>> subscriptionsWithVehicleId(@NonNull String vehicleId) {
+    return subscriptionsWithVehicleId(vehicleId, null, null, null, null);
+  }
+
+  public static Observable<Page<Subscription>> subscriptionsWithVehicleId(@NonNull String vehicleId,
+      @Nullable Integer limit, @Nullable Integer offset, @Nullable String objectId,
+      @Nullable String objectType) {
+    return Vinli.curApp()
+        .subscriptions()
+        .vehicleSubscriptions(vehicleId, limit, offset, objectId, objectType);
+  }
+
   public abstract String deviceId();
   public abstract String eventType();
   public abstract String url();
@@ -147,6 +159,7 @@ public abstract class Subscription implements VinliItem {
         return Vinli.curApp().subscriptions().create(sc.deviceId(), sc)
             .map(Wrapped.<Subscription>pluckItem());
       }
+
     }
 
     /*package*/ static final class Adapter extends TypeAdapter<SeedCreate> {
