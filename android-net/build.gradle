@@ -77,7 +77,7 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.1.+'
     compile 'com.google.code.gson:gson:2.+'
-    compile 'com.android.support:support-annotations:24.2.1'
+    provided 'com.android.support:support-annotations:24.2.1'
     compile 'com.github.frankiesardo:auto-parcel:0.3'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
