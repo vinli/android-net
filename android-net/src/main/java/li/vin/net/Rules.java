@@ -19,6 +19,12 @@ import rx.Observable;
       @Nullable @Query("limit") Integer limit,
       @Nullable @Query("offset") Integer offset);
 
+  @GET("vehicles/{vehicleId}/rules")
+  Observable<Page<Rule>> vehicleRules(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("offset") Integer offset);
+
   @GET("rules/{ruleId}")
   Observable<Wrapped<Rule>> rule(
       @NonNull @Path("ruleId") String ruleId);

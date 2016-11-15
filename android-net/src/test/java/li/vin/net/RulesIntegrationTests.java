@@ -231,6 +231,64 @@ public class RulesIntegrationTests {
   }
 
   @Test
+  public void testGetRulesByVehicleId(){
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Rule.rulesWithVehicleId(TestHelper.getVehicleId(), 1, null)
+        .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+      @Override
+      public void onCompleted() {
+
+      }
+
+      @Override
+      public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override
+      public void onNext(Page<Rule> rulePage) {
+        assertTrue(rulePage.getItems().size() > 0);
+
+        for(Rule rule : rulePage.getItems()){
+          assertTrue(rule.id() != null && rule.id().length() > 0);
+          assertTrue(rule.object().type().equals("vehicle") && rule.object().id()!=null);
+          assertTrue(rule.object().type().length() > 0);
+          assertTrue(rule.object().id().length() > 0);
+        }
+
+        if (rulePage.hasNextPage()) {
+          rulePage.loadNextPage()
+              .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+            @Override public void onCompleted() {
+
+            }
+
+            @Override public void onError(Throwable e) {
+              System.out.println("Error: " + e.getMessage());
+              e.printStackTrace();
+              assertTrue(false);
+            }
+
+            @Override public void onNext(Page<Rule> rulePage) {
+              assertTrue(rulePage.getItems().size() > 0);
+
+              for(Rule rule : rulePage.getItems()){
+                assertTrue(rule.id() != null && rule.id().length() > 0);
+                assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+                assertTrue(rule.object().type().length() > 0);
+                assertTrue(rule.object().id().length() > 0);
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  @Test
   public void getRuleById(){
     assertTrue(TestHelper.getRuleId() != null);
 
