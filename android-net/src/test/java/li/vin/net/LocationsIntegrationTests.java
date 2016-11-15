@@ -106,6 +106,34 @@ public class LocationsIntegrationTests {
         });
   }
 
+  @Test public void testGetLocationsByVehicleId() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Location.locationsWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Location>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Location> locationTimeSeries) {
+            assertTrue(locationTimeSeries.getItems().size() > 0);
+
+            for (Location location : locationTimeSeries.getItems()) {
+              assertTrue(location.coordinate() != null);
+              assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+              assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+              assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+            }
+          }
+        });
+  }
+
   @Test public void testGetLatestLocation(){
     assertTrue(TestHelper.getDeviceId() != null);
 
@@ -138,6 +166,36 @@ public class LocationsIntegrationTests {
 
     vinliApp.locations()
         .locations(TestHelper.getDeviceId(), 0L, currentTimeMillis(), 5, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Location>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Location> locationTimeSeries) {
+            assertTrue(locationTimeSeries.getItems().size() > 0);
+            assertTrue(locationTimeSeries.getItems().size() <= 5);
+
+            for (Location location : locationTimeSeries.getItems()) {
+              assertTrue(location.coordinate() != null);
+              assertTrue(Math.abs(location.coordinate().lat()) <= 180.0);
+              assertTrue(Math.abs(location.coordinate().lon()) <= 180.0);
+              assertTrue(location.timestamp() != null && location.timestamp().length() > 0);
+            }
+          }
+        });
+  }
+
+  @Test public void testGetLocationsWithSinceUntilLimitByVehicleId() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    vinliApp.locations()
+        .vehicleLocations(TestHelper.getVehicleId(), 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {

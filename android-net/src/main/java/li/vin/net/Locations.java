@@ -18,6 +18,14 @@ import rx.Observable;
       @Nullable @Query("limit") Integer limit,
       @Nullable @Query("sortDir") String sortDir);
 
+  @GET("vehicles/{vehicleId}/locations")
+  Observable<TimeSeries<Location>> vehicleLocations(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("since") Long since,
+      @Nullable @Query("until") Long until,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("sortDir") String sortDir);
+
   @GET Observable<TimeSeries<Location>> locationsForUrl(@NonNull @Url String url);
 
 }

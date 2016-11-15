@@ -10,6 +10,7 @@ import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
 import static li.vin.net.TestHelper.getDeviceId;
+import static li.vin.net.TestHelper.getVehicleId;
 
 @RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 22)
 public class MessagesIntegrationTests {
@@ -66,11 +67,80 @@ public class MessagesIntegrationTests {
           }
         });
   }
+  @Test public void getPagedMessagesByVehicleId() {
+    assertTrue(getVehicleId() != null);
+
+    Message.messagesWithVehicleId(getVehicleId(), (Long) null, null, 1, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+
+            if (messageTimeSeries.hasPrior()) {
+              messageTimeSeries.loadPrior().toBlocking()
+                  .subscribe(new Subscriber<TimeSeries<Message>>() {
+                    @Override public void onCompleted() {
+
+                    }
+
+                    @Override public void onError(Throwable e) {
+                      e.printStackTrace();
+                      assertTrue(false);
+                    }
+
+                    @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+                      for (Message message : messageTimeSeries.getItems()) {
+                        assertTrue(message.id() != null && message.id().length() > 0);
+                        assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+                      }
+                    }
+                  });
+            }
+          }
+        });
+  }
 
   @Test public void getMessagesByDeviceId() {
     assertTrue(getDeviceId() != null);
 
     Message.messagesWithDeviceId(getDeviceId(), (Long) null, null, null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            assertTrue(messageTimeSeries.getItems().size() > 0);
+
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+          }
+        });
+  }
+  @Test public void getMessagesByVehicleId() {
+    assertTrue(getVehicleId() != null);
+
+    Message.messagesWithVehicleId(getVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
           @Override public void onCompleted() {
@@ -170,4 +240,5 @@ public class MessagesIntegrationTests {
               }
             });
   }
+
 }

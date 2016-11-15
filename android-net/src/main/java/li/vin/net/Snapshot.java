@@ -4,27 +4,18 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
+import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import auto.parcel.AutoParcel;
 import rx.Observable;
 
 @AutoParcel
@@ -59,6 +50,17 @@ public class Snapshot implements VinliItem {
     Long sinceMs = since == null ? null : since.getTime();
     Long untilMs = until == null ? null : until.getTime();
     return Vinli.curApp().snapshots().snapshots(deviceId, fields, untilMs, sinceMs, limit, sortDir);
+  }
+
+  public static Observable<TimeSeries<Snapshot>> snapshotsWithVehicleId(@NonNull String vehicleId,
+      @NonNull String fields) {
+    return snapshotsWithVehicleId(vehicleId, fields, (Long) null, null, null, null);
+  }
+
+  public static Observable<TimeSeries<Snapshot>> snapshotsWithVehicleId(@NonNull String vehicleId,
+      @NonNull String fields, @Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().snapshots().vehicleSnapshots(vehicleId, fields, sinceMs, untilMs, limit, sortDir);
   }
 
   private String id;

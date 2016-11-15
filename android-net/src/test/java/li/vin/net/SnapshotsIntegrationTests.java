@@ -101,11 +101,67 @@ public class SnapshotsIntegrationTests {
         });
   }
 
+  @Test public void getSnapshotsByVehicleId() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    Snapshot.snapshotsWithVehicleId(TestHelper.getVehicleId(), "location,vehicleSpeed", (Long) null, null, null, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Snapshot> snapshotTimeSeries) {
+            assertTrue(snapshotTimeSeries.getItems().size() > 0);
+
+            for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+              assertTrue(snapshot.coord() != null);
+              assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
+              assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
+            }
+          }
+        });
+  }
+
+
   @Test public void getSnapshotsWithSinceUntilLimitByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.snapshots()
         .snapshots(TestHelper.getDeviceId(), "vehicleSpeed", 0L, currentTimeMillis(), 5, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
+          @Override public void onCompleted() {
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Snapshot> snapshotTimeSeries) {
+            assertTrue(snapshotTimeSeries.getItems().size() > 0);
+            assertTrue(snapshotTimeSeries.getItems().size() <= 5);
+
+            for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
+              assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
+              assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
+            }
+          }
+        });
+  }
+
+  @Test public void getSnapshotsWithSinceUntilLimitByVehicleId() {
+    assertTrue(TestHelper.getVehicleId() != null);
+
+    vinliApp.snapshots()
+        .vehicleSnapshots(TestHelper.getVehicleId(), "vehicleSpeed", 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
           @Override public void onCompleted() {
