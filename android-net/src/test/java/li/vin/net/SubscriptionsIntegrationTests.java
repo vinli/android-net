@@ -138,7 +138,7 @@ public class SubscriptionsIntegrationTests {
             assertTrue(subscriptionPage.getItems().size() > 0);
             for (Subscription subscription : subscriptionPage.getItems()) {
               assertTrue(subscription.id() != null && subscription.id().length() > 0);
-              assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+              assertTrue(subscription.vehicleId() != null && subscription.vehicleId().length() > 0);
               assertTrue(subscription.url() != null && subscription.url().length() > 0);
             }
 
