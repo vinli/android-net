@@ -29,10 +29,14 @@ import rx.Observable;
   Observable<Wrapped<Rule>> rule(
       @NonNull @Path("ruleId") String ruleId);
 
-
   @POST("devices/{deviceId}/rules")
   Observable<Wrapped<Rule>> create(
       @NonNull @Path("deviceId") String deviceId,
+      @NonNull @Body Rule.Seed ruleSeed);
+
+  @POST("vehicles/{vehicleId}/rules")
+  Observable<Wrapped<Rule>> vehicleCreate(
+      @NonNull @Path("vehicleId") String vehicleId,
       @NonNull @Body Rule.Seed ruleSeed);
 
   @DELETE("rules/{ruleId}")

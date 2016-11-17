@@ -328,7 +328,9 @@ import rx.Observable;
 
     @Nullable public abstract List<ParametricBoundary.Seed> parametricBoundaries();
 
-    @NonNull public abstract String deviceId();
+    @Nullable public abstract String deviceId();
+
+    @Nullable public abstract String vehicleId();
 
     /*package*/ Seed() {
     }
@@ -342,7 +344,9 @@ import rx.Observable;
 
       public abstract Saver parametricBoundaries(@Nullable List<ParametricBoundary.Seed> l);
 
-      public abstract Saver deviceId(@NonNull String s);
+      public abstract Saver deviceId(@Nullable String s);
+
+      public abstract Saver vehicleId(@Nullable String s);
 
       /*package*/ Saver() {
       }
@@ -355,7 +359,19 @@ import rx.Observable;
 
         return Vinli.curApp().rules().create(s.deviceId(), s).map(Wrapped.<Rule>pluckItem());
       }
+
+      public Observable<Rule> vehicleSave() {
+        final Seed s = autoBuild();
+
+        return Vinli.curApp().rules().vehicleCreate(s.vehicleId(), s).map(Wrapped.<Rule>pluckItem());
+      }
+
+
+
+
     }
+
+
 
     /*package*/ static final class Adapter extends TypeAdapter<Seed> {
       private Gson gson;
