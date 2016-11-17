@@ -62,6 +62,11 @@ public class TestHelper {
     return ruleId.equals("DEFAULT_RULE_ID") ? null : ruleId;
   }
 
+  public static String getVehicleRuleId(){
+    String vehicleRuleId = BuildConfig.VEHICLE_RULE_ID;
+    return vehicleRuleId.equals("DEFAULT_VEHICLE_RULE_ID") ? null : vehicleRuleId;
+  }
+
   public static String getSubscriptionId(){
     String subscriptionId = BuildConfig.SUBSCRIPTION_ID;
     return subscriptionId.equals("DEFAULT_SUBSCRIPTION_ID") ? null : subscriptionId;

@@ -31,7 +31,7 @@ import rx.Observable;
       @Nullable @Query("objectId") String objectId,
       @Nullable @Query("objectType") String objectType);
 
-  @POST("devices/{deviceId}/subscriptions")
+  @POST("vehicles/{vehicleId}/subscriptions")
   Observable<Wrapped<Subscription>> vehicleCreate(
       @NonNull @Path("vehicleId") String vehicleId,
       @NonNull @Body Subscription.SeedCreate seedCreate);

@@ -37,6 +37,7 @@ android {
             buildConfigField("String", "DEVICE_ID", "\"" + integrationProperties['DEVICE_ID'] + "\"")
             buildConfigField("String", "SUBSCRIPTION_ID", "\"" + integrationProperties['SUBSCRIPTION_ID'] + "\"")
             buildConfigField("String", "RULE_ID", "\"" + integrationProperties['RULE_ID'] + "\"")
+            buildConfigField("String", "VEHICLE_RULE_ID", "\"" + integrationProperties['VEHICLE_RULE_ID'] + "\"")
             buildConfigField("String", "VEHICLE_ID", "\"" + integrationProperties['VEHICLE_ID'] + "\"")
             buildConfigField("String", "EVENT_ID", "\"" + integrationProperties['EVENT_ID'] + "\"")
             buildConfigField("String", "NOTIFICATION_ID", "\"" + integrationProperties['NOTIFICATION_ID'] + "\"")

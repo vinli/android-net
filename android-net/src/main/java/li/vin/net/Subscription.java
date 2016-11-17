@@ -142,8 +142,8 @@ public abstract class Subscription implements VinliItem {
     @Nullable public abstract ObjectRef object();
     public abstract String url();
     @Nullable public abstract String appData();
-    public abstract String deviceId();
-
+    @Nullable public abstract String deviceId();
+    @Nullable public abstract String vehicleId();
     /*package*/ SeedCreate() { }
 
     @AutoParcel.Builder
@@ -153,19 +153,28 @@ public abstract class Subscription implements VinliItem {
       public abstract Saver url(String s);
       public abstract Saver appData(@Nullable String s);
       public abstract Saver deviceId(String deviceId);
+      public abstract Saver vehicleId(String vehicleId);
 
-      /*package*/ Saver() { }
+
+      /*package*/ Saver() {
+      }
 
       /*package*/ abstract SeedCreate autoBuild();
 
       public Observable<Subscription> save() {
         final SeedCreate sc = autoBuild();
-
         return Vinli.curApp().subscriptions().create(sc.deviceId(), sc)
+            .map(Wrapped.<Subscription>pluckItem());
+      }
+      public Observable<Subscription> vehicleSave() {
+        final SeedCreate sc = autoBuild();
+        return Vinli.curApp().subscriptions().vehicleCreate(sc.vehicleId(), sc)
             .map(Wrapped.<Subscription>pluckItem());
       }
 
     }
+
+
 
     /*package*/ static final class Adapter extends TypeAdapter<SeedCreate> {
       private Gson gson;

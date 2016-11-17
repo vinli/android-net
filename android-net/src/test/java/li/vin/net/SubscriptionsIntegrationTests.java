@@ -66,6 +66,51 @@ public class SubscriptionsIntegrationTests {
     });
   }
 
+  @Test
+  public void testCreateAndDeleteSubscriptionWithVehicleId(){
+    assertTrue(TestHelper.getDeviceId() != null);
+
+    Subscription.create().vehicleId(TestHelper.getVehicleId())
+        .eventType("rule-enter")
+        .appData("{\"data\":\"stuff\"}")
+        .object(ObjectRef.builder().id(TestHelper.getVehicleRuleId()).type("rule").build())
+        .url("https://someurl/notifications")
+        .vehicleSave().toBlocking().subscribe(new Subscriber<Subscription>() {
+      @Override public void onCompleted() {
+
+      }
+
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
+
+      @Override public void onNext(final Subscription subscription) {
+        assertTrue(subscription.id() != null && subscription.id().length() > 0);
+        assertTrue(subscription.vehicleId() != null && subscription.vehicleId().length() > 0);
+        assertTrue(subscription.url() != null && subscription.url().length() > 0);
+
+        subscription.delete().toBlocking().subscribe(new Subscriber<Void>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(Void aVoid) {
+
+          }
+        });
+
+      }
+    });
+  }
+
   @Test public void getSubscriptionByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
@@ -160,7 +205,7 @@ public class SubscriptionsIntegrationTests {
 
                   for (Subscription subscription : subscriptionPage.getItems()) {
                     assertTrue(subscription.id() != null && subscription.id().length() > 0);
-                    assertTrue(subscription.deviceId() != null && subscription.deviceId().length() > 0);
+                    assertTrue(subscription.vehicleId() != null && subscription.vehicleId().length() > 0);
                     assertTrue(subscription.url() != null && subscription.url().length() > 0);
                   }
                 }
