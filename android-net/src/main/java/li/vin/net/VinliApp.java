@@ -145,7 +145,7 @@ public final class VinliApp {
         System.out.println(message);
       }
     });
-    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
     client = clientBuilder.build().newBuilder()
         .addInterceptor(new OauthInterceptor(accessToken))
