@@ -231,7 +231,7 @@ public class RulesIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeletePolygonBoundaryRuleWithVehicle(){
+  public void testCreateAndDeletePolygonBoundaryRuleByVehicle(){
     assertTrue(TestHelper.getDeviceId() != null);
 
     List<double[]> l = new ArrayList<>();
@@ -282,7 +282,7 @@ public class RulesIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeleteParametricBoundaryRuleWithVehicle(){
+  public void testCreateAndDeleteParametricBoundaryRuleByVehicle(){
     assertTrue(TestHelper.getDeviceId() != null);
 
     List<double[]> l = new ArrayList<>();
@@ -336,7 +336,7 @@ public class RulesIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeleteRadiusBoundaryRuleWithVehicle(){
+  public void testCreateAndDeleteRadiusBoundaryRuleByVehicle(){
     assertTrue(TestHelper.getDeviceId() != null);
 
     Rule.create().vehicleId(TestHelper.getVehicleId()).name("testrule").radiusBoundary(

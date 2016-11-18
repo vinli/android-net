@@ -34,11 +34,13 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "ACCESS_TOKEN", "\"" + integrationProperties['ACCESS_TOKEN'] + "\"")
+            buildConfigField("String", "VEHICULARIZATION_ACCESS_TOKEN", "\"" + integrationProperties['VEHICULARIZATION_ACCESS_TOKEN'] + "\"")
             buildConfigField("String", "DEVICE_ID", "\"" + integrationProperties['DEVICE_ID'] + "\"")
             buildConfigField("String", "SUBSCRIPTION_ID", "\"" + integrationProperties['SUBSCRIPTION_ID'] + "\"")
             buildConfigField("String", "RULE_ID", "\"" + integrationProperties['RULE_ID'] + "\"")
             buildConfigField("String", "VEHICLE_RULE_ID", "\"" + integrationProperties['VEHICLE_RULE_ID'] + "\"")
             buildConfigField("String", "VEHICLE_ID", "\"" + integrationProperties['VEHICLE_ID'] + "\"")
+            buildConfigField("String", "SECOND_VEHICLE_ID", "\"" + integrationProperties['SECOND_VEHICLE_ID'] + "\"")
             buildConfigField("String", "EVENT_ID", "\"" + integrationProperties['EVENT_ID'] + "\"")
             buildConfigField("String", "NOTIFICATION_ID", "\"" + integrationProperties['NOTIFICATION_ID'] + "\"")
             buildConfigField("String", "MESSAGE_ID", "\"" + integrationProperties['MESSAGE_ID'] + "\"")

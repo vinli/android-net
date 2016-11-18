@@ -10,22 +10,27 @@ import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
 import static li.vin.net.TestHelper.getDeviceId;
+import static li.vin.net.TestHelper.getSecondVehicleId;
 import static li.vin.net.TestHelper.getVehicleId;
 
 @RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 22)
 public class MessagesIntegrationTests {
 
   public VinliApp vinliApp;
+  public VinliApp vehicleVinliApp;
 
   @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
+
+    assertTrue(TestHelper.getVehicleAccessToken() != null);
+
+    vehicleVinliApp = TestHelper.getVehicleVinliApp();
   }
 
   @Test public void getPagedMessagesByDeviceId() {
     assertTrue(getDeviceId() != null);
-
     Message.messagesWithDeviceId(getDeviceId(), (Long) null, null, 1, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
@@ -139,8 +144,7 @@ public class MessagesIntegrationTests {
   }
   @Test public void getMessagesByVehicleId() {
     assertTrue(getVehicleId() != null);
-
-    Message.messagesWithVehicleId(getVehicleId(), null, null, null, null)
+    vehicleVinliApp.messages().vehicleMessages(TestHelper.getSecondVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
           @Override public void onCompleted() {
@@ -168,6 +172,34 @@ public class MessagesIntegrationTests {
 
     vinliApp.messages()
         .messages(getDeviceId(), 0L, System.currentTimeMillis(), 5, null)
+        .toBlocking()
+        .subscribe(new Subscriber<TimeSeries<Message>>() {
+          @Override public void onCompleted() {
+
+          }
+
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
+
+          @Override public void onNext(TimeSeries<Message> messageTimeSeries) {
+            assertTrue(messageTimeSeries.getItems().size() > 0);
+            assertTrue(messageTimeSeries.getItems().size() <= 5);
+
+            for (Message message : messageTimeSeries.getItems()) {
+              assertTrue(message.id() != null && message.id().length() > 0);
+              assertTrue(message.timestamp != null && message.timestamp.length() > 0);
+            }
+          }
+        });
+  }
+
+  @Test public void getMessagesWithSinceUntilLimitByVehicleId() {
+    assertTrue(getDeviceId() != null);
+
+    vehicleVinliApp.messages()
+        .vehicleMessages(getSecondVehicleId(), 0L, System.currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {
           @Override public void onCompleted() {

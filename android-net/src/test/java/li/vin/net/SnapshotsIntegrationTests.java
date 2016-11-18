@@ -15,11 +15,18 @@ import static junit.framework.Assert.assertTrue;
 public class SnapshotsIntegrationTests {
 
   public VinliApp vinliApp;
+  public VinliApp vehicleVinliApp;
 
   @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
+
+    assertTrue(TestHelper.getVehicleAccessToken() != null);
+
+    vehicleVinliApp = TestHelper.getVehicleVinliApp();
+
+
   }
 
   @Test public void getPagedSnapshots() {
@@ -103,8 +110,7 @@ public class SnapshotsIntegrationTests {
 
   @Test public void getSnapshotsByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
-
-    Snapshot.snapshotsWithVehicleId(TestHelper.getVehicleId(), "location,vehicleSpeed", (Long) null, null, null, null)
+    vehicleVinliApp.snapshots().vehicleSnapshots(TestHelper.getSecondVehicleId(), "location", null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
           @Override public void onCompleted() {
@@ -122,7 +128,6 @@ public class SnapshotsIntegrationTests {
             for (Snapshot snapshot : snapshotTimeSeries.getItems()) {
               assertTrue(snapshot.coord() != null);
               assertTrue(snapshot.timestamp() != null && snapshot.timestamp().length() > 0);
-              assertTrue(snapshot.doubleVal("vehicleSpeed", Double.MIN_VALUE) != Double.MIN_VALUE);
             }
           }
         });
@@ -160,8 +165,8 @@ public class SnapshotsIntegrationTests {
   @Test public void getSnapshotsWithSinceUntilLimitByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.snapshots()
-        .vehicleSnapshots(TestHelper.getVehicleId(), "vehicleSpeed", 0L, currentTimeMillis(), 5, null)
+    vehicleVinliApp.snapshots()
+        .vehicleSnapshots(TestHelper.getSecondVehicleId(), "vehicleSpeed", 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
           @Override public void onCompleted() {

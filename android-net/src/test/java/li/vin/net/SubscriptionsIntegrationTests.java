@@ -67,7 +67,7 @@ public class SubscriptionsIntegrationTests {
   }
 
   @Test
-  public void testCreateAndDeleteSubscriptionWithVehicleId(){
+  public void testCreateAndDeleteSubscriptionByVehicleId(){
     assertTrue(TestHelper.getDeviceId() != null);
 
     Subscription.create().vehicleId(TestHelper.getVehicleId())

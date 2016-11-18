@@ -17,16 +17,20 @@ import static junit.framework.Assert.assertTrue;
 public class LocationsIntegrationTests {
 
   public VinliApp vinliApp;
+  public VinliApp vehicleVinliApp;
 
   @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
+
+    assertTrue(TestHelper.getVehicleAccessToken() != null);
+
+    vehicleVinliApp = TestHelper.getVehicleVinliApp();
   }
 
   @Test public void testGetPagedLocations() {
     assertTrue(TestHelper.getDeviceId() != null);
-
     Location.locationsWithDeviceId(TestHelper.getDeviceId(), (Long) null, null, 1, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
@@ -108,8 +112,7 @@ public class LocationsIntegrationTests {
 
   @Test public void testGetLocationsByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
-
-    Location.locationsWithVehicleId(TestHelper.getVehicleId(), (Long) null, null, null, null)
+    vehicleVinliApp.locations().vehicleLocations(TestHelper.getSecondVehicleId(), null, null, null, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {
@@ -194,8 +197,8 @@ public class LocationsIntegrationTests {
   @Test public void testGetLocationsWithSinceUntilLimitByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.locations()
-        .vehicleLocations(TestHelper.getVehicleId(), 0L, currentTimeMillis(), 5, null)
+    vehicleVinliApp.locations()
+        .vehicleLocations(TestHelper.getSecondVehicleId(), 0L, currentTimeMillis(), 5, null)
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {
           @Override public void onCompleted() {
