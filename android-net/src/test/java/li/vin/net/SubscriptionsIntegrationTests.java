@@ -220,6 +220,7 @@ public class SubscriptionsIntegrationTests {
 
     vinliApp.subscriptions()
         .subscriptions(TestHelper.getDeviceId(), 5, 1, null, null)
+        .toBlocking()
         .subscribe(new Subscriber<Page<Subscription>>() {
           @Override public void onCompleted() {
           }
