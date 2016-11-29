@@ -28,7 +28,7 @@ public class DiagnosticsIntegrationTests {
   public void testGetPagedCodes(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, 1, null)
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, 1, null,null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
       @Override
       public void onCompleted() {
@@ -87,7 +87,7 @@ public class DiagnosticsIntegrationTests {
   public void testGetCodesByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, null, null)
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, null, null, null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
       @Override
       public void onCompleted() {
