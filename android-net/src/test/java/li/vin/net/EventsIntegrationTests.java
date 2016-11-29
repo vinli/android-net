@@ -75,7 +75,7 @@ public class EventsIntegrationTests {
         });
   }
 
-  @Test public void testGetEventsByVehicleId() {//TODO no events for this
+  @Test public void testGetEventsByVehicleId() {
     assertTrue(TestHelper.getVehicleId()!= null);
 
     Event.eventsWithVehicleId(TestHelper.getVehicleId())

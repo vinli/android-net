@@ -55,7 +55,7 @@ public abstract class Event implements VinliItem {
       @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
     return Vinli.curApp()
         .events()
-        .events(vehicleId, type, objectId, sinceMs, untilMs, limit, sortDir);
+        .vehicleEvents(vehicleId, type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   @Deprecated
@@ -66,7 +66,7 @@ public abstract class Event implements VinliItem {
     Long untilMs = until == null ? null : until.getTime();
     return Vinli.curApp()
         .events()
-        .vehicleEvents(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
+        .events(deviceId, type, objectId, sinceMs, untilMs, limit, sortDir);
   }
 
   public abstract String eventType();

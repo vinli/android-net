@@ -27,9 +27,9 @@ import rx.Observable;
 
 
 
-  @GET("vehicles/{deviceId}/events")
+  @GET("vehicles/{vehicleId}/events")
   Observable<TimeSeries<Event>> vehicleEvents(
-      @NonNull @Path("deviceId") String vehicleId,
+      @NonNull @Path("vehicleId") String vehicleId,
       @Nullable @Query("type") String type,
       @Nullable @Query("objectId") String objectId,
       @Nullable @Query("since") Long since,
