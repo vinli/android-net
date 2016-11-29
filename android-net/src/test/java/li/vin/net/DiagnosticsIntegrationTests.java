@@ -50,6 +50,7 @@ public class DiagnosticsIntegrationTests {
           assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
           assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
           assertTrue(dtc.number() != null && dtc.number().length() > 0);
+          assertTrue(dtc.description() != null && dtc.description().length() > 0);
         }
 
         if (dtcTimeSeries.hasPrior()) {
@@ -73,6 +74,7 @@ public class DiagnosticsIntegrationTests {
                 assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
                 assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
                 assertTrue(dtc.number() != null && dtc.number().length() > 0);
+                assertTrue(dtc.description() != null && dtc.description().length() > 0);
               }
             }
           });
@@ -107,6 +109,7 @@ public class DiagnosticsIntegrationTests {
           assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
           assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
           assertTrue(dtc.number() != null && dtc.number().length() > 0);
+          assertTrue(dtc.description() != null && dtc.description().length() > 0);
         }
       }
     });
