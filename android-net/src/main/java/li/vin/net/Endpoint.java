@@ -14,7 +14,8 @@ import okhttp3.HttpUrl;
   TRIPS("trips"),
   SAFETY("safety"),
   BEHAVIORAL("behavioral"),
-  DISTANCE("distance");
+  DISTANCE("distance"),
+  DUMMY("dummies");
 
   /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";
   /*package*/ static final String DOMAIN_DEV = "-dev.vin.li";
