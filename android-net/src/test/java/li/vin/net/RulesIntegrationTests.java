@@ -12,26 +12,28 @@ import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 22)
+@RunWith(RobolectricTestRunner.class) @Config(constants = BuildConfig.class, sdk = 22)
 public class RulesIntegrationTests {
 
   public VinliApp vinliApp;
 
-  @Before
-  public void setup(){
+  @Before public void setup() {
     assertTrue(TestHelper.getAccessToken() != null);
 
     vinliApp = TestHelper.getVinliApp();
   }
 
-  @Test
-  public void testCreateAndDeleteRadiusBoundaryRule(){
+  @Test public void testCreateAndDeleteRadiusBoundaryRule() {
     assertTrue(TestHelper.getDeviceId() != null);
 
-    Rule.create().deviceId(TestHelper.getDeviceId()).name("testrule").radiusBoundary(
-        Rule.RadiusBoundary.create().lat(32.897480f).lon(-97.040443f).radius(100).build()).save()
-        .toBlocking().subscribe(new Subscriber<Rule>() {
+    Rule.create()
+        .deviceId(TestHelper.getDeviceId())
+        .name("testrule")
+        .radiusBoundary(
+            Rule.RadiusBoundary.create().lat(32.897480f).lon(-97.040443f).radius(100).build())
+        .save()
+        .toBlocking()
+        .subscribe(new Subscriber<Rule>() {
           @Override public void onCompleted() {
 
           }
@@ -67,25 +69,27 @@ public class RulesIntegrationTests {
         });
   }
 
-  @Test
-  public void testCreateAndDeleteParametricBoundaryRule(){
+  @Test public void testCreateAndDeleteParametricBoundaryRule() {
     assertTrue(TestHelper.getDeviceId() != null);
 
     List<double[]> l = new ArrayList<>();
-    l.add(new double[]{32.792492f, -96.823495f});
-    l.add(new double[]{32.817846f, -96.670862f});
-    l.add(new double[]{32.67926f, -96.771103f});
-    l.add(new double[]{32.792492f, -96.823495f});
+    l.add(new double[] { 32.792492f, -96.823495f });
+    l.add(new double[] { 32.817846f, -96.670862f });
+    l.add(new double[] { 32.67926f, -96.771103f });
+    l.add(new double[] { 32.792492f, -96.823495f });
     List<List<double[]>> ll = new ArrayList<>();
     ll.add(l);
 
-    Rule.create().deviceId(TestHelper.getDeviceId()).name("testrule")
-        .parametricBoundaries(Arrays.asList(new Rule.ParametricBoundary.Seed[]{
+    Rule.create()
+        .deviceId(TestHelper.getDeviceId())
+        .name("testrule")
+        .parametricBoundaries(Arrays.asList(new Rule.ParametricBoundary.Seed[] {
             Rule.ParametricBoundary.create().parameter("vehicleSpeed").max(32f).min(16f).build(),
             Rule.ParametricBoundary.create().parameter("rpm").max(32f).min(16f).build(),
         }))
         .save()
-        .toBlocking().subscribe(new Subscriber<Rule>() {
+        .toBlocking()
+        .subscribe(new Subscriber<Rule>() {
           @Override public void onCompleted() {
 
           }
@@ -121,22 +125,24 @@ public class RulesIntegrationTests {
         });
   }
 
-  @Test
-  public void testCreateAndDeletePolygonBoundaryRule(){
+  @Test public void testCreateAndDeletePolygonBoundaryRule() {
     assertTrue(TestHelper.getDeviceId() != null);
 
     List<double[]> l = new ArrayList<>();
-    l.add(new double[]{32.792492f, -96.823495f});
-    l.add(new double[]{32.817846f, -96.670862f});
-    l.add(new double[]{32.67926f, -96.771103f});
-    l.add(new double[]{32.792492f, -96.823495f});
+    l.add(new double[] { 32.792492f, -96.823495f });
+    l.add(new double[] { 32.817846f, -96.670862f });
+    l.add(new double[] { 32.67926f, -96.771103f });
+    l.add(new double[] { 32.792492f, -96.823495f });
     List<List<double[]>> ll = new ArrayList<>();
     ll.add(l);
 
-    Rule.create().deviceId(TestHelper.getDeviceId()).name("testrule")
+    Rule.create()
+        .deviceId(TestHelper.getDeviceId())
+        .name("testrule")
         .polygonBoundary(Rule.PolygonBoundary.create().coordinates(ll).build())
         .save()
-        .toBlocking().subscribe(new Subscriber<Rule>() {
+        .toBlocking()
+        .subscribe(new Subscriber<Rule>() {
           @Override public void onCompleted() {
 
           }
@@ -172,66 +178,61 @@ public class RulesIntegrationTests {
         });
   }
 
-  @Test
-  public void testGetRulesByDeviceId(){
+  @Test public void testGetRulesByDeviceId() {
     assertTrue(TestHelper.getDeviceId() != null);
 
     Rule.rulesWithDeviceId(TestHelper.getDeviceId(), 1, null)
-        .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
-      @Override
-      public void onCompleted() {
+        .toBlocking()
+        .subscribe(new Subscriber<Page<Rule>>() {
+          @Override public void onCompleted() {
 
-      }
+          }
 
-      @Override
-      public void onError(Throwable e) {
-        System.out.println("Error: " + e.getMessage());
-        e.printStackTrace();
-        assertTrue(false);
-      }
+          @Override public void onError(Throwable e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-      @Override
-      public void onNext(Page<Rule> rulePage) {
-        assertTrue(rulePage.getItems().size() > 0);
+          @Override public void onNext(Page<Rule> rulePage) {
+            assertTrue(rulePage.getItems().size() > 0);
 
-        for(Rule rule : rulePage.getItems()){
-          assertTrue(rule.id() != null && rule.id().length() > 0);
-          assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
-          assertTrue(rule.object().type().length() > 0);
-          assertTrue(rule.object().id().length() > 0);
-        }
-
-        if (rulePage.hasNextPage()) {
-          rulePage.loadNextPage()
-              .toBlocking().subscribe(new Subscriber<Page<Rule>>() {
-            @Override public void onCompleted() {
-
+            for (Rule rule : rulePage.getItems()) {
+              assertTrue(rule.id() != null && rule.id().length() > 0);
+              assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+              assertTrue(rule.object().type().length() > 0);
+              assertTrue(rule.object().id().length() > 0);
             }
 
-            @Override public void onError(Throwable e) {
-              System.out.println("Error: " + e.getMessage());
-              e.printStackTrace();
-              assertTrue(false);
-            }
+            if (rulePage.hasNextPage()) {
+              rulePage.loadNextPage().toBlocking().subscribe(new Subscriber<Page<Rule>>() {
+                @Override public void onCompleted() {
 
-            @Override public void onNext(Page<Rule> rulePage) {
-              assertTrue(rulePage.getItems().size() > 0);
+                }
 
-              for(Rule rule : rulePage.getItems()){
-                assertTrue(rule.id() != null && rule.id().length() > 0);
-                assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
-                assertTrue(rule.object().type().length() > 0);
-                assertTrue(rule.object().id().length() > 0);
-              }
+                @Override public void onError(Throwable e) {
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
+                  assertTrue(false);
+                }
+
+                @Override public void onNext(Page<Rule> rulePage) {
+                  assertTrue(rulePage.getItems().size() > 0);
+
+                  for (Rule rule : rulePage.getItems()) {
+                    assertTrue(rule.id() != null && rule.id().length() > 0);
+                    assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+                    assertTrue(rule.object().type().length() > 0);
+                    assertTrue(rule.object().id().length() > 0);
+                  }
+                }
+              });
             }
-          });
-        }
-      }
-    });
+          }
+        });
   }
 
-  @Test
-  public void getRuleById(){
+  @Test public void getRuleById() {
     assertTrue(TestHelper.getRuleId() != null);
 
     Rule.ruleWithId(TestHelper.getRuleId()).toBlocking().subscribe(new Subscriber<Rule>() {
@@ -262,25 +263,25 @@ public class RulesIntegrationTests {
             String.format("%sdevices/%s/rules", Endpoint.RULES.getUrl(), TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<Page<Rule>>() {
-              @Override public void onCompleted() {
+          @Override public void onCompleted() {
 
-              }
+          }
 
-              @Override public void onError(Throwable e) {
-                e.printStackTrace();
-                assertTrue(false);
-              }
+          @Override public void onError(Throwable e) {
+            e.printStackTrace();
+            assertTrue(false);
+          }
 
-              @Override public void onNext(Page<Rule> rulePage) {
-                assertTrue(rulePage.getItems().size() > 0);
+          @Override public void onNext(Page<Rule> rulePage) {
+            assertTrue(rulePage.getItems().size() > 0);
 
-                for(Rule rule : rulePage.getItems()){
-                  assertTrue(rule.id() != null && rule.id().length() > 0);
-                  assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
-                  assertTrue(rule.object().type().length() > 0);
-                  assertTrue(rule.object().id().length() > 0);
-                }
-              }
-            });
+            for (Rule rule : rulePage.getItems()) {
+              assertTrue(rule.id() != null && rule.id().length() > 0);
+              assertTrue(rule.deviceId() != null && rule.deviceId().length() > 0);
+              assertTrue(rule.object().type().length() > 0);
+              assertTrue(rule.object().id().length() > 0);
+            }
+          }
+        });
   }
 }

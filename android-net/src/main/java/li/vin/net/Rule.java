@@ -285,7 +285,6 @@ public abstract class Rule implements VinliItem {
 
       public Observable<Rule> save() {
         final Seed s = autoBuild();
-
         return Vinli.curApp().rules().create(s.deviceId(), s)
             .map(Wrapped.<Rule>pluckItem());
       }

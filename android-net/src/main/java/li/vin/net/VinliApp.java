@@ -70,6 +70,7 @@ public final class VinliApp {
     Collision.registerGson(gsonB);
     ReportCard.registerGson(gsonB);
     BatteryStatus.registerGson(gsonB);
+    Dummy.registerGson(gsonB);
 
     return gsonB;
   }
@@ -147,7 +148,7 @@ public final class VinliApp {
         Log.d("VinliNet", message);
       }
     });
-    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
     client = clientBuilder.build().newBuilder()
         .addInterceptor(new OauthInterceptor(accessToken))
@@ -249,6 +250,7 @@ public final class VinliApp {
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Dummies.class);
+
   }
 
   public String getAccessToken() {
@@ -320,6 +322,14 @@ public final class VinliApp {
 
   public Observable<Event> event(@NonNull String eventId){
     return mEvents.event(eventId).map(Wrapped.<Event>pluckItem());
+  }
+
+  public Observable<Page<Dummy>> dummy(@Nullable Integer limit, @Nullable Integer offset) {
+    return mDummies.dummies(limit, offset);
+  }
+
+  public Observable<Dummy.Run> run(@NonNull String dummyId) {
+    return mDummies.currentRun(dummyId).map(Wrapped.<Dummy.Run>pluckItem());
   }
 
   /*package*/ Devices devicesSvc() {
