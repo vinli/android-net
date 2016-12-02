@@ -146,10 +146,9 @@ public final class VinliApp {
     HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
       @Override public void log(String message) {
         Log.d("VinliNet", message);
-        System.out.println(message);
       }
     });
-    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
 
     client = clientBuilder.build().newBuilder()
         .addInterceptor(new OauthInterceptor(accessToken))
