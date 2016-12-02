@@ -39,7 +39,7 @@ import rx.Observable;
 
     gb.registerTypeAdapter(Run.Seed.class, new Dummy.Run.Seed.Adapter());
   }
-
+  
   public static Observable<Run> currentRun(@NonNull String dummyId) {
     return Vinli.curApp().run(dummyId);
   }
@@ -97,7 +97,7 @@ import rx.Observable;
 
       @Nullable public abstract Double lastRPM();
 
-      @Nullable public abstract Integer lastMessageTime();
+      @Nullable public abstract Long lastMessageTime();
 
       @Nullable public abstract Integer totalMessages();
 

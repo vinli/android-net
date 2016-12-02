@@ -208,6 +208,8 @@ public abstract class Device implements VinliItem {
               @Override
               public void onOpen(WebSocket webSocket, Response response) {
                 recordActivity.run();
+                System.out.println(response.body());
+                System.out.println(webSocket.TEXT);
 
                 if (handleSuspend.call(webSocket)) return;
 
@@ -266,6 +268,7 @@ public abstract class Device implements VinliItem {
                   }
 
                   if (responseBody.contentType().equals(WebSocket.TEXT)) {
+                    System.out.println("response body is the websocket text");
                     try {
                       String payloadStr = responseBody.string();
                       if (!payloadStr.isEmpty()) {
