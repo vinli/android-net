@@ -15,14 +15,9 @@ import static junit.framework.Assert.assertTrue;
  * Created by JoshBeridon on 12/2/16.
  */
 
-
-@RunWith(AndroidJUnit4.class)
-@SmallTest
-public class StreamingInstTest {
+@RunWith(AndroidJUnit4.class) @SmallTest public class StreamingInstTest {
 
   public VinliApp vinliApp;
-
-
 
   @Before public void setup() {
     assertTrue(InstTestHelper.getAccessToken() != null);
@@ -51,18 +46,12 @@ public class StreamingInstTest {
           }
 
           @Override public void onNext(Wrapped<Dummy.Run> runWrapped) {
-            System.out.println("On next for deleting");
-
             if (runWrapped.item() != null) {
-              System.out.println(runWrapped.item().id());
-              System.out.println(runWrapped.item().status());
-              System.out.println("run is null");
               vinliApp.dummies()
                   .deleteRun(InstTestHelper.getDummyId())
                   .toBlocking()
                   .subscribe(new Subscriber<Void>() {
                     @Override public void onCompleted() {
-                      System.out.println("Run was deleted");
                     }
 
                     @Override public void onError(Throwable e) {
@@ -86,7 +75,6 @@ public class StreamingInstTest {
         .toBlocking()
         .subscribe(new Subscriber<Dummy.Run>() {
           @Override public void onCompleted() {
-            System.out.println("Created a run!");
           }
 
           @Override public void onError(Throwable e) {
@@ -100,47 +88,42 @@ public class StreamingInstTest {
           }
         });
 
-    vinliApp.device(deviceId)
-        .toBlocking()
-        .subscribe(new Subscriber<Device>() {
-          @Override public void onCompleted() {
-            System.out.println("Completed looking for device");
-          }
+    vinliApp.device(deviceId).toBlocking().subscribe(new Subscriber<Device>() {
+      @Override public void onCompleted() {
+      }
 
-          @Override public void onError(Throwable e) {
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            assertTrue(false);
-          }
+      @Override public void onError(Throwable e) {
+        System.out.println("Error: " + e.getMessage());
+        e.printStackTrace();
+        assertTrue(false);
+      }
 
-          @Override public void onNext(Device device) {
-            System.out.println(device.id());
-            device.stream()
-                .observeOn(AndroidSchedulers.mainThread())
-                .toBlocking()
-                .subscribe(new Subscriber<StreamMessage>() {
-                  @Override public void onCompleted() {
+      @Override public void onNext(Device device) {
+        System.out.println(device.id());
+        device.stream()
+            .observeOn(AndroidSchedulers.mainThread())
+            .toBlocking()
+            .subscribe(new Subscriber<StreamMessage>() {
+              @Override public void onCompleted() {
 
-                  }
+              }
 
-                  @Override public void onError(Throwable e) {
-                    System.out.println("Error: " + e.getMessage());
-                    e.printStackTrace();
-                    assertTrue(false);
-                  }
+              @Override public void onError(Throwable e) {
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+                assertTrue(false);
+              }
 
-                  @Override public void onNext(StreamMessage streamMessage) {
-                    if(messages.get() > 5){
-                      unsubscribe();
-                    }
-                    messages.addAndGet(1);
-                    System.out.println(streamMessage.toString());
-                    assertTrue(streamMessage.getType()!=null);
-                  }
-                });
-          }
-        });
-
-    System.out.println("End of Test");
+              @Override public void onNext(StreamMessage streamMessage) {
+                if (messages.get() > 5) {
+                  unsubscribe();
+                }
+                messages.addAndGet(1);
+                System.out.println(streamMessage.toString());
+                assertTrue(streamMessage.getType() != null);
+              }
+            });
+      }
+    });
   }
 }
