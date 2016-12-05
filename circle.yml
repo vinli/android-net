@@ -6,7 +6,8 @@ dependencies:
   pre:
     - git clone git@github.com:vinli/build.git .build
   override:
-    - .build/android-net/pretest.sh
+    - .build/android-net/pretest.sh:
+      timeout: 900
 
 test:
   override:
