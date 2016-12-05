@@ -138,6 +138,14 @@ public class VehiclesIntegrationTests {
           }
 
           @Override public void onNext(Vehicle vehicle) {
+            assertTrue(vehicle.engine()!=null);
+            assertTrue(vehicle.engineDisplacement()!=null);
+            assertTrue(vehicle.transmission()!=null);
+            assertTrue(vehicle.manufacturer()!=null);
+            assertTrue(vehicle.categories()!=null);
+            assertTrue(vehicle.epaMpg()!=null);
+            assertTrue(vehicle.drive()!=null);
+            assertTrue(vehicle.numDoors()!=null);
             assertTrue(vehicle.id() != null && vehicle.id().length() > 0);
             assertTrue(vehicle.vin() != null && vehicle.vin().length() > 0);
           }
@@ -171,4 +179,6 @@ public class VehiclesIntegrationTests {
               }
             });
   }
+
+
 }
