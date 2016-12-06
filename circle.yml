@@ -10,6 +10,12 @@ dependencies:
         timeout: 5000
 
 test:
+  pre:
+    - mksdcard -l e 512M mysdcard.img
+    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
+        background: true
+        parallel: true
+    - circle-android wait-for-boot
   override:
     - .build/android-net/test.sh
   post:
