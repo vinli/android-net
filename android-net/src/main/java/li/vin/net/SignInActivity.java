@@ -10,7 +10,9 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.squareup.okhttp.HttpUrl;
+
+import okhttp3.HttpUrl;
+//import com.squareup.okhttp.HttpUrl;
 
 public class SignInActivity extends Activity {
   private static final String TAG = SignInActivity.class.getSimpleName();

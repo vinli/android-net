@@ -1,7 +1,8 @@
 package li.vin.net;
 
 import android.support.annotation.NonNull;
-import com.squareup.okhttp.HttpUrl;
+
+import okhttp3.HttpUrl;
 
 /*package*/ enum Endpoint {
   AUTH("auth"),
