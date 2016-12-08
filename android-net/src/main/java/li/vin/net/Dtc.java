@@ -28,6 +28,7 @@ public abstract class Dtc implements VinliItem {
   public abstract String number();
   public abstract String vehicleId();
   public abstract String deviceId();
+  public abstract String description();
 
   public Observable<Device> device() {
     return Vinli.curApp().device(deviceId());

@@ -230,8 +230,9 @@ public abstract class Vehicle implements VinliItem {
   public Observable<TimeSeries<Dtc>> dtcs(@Nullable @Query("since") Long since,
       @Nullable @Query("until") Long until,
       @Nullable @Query("limit") Integer limit,
-      @Nullable @Query("sortDir") String sortDir) {
-    return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir);
+      @Nullable @Query("sortDir") String sortDir,
+    @Nullable @Query("state") String state){
+    return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir, state);
   }
 
   public Observable<TimeSeries<Event>> events() {

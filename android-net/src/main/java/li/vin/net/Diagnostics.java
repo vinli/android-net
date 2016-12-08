@@ -15,7 +15,8 @@ import rx.Observable;
       @Nullable @Query("since") Long since,
       @Nullable @Query("until") Long until,
       @Nullable @Query("limit") Integer limit,
-      @Nullable @Query("sortDir") String sortDir);
+      @Nullable @Query("sortDir") String sortDir,
+      @Nullable @Query("state") String state);
 
   @GET("codes")
   Observable<Page<Dtc.Code>> diagnose(@NonNull @Query("number") String number);

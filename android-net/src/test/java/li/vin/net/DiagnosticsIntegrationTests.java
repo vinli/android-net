@@ -28,7 +28,7 @@ public class DiagnosticsIntegrationTests {
   public void testGetPagedCodes(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, 1, null)
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, 1, null,null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
       @Override
       public void onCompleted() {
@@ -50,6 +50,7 @@ public class DiagnosticsIntegrationTests {
           assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
           assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
           assertTrue(dtc.number() != null && dtc.number().length() > 0);
+          assertTrue(dtc.description() != null && dtc.description().length() > 0);
         }
 
         if (dtcTimeSeries.hasPrior()) {
@@ -73,6 +74,7 @@ public class DiagnosticsIntegrationTests {
                 assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
                 assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
                 assertTrue(dtc.number() != null && dtc.number().length() > 0);
+                assertTrue(dtc.description() != null && dtc.description().length() > 0);
               }
             }
           });
@@ -85,7 +87,7 @@ public class DiagnosticsIntegrationTests {
   public void testGetCodesByVehicleId(){
     assertTrue(TestHelper.getVehicleId() != null);
 
-    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, null, null)
+    vinliApp.diagnostics().codes(TestHelper.getVehicleId(), null, null, null, null, null)
         .toBlocking().subscribe(new Subscriber<TimeSeries<Dtc>>() {
       @Override
       public void onCompleted() {
@@ -107,6 +109,7 @@ public class DiagnosticsIntegrationTests {
           assertTrue(dtc.vehicleId() != null && dtc.vehicleId().length() > 0);
           assertTrue(dtc.deviceId() != null && dtc.deviceId().length() > 0);
           assertTrue(dtc.number() != null && dtc.number().length() > 0);
+          assertTrue(dtc.description() != null && dtc.description().length() > 0);
         }
       }
     });
