@@ -17,6 +17,7 @@ import javax.net.ssl.X509TrustManager;
 public class TestHelper {
 
   private static VinliApp vinliApp;
+  private static VinliApp vehicleVinliApp;
 
   public static VinliApp getVinliApp(){
     if(vinliApp == null){
@@ -32,8 +33,26 @@ public class TestHelper {
     return vinliApp;
   }
 
+  public static VinliApp getVehicleVinliApp(){
+    if(vehicleVinliApp == null){
+      VinliApp.clientBuilder = generateUnsafeBuilder();
+
+      Endpoint.setDomain(Endpoint.DOMAIN_DEV);
+      FakeHttp.getFakeHttpLayer().interceptHttpRequests(false);
+
+      vehicleVinliApp = new VinliApp(getVehicleAccessToken());
+    }
+
+    return vehicleVinliApp;
+  }
+
   public static String getAccessToken(){
     String accessToken = BuildConfig.ACCESS_TOKEN;
+    return accessToken.equals("DEFAULT_ACCESS_TOKEN") ? null : accessToken;
+  }
+
+  public static String getVehicleAccessToken(){
+    String accessToken = BuildConfig.VEHICULARIZATION_ACCESS_TOKEN;
     return accessToken.equals("DEFAULT_ACCESS_TOKEN") ? null : accessToken;
   }
 
@@ -45,6 +64,11 @@ public class TestHelper {
   public static String getVehicleId(){
     String vehicleId = BuildConfig.VEHICLE_ID;
     return vehicleId.equals("DEFAULT_VEHICLE_ID") ? null : vehicleId;
+  }
+
+  public static String getSecondVehicleId(){
+    String secondVehicleId = BuildConfig.SECOND_VEHICLE_ID;
+    return secondVehicleId.equals("DEFAULT_SECOND_VEHICLE_ID") ? null : secondVehicleId;
   }
 
   public static String getTripId(){
@@ -60,6 +84,11 @@ public class TestHelper {
   public static String getRuleId(){
     String ruleId = BuildConfig.RULE_ID;
     return ruleId.equals("DEFAULT_RULE_ID") ? null : ruleId;
+  }
+
+  public static String getVehicleRuleId(){
+    String vehicleRuleId = BuildConfig.VEHICLE_RULE_ID;
+    return vehicleRuleId.equals("DEFAULT_VEHICLE_RULE_ID") ? null : vehicleRuleId;
   }
 
   public static String getSubscriptionId(){

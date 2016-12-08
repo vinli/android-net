@@ -19,14 +19,24 @@ import rx.Observable;
       @Nullable @Query("limit") Integer limit,
       @Nullable @Query("offset") Integer offset);
 
+  @GET("vehicles/{vehicleId}/rules")
+  Observable<Page<Rule>> vehicleRules(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("offset") Integer offset);
+
   @GET("rules/{ruleId}")
   Observable<Wrapped<Rule>> rule(
       @NonNull @Path("ruleId") String ruleId);
 
-
   @POST("devices/{deviceId}/rules")
   Observable<Wrapped<Rule>> create(
       @NonNull @Path("deviceId") String deviceId,
+      @NonNull @Body Rule.Seed ruleSeed);
+
+  @POST("vehicles/{vehicleId}/rules")
+  Observable<Wrapped<Rule>> vehicleCreate(
+      @NonNull @Path("vehicleId") String vehicleId,
       @NonNull @Body Rule.Seed ruleSeed);
 
   @DELETE("rules/{ruleId}")

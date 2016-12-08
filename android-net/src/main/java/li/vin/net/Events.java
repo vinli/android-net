@@ -25,4 +25,16 @@ import rx.Observable;
 
   @GET Observable<TimeSeries<Event>> eventsForUrl(@NonNull @Url String url);
 
+
+
+  @GET("vehicles/{vehicleId}/events")
+  Observable<TimeSeries<Event>> vehicleEvents(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("type") String type,
+      @Nullable @Query("objectId") String objectId,
+      @Nullable @Query("since") Long since,
+      @Nullable @Query("until") Long until,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("sortDir") String sortDir);
+
 }
