@@ -126,6 +126,21 @@ public class TestHelper {
     return notificationId.equals("DEFAULT_NOTIFICATION_ID") ? null : notificationId;
   }
 
+  public static String getDummyId(){
+    String dummyId = BuildConfig.DUMMY_ID;
+    return dummyId.equals("DEFAULT_DUMMY_ID") ? null : dummyId;
+  }
+
+  public static String getRouteId(){
+    String routeId = BuildConfig.ROUTE_ID;
+    return routeId.equals("DEFAULT_ROUTE_ID") ? null : routeId;
+  }
+
+  public static String getVIN(){
+    String vin = BuildConfig.VIN;
+    return vin.equals("DEFAULT_VIN") ? null : vin;
+  }
+
   //public static OkHttpClient.Builder configureClient(OkHttpClient.Builder clientBuilder) {
   //  final TrustManager[] certs = new TrustManager[]{new X509TrustManager() {
   //

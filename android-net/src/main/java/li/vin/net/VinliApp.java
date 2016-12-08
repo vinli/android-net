@@ -29,6 +29,7 @@ public final class VinliApp {
   private final Subscriptions mSubscriptions;
   private final Users mUsers;
   private final Trips mTrips;
+  private final Dummies mDummies;
   private final Distances mDistances;
   private final Messages mMessages;
   private final Collisions mCollisions;
@@ -69,6 +70,7 @@ public final class VinliApp {
     Collision.registerGson(gsonB);
     ReportCard.registerGson(gsonB);
     BatteryStatus.registerGson(gsonB);
+    Dummy.registerGson(gsonB);
 
     return gsonB;
   }
@@ -128,6 +130,9 @@ public final class VinliApp {
     }
     if (Trip.class.equals(itemClz)) {
       return mTrips.tripsForUrl(link.replaceFirst(Endpoint.TRIPS.getUrl(), ""));
+    }
+    if (Dummy.class.equals(itemClz)) {
+      return mDummies.dummiesForUrl(link.replaceFirst(Endpoint.DUMMY.getUrl(), ""));
     }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
@@ -237,6 +242,15 @@ public final class VinliApp {
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(ReportCards.class);
+
+    mDummies = new Retrofit.Builder()
+        .baseUrl(Endpoint.DUMMY.getUrl())
+        .client(client)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(rxJavaCallAdapterFactory)
+        .build()
+        .create(Dummies.class);
+
   }
 
   public String getAccessToken() {
@@ -310,6 +324,14 @@ public final class VinliApp {
     return mEvents.event(eventId).map(Wrapped.<Event>pluckItem());
   }
 
+  public Observable<Page<Dummy>> dummy(@Nullable Integer limit, @Nullable Integer offset) {
+    return mDummies.dummies(limit, offset);
+  }
+
+  public Observable<Dummy.Run> run(@NonNull String dummyId) {
+    return mDummies.currentRun(dummyId).map(Wrapped.<Dummy.Run>pluckItem());
+  }
+
   /*package*/ Devices devicesSvc() {
     return mDevices;
   }
@@ -368,6 +390,10 @@ public final class VinliApp {
 
   /*package*/ Gson gson() {
     return mGson;
+  }
+
+  /*package*/ Dummies dummies() {
+    return mDummies;
   }
 
   private static final class OauthInterceptor implements Interceptor {
