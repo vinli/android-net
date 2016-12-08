@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
 import rx.Subscriber;
 
 import static java.lang.System.currentTimeMillis;
@@ -141,7 +140,6 @@ public class TripsIntegrationTests {
 
   @Test public void getTripsWithSinceUntilLimitByVehicleId() {
     assertTrue(TestHelper.getVehicleId() != null);
-
     vinliApp.trips()
         .vehicleTrips(TestHelper.getVehicleId(), 0L, currentTimeMillis(), 5, null)
         .toBlocking()

@@ -683,6 +683,7 @@ public abstract class Device implements VinliItem {
     return Vinli.curApp().locations().locations(this.id(), sinceMs, untilMs, limit, sortDir);
   }
 
+
   public Observable<Location> latestlocation() {
     return locations((Long) null, null, 1, null).flatMap(TimeSeries.<Location>extractItems())
         .firstOrDefault(null);

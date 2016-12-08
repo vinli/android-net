@@ -234,6 +234,46 @@ public abstract class Vehicle implements VinliItem {
     return Vinli.curApp().diagnostics().codes(this.id(), since, until, limit, sortDir);
   }
 
+  public Observable<TimeSeries<Event>> events() {
+    return events(null, null, (Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Event>> events(@Nullable String type, @Nullable String objectId,
+      @Nullable Long sinceMs, @Nullable Long untilMs, @Nullable Integer limit,
+      @Nullable String sortDir) {
+    return Vinli.curApp().events().vehicleEvents(this.id(), type, objectId, sinceMs, untilMs, limit,
+        sortDir);
+  }
+
+  public Observable<TimeSeries<Message>> messages() {
+    return messages((Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Message>> messages(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().messages().vehicleMessages(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+
+  public Observable<TimeSeries<Location>> locations() {
+    return locations((Long) null, null, null, null);
+  }
+
+
+  public Observable<TimeSeries<Location>> locations(@Nullable Long sinceMs, @Nullable Long untilMs,
+      @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().locations().vehicleLocations(this.id(), sinceMs, untilMs, limit, sortDir);
+  }
+
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields){
+    return snapshots(fields, (Long) null, null, null, null);
+  }
+
+  public Observable<TimeSeries<Snapshot>> snapshots(@NonNull String fields, @Nullable Long sinceMs,
+      @Nullable Long untilMs, @Nullable Integer limit, @Nullable String sortDir) {
+    return Vinli.curApp().snapshots().vehicleSnapshots(this.id(), fields, sinceMs, untilMs, limit, sortDir);
+  }
+
   @SuppressWarnings("unchecked") LinkedTreeMap<String, Object> engine(){
     return (LinkedTreeMap<String, Object>) data().get("engine");
   }

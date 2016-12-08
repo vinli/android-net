@@ -18,6 +18,15 @@ public interface Messages {
     @Nullable @Query("limit") Integer limit,
     @Nullable @Query("sortDir") String sortDir);
 
+
+  @GET("vehicles/{vehicleId}/messages")
+  Observable<TimeSeries<Message>> vehicleMessages(
+      @NonNull @Path("vehicleId") String vehicleId,
+      @Nullable @Query("since") Long since,
+      @Nullable @Query("until") Long until,
+      @Nullable @Query("limit") Integer limit,
+      @Nullable @Query("sortDir") String sortDir);
+
   @GET("messages/{messageId}")
   Observable<Wrapped<Message>> message(
     @NonNull @Path("messageId") String messageId);

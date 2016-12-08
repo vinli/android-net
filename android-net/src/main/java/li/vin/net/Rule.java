@@ -20,27 +20,32 @@ import java.util.Collections;
 import java.util.List;
 import rx.Observable;
 
-@AutoParcel
-public abstract class Rule implements VinliItem {
-  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Rule>>() { }.getType();
-  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Rule>>() { }.getType();
+@AutoParcel public abstract class Rule implements VinliItem {
+  /*package*/ static final Type PAGE_TYPE = new TypeToken<Page<Rule>>() {
+  }.getType();
+  /*package*/ static final Type WRAPPED_TYPE = new TypeToken<Wrapped<Rule>>() {
+  }.getType();
 
-  /*package*/ static final void registerGson(GsonBuilder gb) {
+  /*package*/
+  static final void registerGson(GsonBuilder gb) {
     gb.registerTypeAdapter(Rule.class, new RuleAdapter());
     gb.registerTypeAdapter(WRAPPED_TYPE, Wrapped.Adapter.create(Rule.class));
     gb.registerTypeAdapter(PAGE_TYPE, Page.Adapter.create(PAGE_TYPE, Rule.class));
 
     gb.registerTypeAdapter(Links.class, AutoParcelAdapter.create(AutoParcel_Rule_Links.class));
 
-    gb.registerTypeAdapter(ParametricBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
+    gb.registerTypeAdapter(ParametricBoundary.class,
+        AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary.class));
     gb.registerTypeAdapter(ParametricBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_ParametricBoundary_Seed.class));
 
-    gb.registerTypeAdapter(RadiusBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
+    gb.registerTypeAdapter(RadiusBoundary.class,
+        AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary.class));
     gb.registerTypeAdapter(RadiusBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_RadiusBoundary_Seed.class));
 
-    gb.registerTypeAdapter(PolygonBoundary.class, AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
+    gb.registerTypeAdapter(PolygonBoundary.class,
+        AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary.class));
     gb.registerTypeAdapter(PolygonBoundary.Seed.class,
         AutoParcelAdapter.create(AutoParcel_Rule_PolygonBoundary_Seed.class));
 
@@ -60,26 +65,46 @@ public abstract class Rule implements VinliItem {
     return Vinli.curApp().rules().rules(deviceId, limit, offset);
   }
 
+  public static Observable<Page<Rule>> rulesWithVehicleId(@NonNull String vehicleId) {
+    return rulesWithVehicleId(vehicleId, null, null);
+  }
+
+  public static Observable<Page<Rule>> rulesWithVehicleId(@NonNull String vehicleId,
+      @Nullable Integer limit, @Nullable Integer offset) {
+    return Vinli.curApp().rules().vehicleRules(vehicleId, limit, offset);
+  }
+
   public static final Seed.Saver create() {
     return new AutoParcel_Rule_Seed.Builder();
   }
 
   public abstract String name();
+
   public abstract boolean evaluated();
+
   @Nullable public abstract Boolean covered();
+
   @Nullable public abstract String createdAt();
+
   @Nullable public abstract String deviceId();
+
   @Nullable public abstract PolygonBoundary polygonBoundary();
+
   @Nullable public abstract RadiusBoundary radiusBoundary();
+
   @NonNull public abstract List<ParametricBoundary> parametricBoundaries();
+
   @NonNull public abstract ObjectRef object();
 
-  /*package*/ abstract Links links();
+  /*package*/
+  abstract Links links();
 
-  /*package*/ Rule() { }
+  /*package*/ Rule() {
+  }
 
   public Observable<TimeSeries<Event>> events() {
-    return Event.eventsWithDeviceId(this.deviceId(), "rule-*", this.id(), (Long) null, null, null, null);
+    return Event.eventsWithDeviceId(this.deviceId(), "rule-*", this.id(), (Long) null, null, null,
+        null);
   }
 
   public Observable<Page<Subscription>> subscriptions() {
@@ -97,34 +122,47 @@ public abstract class Rule implements VinliItem {
   @AutoParcel
   /*package*/ static abstract class Links implements Parcelable {
     public abstract String self();
+
     @Nullable public abstract String events();
+
     @Nullable public abstract String subscriptions();
 
-    /*package*/ Links() { }
+    /*package*/ Links() {
+    }
   }
 
   @AutoParcel.Builder
   /*package*/ static abstract class Builder {
     public abstract Builder id(String s);
+
     public abstract Builder name(String s);
+
     public abstract Builder evaluated(boolean b);
+
     public abstract Builder covered(@Nullable Boolean b);
+
     public abstract Builder createdAt(@Nullable String s);
+
     public abstract Builder deviceId(@Nullable String s);
+
     public abstract Builder polygonBoundary(@Nullable PolygonBoundary pb);
+
     public abstract Builder radiusBoundary(@Nullable RadiusBoundary rb);
+
     public abstract Builder parametricBoundaries(List<ParametricBoundary> l);
+
     public abstract Builder links(Links l);
+
     public abstract Builder object(ObjectRef objectRef);
 
     public abstract Rule build();
   }
 
-  @AutoParcel
-  public static abstract class ParametricBoundary implements VinliItem {
+  @AutoParcel public static abstract class ParametricBoundary implements VinliItem {
     /*package*/ static final String TYPE = "parametric";
 
-    /*package*/ static final Builder builder() {
+    /*package*/
+    static final Builder builder() {
       return new AutoParcel_Rule_ParametricBoundary.Builder();
     }
 
@@ -133,49 +171,59 @@ public abstract class Rule implements VinliItem {
     }
 
     public abstract String parameter();
+
     @Nullable public abstract Float min();
+
     @Nullable public abstract Float max();
 
     @AutoParcel.Builder
     /*package*/ interface Builder {
       Builder id(String s);
+
       Builder parameter(String s);
+
       Builder min(Float f);
+
       Builder max(Float f);
 
       ParametricBoundary build();
     }
 
-    @AutoParcel
-    public static abstract class Seed {
+    @AutoParcel public static abstract class Seed {
       private final String type = ParametricBoundary.TYPE; // needed for GSON serialization
 
       @NonNull public abstract String parameter();
+
       @Nullable public abstract Float min();
+
       @Nullable public abstract Float max();
 
-      /*package*/ Seed() { }
+      /*package*/ Seed() {
+      }
 
-      @AutoParcel.Builder
-      public static abstract class Builder {
+      @AutoParcel.Builder public static abstract class Builder {
         public abstract Builder parameter(@NonNull String s);
+
         public abstract Builder min(@Nullable Float f);
+
         public abstract Builder max(@Nullable Float f);
 
         public abstract Seed build();
 
-        /*package*/ Builder() { }
+        /*package*/ Builder() {
+        }
       }
     }
 
-    /*package*/ ParametricBoundary() { }
+    /*package*/ ParametricBoundary() {
+    }
   }
 
-  @AutoParcel
-  public static abstract class RadiusBoundary implements VinliItem {
+  @AutoParcel public static abstract class RadiusBoundary implements VinliItem {
     /*package*/ static final String TYPE = "radius";
 
-    /*package*/ static final Builder builder() {
+    /*package*/
+    static final Builder builder() {
       return new AutoParcel_Rule_RadiusBoundary.Builder();
     }
 
@@ -184,47 +232,56 @@ public abstract class Rule implements VinliItem {
     }
 
     public abstract float radius();
+
     public abstract float lon();
+
     public abstract float lat();
 
     @AutoParcel.Builder
     /*package*/ interface Builder {
       Builder id(String s);
+
       Builder radius(float f);
+
       Builder lon(float f);
+
       Builder lat(float f);
 
       RadiusBoundary build();
     }
 
-    @AutoParcel
-    public static abstract class Seed {
+    @AutoParcel public static abstract class Seed {
       private final String type = RadiusBoundary.TYPE; // needed for GSON serialization
 
       public abstract float radius();
+
       public abstract float lon();
+
       public abstract float lat();
 
-      @AutoParcel.Builder
-      public static abstract class Builder {
+      @AutoParcel.Builder public static abstract class Builder {
         public abstract Builder radius(float f);
+
         public abstract Builder lon(float f);
+
         public abstract Builder lat(float f);
 
         public abstract Seed build();
 
-        /*package*/ Builder() { }
+        /*package*/ Builder() {
+        }
       }
     }
 
-    /*package*/ RadiusBoundary() { }
+    /*package*/ RadiusBoundary() {
+    }
   }
 
-  @AutoParcel
-  public static abstract class PolygonBoundary implements VinliItem {
+  @AutoParcel public static abstract class PolygonBoundary implements VinliItem {
     /*package*/ static final String TYPE = "polygon";
 
-    /*package*/ static final Builder builder() {
+    /*package*/
+    static final Builder builder() {
       return new AutoParcel_Rule_PolygonBoundary.Builder();
     }
 
@@ -237,58 +294,84 @@ public abstract class Rule implements VinliItem {
     @AutoParcel.Builder
     /*package*/ interface Builder {
       Builder id(String s);
+
       Builder coordinates(List<List<double[]>> l);
 
       PolygonBoundary build();
     }
 
-    @AutoParcel
-    public static abstract class Seed {
+    @AutoParcel public static abstract class Seed {
       private final String type = PolygonBoundary.TYPE; // needed for GSON serialization
 
       public abstract List<List<double[]>> coordinates();
 
-      @AutoParcel.Builder
-      public static abstract class Builder {
+      @AutoParcel.Builder public static abstract class Builder {
         public abstract Builder coordinates(List<List<double[]>> l);
 
         public abstract Seed build();
 
-        /*package*/ Builder() { }
+        /*package*/ Builder() {
+        }
       }
     }
 
-    /*package*/ PolygonBoundary() { }
+    /*package*/ PolygonBoundary() {
+    }
   }
 
-  @AutoParcel
-  public static abstract class Seed {
+  @AutoParcel public static abstract class Seed {
     @NonNull public abstract String name();
+
     @Nullable public abstract PolygonBoundary.Seed polygonBoundary();
+
     @Nullable public abstract RadiusBoundary.Seed radiusBoundary();
+
     @Nullable public abstract List<ParametricBoundary.Seed> parametricBoundaries();
-    @NonNull public abstract String deviceId();
 
-    /*package*/ Seed() { }
+    @Nullable public abstract String deviceId();
 
-    @AutoParcel.Builder
-    public static abstract class Saver {
+    @Nullable public abstract String vehicleId();
+
+    /*package*/ Seed() {
+    }
+
+    @AutoParcel.Builder public static abstract class Saver {
       public abstract Saver name(@NonNull String s);
+
       public abstract Saver polygonBoundary(@Nullable PolygonBoundary.Seed s);
+
       public abstract Saver radiusBoundary(@Nullable RadiusBoundary.Seed s);
+
       public abstract Saver parametricBoundaries(@Nullable List<ParametricBoundary.Seed> l);
-      public abstract Saver deviceId(@NonNull String s);
 
-      /*package*/ Saver() { }
+      public abstract Saver deviceId(@Nullable String s);
 
-      /*package*/ abstract Seed autoBuild();
+      public abstract Saver vehicleId(@Nullable String s);
+
+      /*package*/ Saver() {
+      }
+
+      /*package*/
+      abstract Seed autoBuild();
 
       public Observable<Rule> save() {
         final Seed s = autoBuild();
         return Vinli.curApp().rules().create(s.deviceId(), s)
             .map(Wrapped.<Rule>pluckItem());
       }
+
+      public Observable<Rule> vehicleSave() {
+        final Seed s = autoBuild();
+
+        return Vinli.curApp().rules().vehicleCreate(s.vehicleId(), s).map(Wrapped.<Rule>pluckItem());
+      }
+
+
+
+
     }
+
+
 
     /*package*/ static final class Adapter extends TypeAdapter<Seed> {
       private Gson gson;
@@ -299,27 +382,27 @@ public abstract class Rule implements VinliItem {
         }
 
         out.beginObject();
-          out.name("rule").beginObject();
-            out.name("name").value(value.name());
-            out.name("boundaries").beginArray();
-              final PolygonBoundary.Seed polyBoundary = value.polygonBoundary();
-              if (polyBoundary != null) {
-                gson.toJson(polyBoundary, PolygonBoundary.Seed.class, out);
-              }
+        out.name("rule").beginObject();
+        out.name("name").value(value.name());
+        out.name("boundaries").beginArray();
+        final PolygonBoundary.Seed polyBoundary = value.polygonBoundary();
+        if (polyBoundary != null) {
+          gson.toJson(polyBoundary, PolygonBoundary.Seed.class, out);
+        }
 
-              final RadiusBoundary.Seed radiusBoundary = value.radiusBoundary();
-              if (radiusBoundary != null) {
-                gson.toJson(radiusBoundary, RadiusBoundary.Seed.class, out);
-              }
+        final RadiusBoundary.Seed radiusBoundary = value.radiusBoundary();
+        if (radiusBoundary != null) {
+          gson.toJson(radiusBoundary, RadiusBoundary.Seed.class, out);
+        }
 
-              final List<ParametricBoundary.Seed> parametricBoundaries = value.parametricBoundaries();
-              if (parametricBoundaries != null) {
-                for (final ParametricBoundary.Seed pb : parametricBoundaries) {
-                  gson.toJson(pb, ParametricBoundary.Seed.class, out);
-                }
-              }
-            out.endArray();
-          out.endObject();
+        final List<ParametricBoundary.Seed> parametricBoundaries = value.parametricBoundaries();
+        if (parametricBoundaries != null) {
+          for (final ParametricBoundary.Seed pb : parametricBoundaries) {
+            gson.toJson(pb, ParametricBoundary.Seed.class, out);
+          }
+        }
+        out.endArray();
+        out.endObject();
         out.endObject();
       }
 
@@ -341,17 +424,23 @@ public abstract class Rule implements VinliItem {
         gson = Vinli.curApp().gson();
       }
 
-      final Rule.Builder b = new AutoParcel_Rule.Builder()
-          .parametricBoundaries(Collections.<ParametricBoundary>emptyList());
+      final Rule.Builder b = new AutoParcel_Rule.Builder().parametricBoundaries(
+          Collections.<ParametricBoundary>emptyList());
 
       in.beginObject();
       while (in.hasNext()) {
         final String name = in.nextName();
 
         switch (name) {
-          case "id": b.id(in.nextString()); break;
-          case "name": b.name(in.nextString()); break;
-          case "evaluated": b.evaluated(in.nextBoolean()); break;
+          case "id":
+            b.id(in.nextString());
+            break;
+          case "name":
+            b.name(in.nextString());
+            break;
+          case "evaluated":
+            b.evaluated(in.nextBoolean());
+            break;
           case "covered":
             if (in.peek() == JsonToken.NULL) {
               in.nextNull();
@@ -368,7 +457,14 @@ public abstract class Rule implements VinliItem {
             }
 
             break;
-          case "deviceId": b.deviceId(in.nextString()); break;
+
+          case "deviceId"://TODO here is where you want
+            if (in.peek() == JsonToken.NULL) {
+              in.nextNull();
+            } else {
+              b.deviceId(in.nextString());
+            }
+            break;
           case "boundaries":
             final List<ParametricBoundary> parametricBoundaries = new ArrayList<>();
 
@@ -388,7 +484,9 @@ public abstract class Rule implements VinliItem {
                 case RadiusBoundary.TYPE:
                   b.radiusBoundary(gson.fromJson(boundary, RadiusBoundary.class));
                   break;
-                default: in.skipValue(); break;
+                default:
+                  in.skipValue();
+                  break;
               }
             }
 
@@ -396,21 +494,30 @@ public abstract class Rule implements VinliItem {
 
             b.parametricBoundaries(parametricBoundaries);
             break;
-          case "links": b.links(gson.<Rule.Links>fromJson(in, Links.class)); break;
+          case "links":
+            b.links(gson.<Rule.Links>fromJson(in, Links.class));
+            break;
           case "object":
             ObjectRef.Builder bld = new AutoParcel_ObjectRef.Builder();
             in.beginObject();
             while (in.hasNext()) {
               switch (in.nextName()) {
-                case "id": bld = bld.id(in.nextString()); break;
-                case "type": bld = bld.type(in.nextString()); break;
-                default: break;
+                case "id":
+                  bld = bld.id(in.nextString());
+                  break;
+                case "type":
+                  bld = bld.type(in.nextString());
+                  break;
+                default:
+                  break;
               }
             }
             in.endObject();
             b.object(bld.build());
             break;
-          default: in.skipValue(); break;
+          default:
+            in.skipValue();
+            break;
         }
       }
       in.endObject();
