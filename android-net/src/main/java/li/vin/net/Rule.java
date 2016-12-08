@@ -356,8 +356,8 @@ import rx.Observable;
 
       public Observable<Rule> save() {
         final Seed s = autoBuild();
-
-        return Vinli.curApp().rules().create(s.deviceId(), s).map(Wrapped.<Rule>pluckItem());
+        return Vinli.curApp().rules().create(s.deviceId(), s)
+            .map(Wrapped.<Rule>pluckItem());
       }
 
       public Observable<Rule> vehicleSave() {

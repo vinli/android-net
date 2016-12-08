@@ -1,6 +1,6 @@
 machine:
   environment:
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
 
 dependencies:
   pre:
@@ -9,6 +9,12 @@ dependencies:
     - .build/android-net/pretest.sh
 
 test:
+  pre:
+    - mksdcard -l e 512M mysdcard.img
+    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
+        background: true
+        parallel: true
+    - circle-android wait-for-boot
   override:
     - .build/android-net/test.sh
   post:

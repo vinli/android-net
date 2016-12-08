@@ -29,6 +29,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -45,6 +46,9 @@ android {
             buildConfigField("String", "NOTIFICATION_ID", "\"" + integrationProperties['NOTIFICATION_ID'] + "\"")
             buildConfigField("String", "MESSAGE_ID", "\"" + integrationProperties['MESSAGE_ID'] + "\"")
             buildConfigField("String", "TRIP_ID", "\"" + integrationProperties['TRIP_ID'] + "\"")
+            buildConfigField("String", "DUMMY_ID", "\"" + integrationProperties['DUMMY_ID'] + "\"")
+            buildConfigField("String", "ROUTE_ID", "\"" + integrationProperties['ROUTE_ID'] + "\"")
+            buildConfigField("String", "VIN", "\"" + integrationProperties['VIN'] + "\"")
             buildConfigField("String", "ODO_ID", "\"" + integrationProperties['ODO_ID'] + "\"")
             buildConfigField("String", "ODO_TRIGGER_ID", "\"" + integrationProperties['ODO_TRIGGER_ID'] + "\"")
             buildConfigField("String", "COLLISION_ID", "\"" + integrationProperties['COLLISION_ID'] + "\"")
@@ -70,17 +74,18 @@ dependencies {
 
     compile 'com.squareup.duktape:duktape-android:0.9.5'
 
+
     provided 'com.android.support:appcompat-v7:24.+'
 
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    compile 'com.squareup.okhttp:okhttp-ws:2.4.+'
+    compile 'com.squareup.okhttp3:okhttp-ws:3.4.+'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.1.+'
     compile 'com.google.code.gson:gson:2.+'
-    compile 'com.android.support:support-annotations:24.2.1'
+    provided 'com.android.support:support-annotations:24.2.1'
     compile 'com.github.frankiesardo:auto-parcel:0.3'
     apt 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
@@ -88,6 +93,11 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'junit:junit:4.12'
     testCompile group: 'org.robolectric', name: 'shadows-httpclient', version: '3.0'
+
+    androidTestCompile 'com.android.support:support-annotations:25.0.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
 }
 
 apply from: file('../gradle/mavenize.gradle')
