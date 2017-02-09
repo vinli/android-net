@@ -31,7 +31,7 @@ public class SignInActivity extends Activity {
       .addPathSegment("authorization")
       .addPathSegment("new")
       .addQueryParameter("response_type", "token")
-      .addQueryParameter("lang", Locale.getDefault().getLanguage())
+      .addQueryParameter("lang", getLang())
       .build();
 
   /*protected*/
@@ -140,9 +140,16 @@ public class SignInActivity extends Activity {
         .host("auth" + Endpoint.domain())
         .setQueryParameter("client_id", clientId)
         .setQueryParameter("redirect_uri", redirectUri)
+        .addQueryParameter("lang", getLang())
         .toString();
 
     Log.d("SignInActivity", "loading url: " + url);
     wv.loadUrl(url);
+  }
+
+  public static String getLang(){
+    String lang = Locale.getDefault().getLanguage();
+    if(lang != null && lang.length()==0) return "en";
+    return lang;
   }
 }
