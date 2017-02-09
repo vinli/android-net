@@ -148,8 +148,10 @@ public class SignInActivity extends Activity {
   }
 
   public static String getLocale(){
-    String lang = Locale.getDefault().toString();
-    if(lang != null && lang.length()==0) return "en-US";
-    return lang;
+    String l = Locale.getDefault().getLanguage();
+    if (l == null || l.length()== 0) return "en-US";
+    String c = Locale.getDefault().getCountry();
+    if (c == null || c.length() != 2) return "en-US";
+    return String.format(Locale.US, "%s-%s", l, c);
   }
 }
