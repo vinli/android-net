@@ -11,6 +11,7 @@ import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.Locale;
 import okhttp3.HttpUrl;
 //import com.squareup.okhttp.HttpUrl;
 
@@ -30,6 +31,7 @@ public class SignInActivity extends Activity {
       .addPathSegment("authorization")
       .addPathSegment("new")
       .addQueryParameter("response_type", "token")
+      .addQueryParameter("lang", Locale.getDefault().getLanguage())
       .build();
 
   /*protected*/
