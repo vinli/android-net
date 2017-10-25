@@ -4,54 +4,63 @@ import android.support.annotation.NonNull;
 
 import okhttp3.HttpUrl;
 
-/*package*/ enum Endpoint {
-  AUTH("auth"),
-  DIAGNOSTICS("diagnostic"),
-  EVENTS("events"),
-  PLATFORM("platform"),
-  RULES("rules"),
-  TELEMETRY("telemetry"),
-  TRIPS("trips"),
-  SAFETY("safety"),
-  BEHAVIORAL("behavioral"),
-  DISTANCE("distance"),
-  DUMMY("dummies");
+enum Endpoint {
+    AUTH("auth"),
+    DIAGNOSTICS("diagnostic"),
+    EVENTS("events"),
+    PLATFORM("platform"),
+    RULES("rules"),
+    TELEMETRY("telemetry"),
+    TRIPS("trips"),
+    SAFETY("safety"),
+    BEHAVIORAL("behavioral"),
+    DISTANCE("distance"),
+    DUMMY("dummies");
 
-  /*package*/ static final String DOMAIN_DEMO = "-demo.vin.li";
-  /*package*/ static final String DOMAIN_DEV = "-dev.vin.li";
-  /*package*/ static final String DOMAIN_PROD = ".vin.li";
-  /*package*/ static final String DOMAIN_QA = "-qa.vin.li";
+    static final String DOMAIN_QA = "-qa.";
+    static final String DOMAIN_DEV = "-dev.";
+    static final String DOMAIN_DEMO = "-demo.";
+    static final String DOMAIN_PROD = ".";
 
-  private static String domain = DOMAIN_PROD;
+    static private String host = "vin.li";
+    static private String domain = DOMAIN_PROD;
 
-  /*package*/ static synchronized String domain() {
-    return domain;
-  }
+    static synchronized String host() {
+        return host;
+    }
 
-  /*package*/ static synchronized void setDomain(@NonNull String domain) {
-    Endpoint.domain = domain;
-  }
+    static synchronized String domain() {
+        return domain;
+    }
 
-  private final HttpUrl mUrl;
-  private final String subDomain;
+    static synchronized void setHost(@NonNull String host) {
+        Endpoint.host = host;
+    }
 
-  private Endpoint(String subDomain) {
-    this.subDomain = subDomain;
-    mUrl = new HttpUrl.Builder()
-        .scheme("https")
-        .host(subDomain + domain())
-        .addPathSegment("api")
-        .addPathSegment("v1")
-        .addPathSegment("")
-        .build();
-  }
+    static synchronized void setDomain(@NonNull String domain) {
+        Endpoint.domain = domain;
+    }
 
-  public String getName() {
-    return this.name();
-  }
+    private final HttpUrl mUrl;
+    private final String subDomain;
 
-  public String getUrl() {
-    return mUrl.newBuilder().host(subDomain + domain()).toString();
-  }
+    Endpoint(String subDomain) {
+        this.subDomain = subDomain;
+        mUrl = new HttpUrl.Builder()
+                .scheme("https")
+                .host(subDomain + domain() + host())
+                .addPathSegment("api")
+                .addPathSegment("v1")
+                .addPathSegment("")
+                .build();
+    }
+
+    public String getName() {
+        return this.name();
+    }
+
+    public String getUrl() {
+        return mUrl.newBuilder().host(subDomain + domain()).toString();
+    }
 
 }
