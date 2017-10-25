@@ -25,12 +25,8 @@ enum Endpoint {
     static private String host = "vin.li";
     static private String domain = DOMAIN_PROD;
 
-    static synchronized String host() {
-        return host;
-    }
-
     static synchronized String domain() {
-        return domain;
+        return domain + host;
     }
 
     static synchronized void setHost(@NonNull String host) {
@@ -48,7 +44,7 @@ enum Endpoint {
         this.subDomain = subDomain;
         mUrl = new HttpUrl.Builder()
                 .scheme("https")
-                .host(subDomain + domain() + host())
+                .host(subDomain + domain())
                 .addPathSegment("api")
                 .addPathSegment("v1")
                 .addPathSegment("")
