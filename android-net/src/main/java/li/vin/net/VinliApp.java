@@ -3,10 +3,13 @@ package li.vin.net;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -78,19 +81,19 @@ public final class VinliApp {
   /*package*/ Observable<? extends Page<? extends VinliItem>> pagingPageObservable(
       Class itemClz, String link) {
     if (Device.class.equals(itemClz)) {
-       return mDevices.devicesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
+      return mDevices.devicesForUrl(link.replaceFirst(VinliEndpoint.PLATFORM.getUrl(), ""));
     }
     if (Dtc.Code.class.equals(itemClz)) {
-       return mDiagnostics.rawCodesForUrl(link.replaceFirst(Endpoint.DIAGNOSTICS.getUrl(), ""));
+      return mDiagnostics.rawCodesForUrl(link.replaceFirst(VinliEndpoint.DIAGNOSTICS.getUrl(), ""));
     }
     if (Rule.class.equals(itemClz)) {
-       return mRules.rulesForUrl(link.replaceFirst(Endpoint.RULES.getUrl(), ""));
+      return mRules.rulesForUrl(link.replaceFirst(VinliEndpoint.RULES.getUrl(), ""));
     }
     if (Subscription.class.equals(itemClz)) {
-       return mSubscriptions.subscriptionsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
+      return mSubscriptions.subscriptionsForUrl(link.replaceFirst(VinliEndpoint.EVENTS.getUrl(), ""));
     }
     if (Vehicle.class.equals(itemClz)) {
-       return mVehicles.vehiclesForUrl(link.replaceFirst(Endpoint.PLATFORM.getUrl(), ""));
+      return mVehicles.vehiclesForUrl(link.replaceFirst(VinliEndpoint.PLATFORM.getUrl(), ""));
     }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
@@ -99,40 +102,40 @@ public final class VinliApp {
   /*package*/ Observable<? extends TimeSeries<? extends VinliItem>> pagingTsObservable(
       Class itemClz, String link) {
     if (Message.class.equals(itemClz)) {
-      return mMessages.messagesForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
+      return mMessages.messagesForUrl(link.replaceFirst(VinliEndpoint.TELEMETRY.getUrl(), ""));
     }
     if (Snapshot.class.equals(itemClz)) {
-      return mSnapshots.snapshotsForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
+      return mSnapshots.snapshotsForUrl(link.replaceFirst(VinliEndpoint.TELEMETRY.getUrl(), ""));
     }
     if (Location.LocationTimeSeriesAdapter.class.equals(itemClz)) {
-      return mLocations.locationsForUrl(link.replaceFirst(Endpoint.TELEMETRY.getUrl(), ""));
+      return mLocations.locationsForUrl(link.replaceFirst(VinliEndpoint.TELEMETRY.getUrl(), ""));
     }
     if (Collision.class.equals(itemClz)) {
-      return mCollisions.collisionsForUrl(link.replaceFirst(Endpoint.SAFETY.getUrl(), ""));
+      return mCollisions.collisionsForUrl(link.replaceFirst(VinliEndpoint.SAFETY.getUrl(), ""));
     }
     if (Dtc.class.equals(itemClz)) {
-      return mDiagnostics.codesForUrl(link.replaceFirst(Endpoint.DIAGNOSTICS.getUrl(), ""));
+      return mDiagnostics.codesForUrl(link.replaceFirst(VinliEndpoint.DIAGNOSTICS.getUrl(), ""));
     }
     if (Odometer.class.equals(itemClz)) {
-      return mDistances.odometerReportsForUrl(link.replaceFirst(Endpoint.DISTANCE.getUrl(), ""));
+      return mDistances.odometerReportsForUrl(link.replaceFirst(VinliEndpoint.DISTANCE.getUrl(), ""));
     }
     if (OdometerTrigger.class.equals(itemClz)) {
-      return mDistances.odometerTriggersForUrl(link.replaceFirst(Endpoint.DISTANCE.getUrl(), ""));
+      return mDistances.odometerTriggersForUrl(link.replaceFirst(VinliEndpoint.DISTANCE.getUrl(), ""));
     }
     if (Event.class.equals(itemClz)) {
-      return mEvents.eventsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
+      return mEvents.eventsForUrl(link.replaceFirst(VinliEndpoint.EVENTS.getUrl(), ""));
     }
     if (Notification.class.equals(itemClz)) {
-      return mNotifications.notificationsForUrl(link.replaceFirst(Endpoint.EVENTS.getUrl(), ""));
+      return mNotifications.notificationsForUrl(link.replaceFirst(VinliEndpoint.EVENTS.getUrl(), ""));
     }
     if (ReportCard.class.equals(itemClz)) {
-      return mReportCards.reportCardsForUrl(link.replaceFirst(Endpoint.BEHAVIORAL.getUrl(), ""));
+      return mReportCards.reportCardsForUrl(link.replaceFirst(VinliEndpoint.BEHAVIORAL.getUrl(), ""));
     }
     if (Trip.class.equals(itemClz)) {
-      return mTrips.tripsForUrl(link.replaceFirst(Endpoint.TRIPS.getUrl(), ""));
+      return mTrips.tripsForUrl(link.replaceFirst(VinliEndpoint.TRIPS.getUrl(), ""));
     }
     if (Dummy.class.equals(itemClz)) {
-      return mDummies.dummiesForUrl(link.replaceFirst(Endpoint.DUMMY.getUrl(), ""));
+      return mDummies.dummiesForUrl(link.replaceFirst(VinliEndpoint.DUMMY.getUrl(), ""));
     }
     throw new RuntimeException(String.format(
         "no paging observable for %s : %s", link, itemClz.getSimpleName()));
@@ -163,7 +166,7 @@ public final class VinliApp {
     RxJavaCallAdapterFactory rxJavaCallAdapterFactory =
         RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io());
 
-    final Retrofit platformAdapter = new Retrofit.Builder().baseUrl(Endpoint.PLATFORM.getUrl())
+    final Retrofit platformAdapter = new Retrofit.Builder().baseUrl(VinliEndpoint.PLATFORM.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -172,21 +175,21 @@ public final class VinliApp {
     mDevices = platformAdapter.create(Devices.class);
     mVehicles = platformAdapter.create(Vehicles.class);
 
-    mDiagnostics = new Retrofit.Builder().baseUrl(Endpoint.DIAGNOSTICS.getUrl())
+    mDiagnostics = new Retrofit.Builder().baseUrl(VinliEndpoint.DIAGNOSTICS.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Diagnostics.class);
 
-    mRules = new Retrofit.Builder().baseUrl(Endpoint.RULES.getUrl())
+    mRules = new Retrofit.Builder().baseUrl(VinliEndpoint.RULES.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Rules.class);
 
-    final Retrofit eventsAdapter = new Retrofit.Builder().baseUrl(Endpoint.EVENTS.getUrl())
+    final Retrofit eventsAdapter = new Retrofit.Builder().baseUrl(VinliEndpoint.EVENTS.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -196,7 +199,7 @@ public final class VinliApp {
     mSubscriptions = eventsAdapter.create(Subscriptions.class);
     mNotifications = eventsAdapter.create(Notifications.class);
 
-    final Retrofit telemAdapter = new Retrofit.Builder().baseUrl(Endpoint.TELEMETRY.getUrl())
+    final Retrofit telemAdapter = new Retrofit.Builder().baseUrl(VinliEndpoint.TELEMETRY.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -206,21 +209,21 @@ public final class VinliApp {
     mSnapshots = telemAdapter.create(Snapshots.class);
     mMessages = telemAdapter.create(Messages.class);
 
-    mUsers = new Retrofit.Builder().baseUrl(Endpoint.AUTH.getUrl())
+    mUsers = new Retrofit.Builder().baseUrl(VinliEndpoint.AUTH.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Users.class);
 
-    mTrips = new Retrofit.Builder().baseUrl(Endpoint.TRIPS.getUrl())
+    mTrips = new Retrofit.Builder().baseUrl(VinliEndpoint.TRIPS.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
         .build()
         .create(Trips.class);
 
-    mDistances = new Retrofit.Builder().baseUrl(Endpoint.DISTANCE.getUrl())
+    mDistances = new Retrofit.Builder().baseUrl(VinliEndpoint.DISTANCE.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -228,7 +231,7 @@ public final class VinliApp {
         .create(Distances.class);
 
     mCollisions = new Retrofit.Builder()
-        .baseUrl(Endpoint.SAFETY.getUrl())
+            .baseUrl(VinliEndpoint.SAFETY.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -236,7 +239,7 @@ public final class VinliApp {
         .create(Collisions.class);
 
     mReportCards = new Retrofit.Builder()
-        .baseUrl(Endpoint.BEHAVIORAL.getUrl())
+            .baseUrl(VinliEndpoint.BEHAVIORAL.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)
@@ -244,7 +247,7 @@ public final class VinliApp {
         .create(ReportCards.class);
 
     mDummies = new Retrofit.Builder()
-        .baseUrl(Endpoint.DUMMY.getUrl())
+            .baseUrl(VinliEndpoint.DUMMY.getUrl())
         .client(client)
         .addConverterFactory(gsonConverterFactory)
         .addCallAdapterFactory(rxJavaCallAdapterFactory)

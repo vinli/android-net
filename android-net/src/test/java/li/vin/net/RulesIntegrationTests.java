@@ -1,13 +1,15 @@
 package li.vin.net;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
@@ -466,7 +468,7 @@ public class RulesIntegrationTests {
 
     vinliApp.rules()
         .rulesForUrl(
-            String.format("%sdevices/%s/rules", Endpoint.RULES.getUrl(), TestHelper.getDeviceId()))
+                String.format("%sdevices/%s/rules", VinliEndpoint.RULES.getUrl(), TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<Page<Rule>>() {
           @Override public void onCompleted() {

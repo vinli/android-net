@@ -217,7 +217,7 @@ public class EventsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.events()
-        .eventsForUrl(String.format("%sdevices/%s/events", Endpoint.EVENTS.getUrl(),
+            .eventsForUrl(String.format("%sdevices/%s/events", VinliEndpoint.EVENTS.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Event>>() {

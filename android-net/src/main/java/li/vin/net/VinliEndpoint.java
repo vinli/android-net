@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import okhttp3.HttpUrl;
 
-enum Endpoint {
+public enum VinliEndpoint {
     AUTH("auth"),
     DIAGNOSTICS("diagnostic"),
     EVENTS("events"),
@@ -30,17 +30,17 @@ enum Endpoint {
     }
 
     static synchronized void setHost(@NonNull String host) {
-        Endpoint.host = host;
+        VinliEndpoint.host = host;
     }
 
     static synchronized void setDomain(@NonNull String domain) {
-        Endpoint.domain = domain;
+        VinliEndpoint.domain = domain;
     }
 
     private final HttpUrl mUrl;
     private final String subDomain;
 
-    Endpoint(String subDomain) {
+    VinliEndpoint(String subDomain) {
         this.subDomain = subDomain;
         mUrl = new HttpUrl.Builder()
                 .scheme("https")

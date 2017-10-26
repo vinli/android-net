@@ -1,8 +1,6 @@
 package li.vin.net;
 
 
-import javax.net.ssl.SSLSocketFactory;
-import okhttp3.OkHttpClient;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
 import java.security.cert.CertificateException;
@@ -10,8 +8,11 @@ import java.security.cert.CertificateException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import okhttp3.OkHttpClient;
 
 
 public class TestHelper {
@@ -23,7 +24,7 @@ public class TestHelper {
     if(vinliApp == null){
       VinliApp.clientBuilder = generateUnsafeBuilder();
 
-      Endpoint.setDomain(Endpoint.DOMAIN_DEV);
+        VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_DEV);
       FakeHttp.getFakeHttpLayer().interceptHttpRequests(false);
 
       vinliApp = new VinliApp(getAccessToken());
@@ -37,7 +38,7 @@ public class TestHelper {
     if(vehicleVinliApp == null){
       VinliApp.clientBuilder = generateUnsafeBuilder();
 
-      Endpoint.setDomain(Endpoint.DOMAIN_DEV);
+        VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_DEV);
       FakeHttp.getFakeHttpLayer().interceptHttpRequests(false);
 
       vehicleVinliApp = new VinliApp(getVehicleAccessToken());

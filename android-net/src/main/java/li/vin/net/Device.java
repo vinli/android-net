@@ -198,7 +198,7 @@ public abstract class Device implements VinliItem {
             cleanup.run();
 
             WebSocketCall call = WebSocketCall.create(new OkHttpClient(), new Request.Builder() //
-                    .url(String.format("wss://stream%s/api/v1/messages?token=%s", Endpoint.domain(), token)) //
+                    .url(String.format("wss://stream%s/api/v1/messages?token=%s", VinliEndpoint.domain(), token)) //
                 .addHeader("Accept", "application/json") //
                 .addHeader("Content-Type", "application/json") //
                 .build());

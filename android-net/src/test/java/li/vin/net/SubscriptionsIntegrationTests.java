@@ -268,7 +268,7 @@ public class SubscriptionsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.subscriptions()
-        .subscriptionsForUrl(String.format("%sdevices/%s/subscriptions", Endpoint.EVENTS.getUrl(),
+            .subscriptionsForUrl(String.format("%sdevices/%s/subscriptions", VinliEndpoint.EVENTS.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<Page<Subscription>>() {
