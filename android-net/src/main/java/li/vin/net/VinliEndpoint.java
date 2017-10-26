@@ -29,11 +29,11 @@ public enum VinliEndpoint {
         return domain + host;
     }
 
-    static synchronized void setHost(@NonNull String host) {
+    public static synchronized void setHost(@NonNull String host) {
         VinliEndpoint.host = host;
     }
 
-    static synchronized void setDomain(@NonNull String domain) {
+    public static synchronized void setDomain(@NonNull String domain) {
         VinliEndpoint.domain = domain;
     }
 
