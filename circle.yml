@@ -99,7 +99,7 @@ jobs:
     #     background: true
     # - run: circle-android wait-for-boot
     #  This is based on your 1.0 configuration file or project settings
-    - run: export TERM=${TERM:-dumb} && ./gradlew clean build
+    - run: export TERM=${TERM:-dumb}
     - run: .build/android-net/test.sh
     # This is based on your 1.0 configuration file or project settings
 
