@@ -100,21 +100,9 @@ jobs:
     # - run: circle-android wait-for-boot
     #  This is based on your 1.0 configuration file or project settings
     # - run: .build/android-net/test.sh
-
     
     # This is based on your 1.0 configuration file or project settings
 
-
-    # - run:
-    #     name: Download Dependencies
-    #     command: ./gradlew androidDependencies
-
-    # - run:
-    #     name: Run Tests
-    #     command: ./gradlew lint test
-
-    - run: ./gradlew clean testDebug -PdisablePreDex
-    - run: .build/android-net/posttest.sh
     # Teardown
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
     # Save test results
