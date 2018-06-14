@@ -33,6 +33,8 @@ jobs:
   build:
     parallelism: 1
     shell: /bin/bash --login
+    docker:
+    - image: circleci/android:api-24-alpha
     # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
     # If any of these refer to each other, rewrite them so that they don't or see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables .
     environment:
@@ -48,9 +50,7 @@ jobs:
     # VM instead of a container) see https://circleci.com/docs/2.0/executor-types/
     # To see the list of pre-built images that CircleCI provides for most common languages see
     # https://circleci.com/docs/2.0/circleci-images/
-    docker:
-    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
-      command: /sbin/init
+    
     steps:
     # Machine Setup
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
@@ -90,16 +90,17 @@ jobs:
         - ~/.gradle
         - ~/.cache/bower
     # Test
-    #   This would typically be a build job when using workflows, possibly combined with build
-    # This is based on your 1.0 configuration file or project settings
-    - run: mksdcard -l e 512M mysdcard.img
-    - run:
-        command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
-        background: true
-    - run: circle-android wait-for-boot
-    # This is based on your 1.0 configuration file or project settings
+
+    # Circle 2 currently does not support emulator testing, https://support.circleci.com/hc/en-us/articles/360000028928-Testing-with-Android-emulator-on-CircleCI-2-0
+    # - run: mksdcard -l e 512M mysdcard.img
+    # - run:
+    #     command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
+    #     background: true
+    # - run: circle-android wait-for-boot
+    # # This is based on your 1.0 configuration file or project settings
     - run: .build/android-net/test.sh
     # This is based on your 1.0 configuration file or project settings
+
     - run: .build/android-net/posttest.sh
     # Teardown
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
