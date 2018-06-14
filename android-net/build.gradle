@@ -1,6 +1,6 @@
 def integrationPropertiesFile = file("integration.properties");
-def integrationProperties = new Properties();
-integrationProperties.load(new FileInputStream(integrationPropertiesFile));
+ def integrationProperties = new Properties();
+ integrationProperties.load(new FileInputStream(integrationPropertiesFile));
 
 buildscript {
     repositories {
