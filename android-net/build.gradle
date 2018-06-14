@@ -1,4 +1,4 @@
-def integrationPropertiesFile = rootProject.file("android-net/integration.properties");
+def integrationPropertiesFile = file("integration.properties");
 def integrationProperties = new Properties();
 integrationProperties.load(new FileInputStream(integrationPropertiesFile));
 
