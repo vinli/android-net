@@ -97,11 +97,20 @@ jobs:
     # - run:
     #     command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
     #     background: true
-    - run: circle-android wait-for-boot
+    # - run: circle-android wait-for-boot
     #  This is based on your 1.0 configuration file or project settings
     - run: export TERM=${TERM:-dumb} && ./gradlew clean build
-    - run: .build/android-net/test.sh
+    # - run: .build/android-net/test.sh
     # This is based on your 1.0 configuration file or project settings
+
+
+    - run:
+        name: Download Dependencies
+        command: ./gradlew androidDependencies
+
+    - run:
+        name: Run Tests
+        command: ./gradlew lint test
 
     - run: .build/android-net/posttest.sh
     # Teardown
