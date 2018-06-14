@@ -100,17 +100,17 @@ jobs:
     # - run: circle-android wait-for-boot
     #  This is based on your 1.0 configuration file or project settings
     - run: export TERM=${TERM:-dumb} && ./gradlew clean build
-    # - run: .build/android-net/test.sh
-    # This is based on your 1.0 configuration file or project settings
+    - run: .build/android-net/test.sh
+    This is based on your 1.0 configuration file or project settings
 
 
-    - run:
-        name: Download Dependencies
-        command: ./gradlew androidDependencies
+    # - run:
+    #     name: Download Dependencies
+    #     command: ./gradlew androidDependencies
 
-    - run:
-        name: Run Tests
-        command: ./gradlew lint test
+    # - run:
+    #     name: Run Tests
+    #     command: ./gradlew lint test
 
     - run: .build/android-net/posttest.sh
     # Teardown
