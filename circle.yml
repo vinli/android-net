@@ -63,51 +63,23 @@ jobs:
     # Dependencies
     #   This would typically go in either a build or a build-and-test job when using workflows
     # Restore the dependency cache
-    - restore_cache:
-        keys:
-        # This branch if available
-        - v1-dep-{{ .Branch }}-
-        # Default branch if not
-        - v1-dep-master-
-        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-        - v1-dep-
     # This is based on your 1.0 configuration file or project settings
     - run: git clone git@github.com:vinli/build.git .build
     # This is based on your 1.0 configuration file or project settings
     - run: .build/android-net/pretest.sh
-    # Save dependency cache
-    - save_cache:
-        key: v1-dep-{{ .Branch }}-{{ epoch }}
-        paths:
-        # This is a broad list of cache paths to include many possible development environments
-        # You can probably delete some of these entries
-        - vendor/bundle
-        - ~/virtualenvs
-        - ~/.m2
-        - ~/.ivy2
-        - ~/.bundle
-        - ~/.go_workspace
-        - ~/.gradle
-        - ~/.cache/bower
-    # Test
-    #   This would typically be a build job when using workflows, possibly combined with build
-    # This is based on your 1.0 configuration file or project settings
-    - run: mksdcard -l e 512M mysdcard.img
+
     - run:
-        command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
-        background: true
-    - run: circle-android wait-for-boot
-    # This is based on your 1.0 configuration file or project settings
-    - run: .build/android-net/test.sh
-    # This is based on your 1.0 configuration file or project settings
-    - run: .build/android-net/posttest.sh
-    # Teardown
-    #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
-    # Save test results
-    - store_test_results:
-        path: /tmp/circleci-test-results
-    # Save artifacts
-    - store_artifacts:
-        path: /tmp/circleci-artifacts
-    - store_artifacts:
-        path: /tmp/circleci-test-results
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "android-net/build.gradle" }}
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: android-net/build/reports
+          destination: reports
+      - store_test_results:
+          path: android-net/build/test-results    
