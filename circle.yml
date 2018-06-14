@@ -50,7 +50,7 @@ jobs:
     # https://circleci.com/docs/2.0/circleci-images/
     docker:
     - image: circleci/android:api-24-alpha
-    
+
     steps:
     # Machine Setup
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
@@ -92,9 +92,9 @@ jobs:
     # Test
     #   This would typically be a build job when using workflows, possibly combined with build
     # This is based on your 1.0 configuration file or project settings
-    - run: mksdcard -l e 512M mysdcard.img
+    # - run: mksdcard -l e 512M mysdcard.img
     - run:
-        command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
+        command: emulator -avd circleci-android22 -no-audio -no-window
         background: true
     - run: circle-android wait-for-boot
     # This is based on your 1.0 configuration file or project settings
