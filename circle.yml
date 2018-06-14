@@ -93,10 +93,10 @@ jobs:
 
     # ******** Circle 2 currently does not support emulator testing, see more at link below: **********************
     # https://support.circleci.com/hc/en-us/articles/360000028928-Testing-with-Android-emulator-on-CircleCI-2-0
-    - run: mksdcard -l e 512M mysdcard.img
-    - run:
-        command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
-        background: true
+    # - run: mksdcard -l e 512M mysdcard.img
+    # - run:
+    #     command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
+    #     background: true
     - run: circle-android wait-for-boot
     #  This is based on your 1.0 configuration file or project settings
     - run: export TERM=${TERM:-dumb} && ./gradlew clean build
