@@ -102,7 +102,7 @@ jobs:
     # - run: .build/android-net/test.sh
     # This is based on your 1.0 configuration file or project settings
 
-    - run: .build/android-net/posttest.sh
+    # - run: .build/android-net/posttest.sh
     # Teardown
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
     # Save test results
