@@ -156,7 +156,7 @@ public class VehiclesIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.vehicles()
-        .vehiclesForUrl(String.format("%sdevices/%s/vehicles", Endpoint.PLATFORM.getUrl(),
+            .vehiclesForUrl(String.format("%sdevices/%s/vehicles", VinliEndpoint.PLATFORM.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<Page<Vehicle>>() {

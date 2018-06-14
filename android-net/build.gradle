@@ -1,6 +1,6 @@
-def integrationPropertiesFile = rootProject.file("android-net/integration.properties");
-def integrationProperties = new Properties();
-integrationProperties.load(new FileInputStream(integrationPropertiesFile));
+def integrationPropertiesFile = file("integration.properties");
+ def integrationProperties = new Properties();
+ integrationProperties.load(new FileInputStream(integrationPropertiesFile));
 
 buildscript {
     repositories {
@@ -22,10 +22,10 @@ apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion '24.0.2'
 
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -98,10 +98,4 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-}
-
-apply from: file('../gradle/mavenize.gradle')
-
-if(!integrationProperties['CI_ENV']) {
-    apply from: file('../gradle/bintray-upload.gradle')
 }

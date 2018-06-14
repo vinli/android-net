@@ -158,7 +158,7 @@ public class CollisionsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.collisions()
-        .collisionsForUrl(String.format("%sdevices/%s/collisions", Endpoint.SAFETY.getUrl(),
+            .collisionsForUrl(String.format("%sdevices/%s/collisions", VinliEndpoint.SAFETY.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Collision>>() {

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
 import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
@@ -142,7 +143,7 @@ public class NotificationsIntegrationTests {
     assertTrue(TestHelper.getEventId() != null);
 
     vinliApp.notifications()
-        .notificationsForUrl(String.format("%sevents/%s/notifications", Endpoint.EVENTS.getUrl(),
+            .notificationsForUrl(String.format("%sevents/%s/notifications", VinliEndpoint.EVENTS.getUrl(),
             TestHelper.getEventId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Notification>>() {

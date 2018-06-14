@@ -1,12 +1,14 @@
 package li.vin.net;
 
 import java.security.cert.CertificateException;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import okhttp3.OkHttpClient;
 
 /**
@@ -21,7 +23,7 @@ public class InstTestHelper {
     if (vinliApp == null) {
       VinliApp.clientBuilder = generateUnsafeBuilder();
 
-      Endpoint.setDomain(Endpoint.DOMAIN_DEV);
+        VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_DEV);
 
       vinliApp = new VinliApp(getAccessToken());
       Vinli.setCurrentApp(vinliApp);

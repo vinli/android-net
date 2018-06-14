@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
 import rx.Subscriber;
 
 import static junit.framework.Assert.assertTrue;
@@ -182,7 +183,7 @@ public class ReportCardsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.reportCards()
-        .reportCardsForUrl(String.format("%sdevices/%s/report_cards", Endpoint.BEHAVIORAL.getUrl(),
+            .reportCardsForUrl(String.format("%sdevices/%s/report_cards", VinliEndpoint.BEHAVIORAL.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<ReportCard>>() {

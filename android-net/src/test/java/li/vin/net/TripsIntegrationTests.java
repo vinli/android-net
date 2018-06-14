@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
 import rx.Subscriber;
 
 import static java.lang.System.currentTimeMillis;
@@ -199,7 +200,7 @@ public class TripsIntegrationTests {
 
     vinliApp.trips()
         .tripsForUrl(
-            String.format("%sdevices/%s/trips", Endpoint.TRIPS.getUrl(), TestHelper.getDeviceId()))
+                String.format("%sdevices/%s/trips", VinliEndpoint.TRIPS.getUrl(), TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Trip>>() {
               @Override public void onCompleted() {

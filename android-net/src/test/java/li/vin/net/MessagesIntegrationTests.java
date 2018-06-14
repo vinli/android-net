@@ -249,7 +249,7 @@ public class MessagesIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.messages()
-        .messagesForUrl(String.format("%sdevices/%s/messages", Endpoint.TELEMETRY.getUrl(),
+            .messagesForUrl(String.format("%sdevices/%s/messages", VinliEndpoint.TELEMETRY.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Message>>() {

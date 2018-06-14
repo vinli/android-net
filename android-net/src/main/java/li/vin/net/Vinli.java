@@ -123,15 +123,15 @@ public final class Vinli {
   }
 
   private static void setEnvironmentToDev() {
-    Endpoint.setDomain(Endpoint.DOMAIN_DEV);
+    VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_DEV);
   }
 
   private static void setEnvironmentToDemo() {
-    Endpoint.setDomain(Endpoint.DOMAIN_DEMO);
+    VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_DEMO);
   }
 
   private static void setEnvironmentToQA() {
-    Endpoint.setDomain(Endpoint.DOMAIN_QA);
+    VinliEndpoint.setDomain(VinliEndpoint.DOMAIN_QA);
   }
 
   private Vinli() { }

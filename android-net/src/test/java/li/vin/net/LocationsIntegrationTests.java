@@ -228,7 +228,7 @@ public class LocationsIntegrationTests {
     assertTrue(TestHelper.getDeviceId() != null);
 
     vinliApp.locations()
-        .locationsForUrl(String.format("%sdevices/%s/locations", Endpoint.TELEMETRY.getUrl(),
+            .locationsForUrl(String.format("%sdevices/%s/locations", VinliEndpoint.TELEMETRY.getUrl(),
             TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Location>>() {

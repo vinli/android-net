@@ -98,7 +98,7 @@ public class DevicesIntegrationTests {
 
   @Test
   public void testGetDevicesByUrl(){
-    vinliApp.devicesSvc().devicesForUrl(String.format("%sdevices", Endpoint.PLATFORM.getUrl()))
+      vinliApp.devicesSvc().devicesForUrl(String.format("%sdevices", VinliEndpoint.PLATFORM.getUrl()))
         .toBlocking().subscribe(new Subscriber<Page<Device>>() {
       @Override
       public void onCompleted() {

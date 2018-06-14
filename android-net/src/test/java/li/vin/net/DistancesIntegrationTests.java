@@ -1,11 +1,12 @@
 package li.vin.net;
 
-import li.vin.net.DistanceList.Distance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import li.vin.net.DistanceList.Distance;
 import rx.Observer;
 import rx.Subscriber;
 
@@ -178,7 +179,7 @@ public class DistancesIntegrationTests {
         assertTrue(odometer.reading() != null);
 
         vinliApp.distances().odometerReportsForUrl(String.format(
-            "%svehicles/%s/odometers", Endpoint.DISTANCE.getUrl(), TestHelper.getVehicleId()))
+                "%svehicles/%s/odometers", VinliEndpoint.DISTANCE.getUrl(), TestHelper.getVehicleId()))
             .toBlocking().subscribe(new Subscriber<TimeSeries<Odometer>>() {
           @Override public void onCompleted() {
 
@@ -430,7 +431,7 @@ public class DistancesIntegrationTests {
 
     vinliApp.distances()
         .odometerTriggersForUrl(
-            String.format("%svehicles/%s/odometer_triggers", Endpoint.DISTANCE.getUrl(),
+                String.format("%svehicles/%s/odometer_triggers", VinliEndpoint.DISTANCE.getUrl(),
                 TestHelper.getVehicleId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<OdometerTrigger>>() {

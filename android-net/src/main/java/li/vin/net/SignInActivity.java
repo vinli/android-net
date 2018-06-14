@@ -25,7 +25,7 @@ public class SignInActivity extends Activity {
   private static final String ACTION_APPROVED = "li.vin.net.signIn.APPROVED";
 
   private static final HttpUrl OAUTH_ENPOINT = new HttpUrl.Builder().scheme("https")
-      .host("auth" + Endpoint.domain())
+          .host("auth" + VinliEndpoint.domain())
       .addPathSegment("oauth")
       .addPathSegment("authorization")
       .addPathSegment("new")
@@ -135,7 +135,7 @@ public class SignInActivity extends Activity {
     });
 
     final String url = OAUTH_ENPOINT.newBuilder()
-        .host("auth" + Endpoint.domain())
+            .host("auth" + VinliEndpoint.domain())
         .setQueryParameter("client_id", clientId)
         .setQueryParameter("redirect_uri", redirectUri)
         .toString();

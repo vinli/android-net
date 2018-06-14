@@ -195,7 +195,7 @@ public class SnapshotsIntegrationTests {
 
     vinliApp.snapshots()
         .snapshotsForUrl(
-            String.format("%sdevices/%s/snapshots?fields=vehicleSpeed", Endpoint.TELEMETRY.getUrl(),
+                String.format("%sdevices/%s/snapshots?fields=vehicleSpeed", VinliEndpoint.TELEMETRY.getUrl(),
                 TestHelper.getDeviceId()))
         .toBlocking()
         .subscribe(new Subscriber<TimeSeries<Snapshot>>() {
