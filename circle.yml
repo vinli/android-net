@@ -98,27 +98,14 @@ jobs:
     #     command: emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
     #     background: true
     # - run: circle-android wait-for-boot
-    # # This is based on your 1.0 configuration file or project settings
-    # - run: .build/android-net/test.sh
+    #  This is based on your 1.0 configuration file or project settings
+    - run: export TERM=${TERM:-dumb} && ./gradlew clean build
+    - run: .build/android-net/test.sh
     # This is based on your 1.0 configuration file or project settings
 
-    # - run: .build/android-net/posttest.sh
+    - run: .build/android-net/posttest.sh
     # Teardown
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
-
-
-    - run:
-            name: Download Dependencies
-            command: ./gradlew androidDependencies
-        - save_cache:
-            paths:
-              - ~/.gradle
-            key: jars-{{ checksum "build.gradle" }}-{{ checksum  "android-net/build.gradle" }}
-    - run:
-        name: Run Tests
-        command: ./gradlew lint test
-
-
     # Save test results
     - store_test_results:
         path: /tmp/circleci-test-results
