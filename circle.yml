@@ -105,6 +105,20 @@ jobs:
     # - run: .build/android-net/posttest.sh
     # Teardown
     #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
+
+
+    - run:
+            name: Download Dependencies
+            command: ./gradlew androidDependencies
+        - save_cache:
+            paths:
+              - ~/.gradle
+            key: jars-{{ checksum "build.gradle" }}-{{ checksum  "android-net/build.gradle" }}
+        - run:
+            name: Run Tests
+            command: ./gradlew lint test
+
+
     # Save test results
     - store_test_results:
         path: /tmp/circleci-test-results
