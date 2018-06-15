@@ -1,6 +1,6 @@
 def integrationPropertiesFile = file("integration.properties");
- def integrationProperties = new Properties();
- integrationProperties.load(new FileInputStream(integrationPropertiesFile));
+def integrationProperties = new Properties();
+integrationProperties.load(new FileInputStream(integrationPropertiesFile));
 
 buildscript {
     repositories {
@@ -18,6 +18,8 @@ version = project.property('vinli.version')
 apply plugin: 'com.android.library'
 apply from: file('../gradle/checkstyle.gradle')
 apply from: file('../gradle/javadoc.gradle')
+apply from: file('../gradle/bintray-upload.gradle')
+apply from: file('../gradle/mavenize.gradle')
 apply plugin: 'android-apt'
 
 android {

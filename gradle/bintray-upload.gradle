@@ -1,5 +1,10 @@
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
+android {
+    compileSdkVersion 24
+    buildToolsVersion '24.0.2'
+}
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -29,13 +34,72 @@ artifacts {
     archives sourcesJar
 }
 
+// Maven
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging project.hasProperty('vinli.packaging') \
+                ? project.property('vinli.packaging') \
+                : 'aar'
+            groupId project.property('vinli.groupId')
+            artifactId project.property('vinli.artifactId')
+            version project.property('vinli.version')
+
+            name project.property('vinli.name')
+            description project.property('vinli.desc')
+            url "https://github.com/vinli/${project.property('vinli.githubRepo')}"
+
+            scm {
+                url "https://github.com/vinli/${project.property('vinli.githubRepo')}"
+                connection "scm:git:git://github.com/vinli/${project.property('vinli.githubRepo')}.git"
+                developerConnection "scm:git:ssh://git@github.com/vinli/${project.property('vinli.githubRepo')}.git"
+                tag project.property('vinli.version')
+            }
+
+            issueManagement {
+                system 'GitHub Issues'
+                url "https://github.com/vinli/${project.property('vinli.githubRepo')}/issues"
+            }
+
+            licenses {
+                license {
+                    name 'MIT'
+                    url 'http://opensource.org/licenses/MIT'
+                }
+            }
+
+            organization {
+                name 'Vinli, Inc.'
+                url 'https://vin.li'
+            }
+
+            developers {
+                developer {
+                    id 'kturney'
+                    name 'Kyle Turney'
+                }
+                developer {
+                    id 'cmc5788'
+                    name 'Christopher Casey'
+                }
+            }
+        }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.artifactId = project.property('vinli.artifactId')
+    }
+}
+
 // Bintray
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 bintray {
     user = properties.getProperty('bintray.user')
-    key = properties.getProperty('bintray.apikey')
+    key = properties.getProperty('bintray.apiKey')
 
     configurations = ['archives']
 
